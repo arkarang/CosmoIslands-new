@@ -6,7 +6,7 @@ import com.minepalm.arkarangutils.bukkit.SimpleConfig;
 import com.minepalm.helloteleport.LocationData;
 import kr.cosmoisland.cosmoislands.api.AbstractLocation;
 import kr.cosmoisland.cosmoislands.api.protection.IslandPermissions;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
 import kr.cosmoisland.cosmoislands.api.player.MemberRank;
 import lombok.Getter;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;

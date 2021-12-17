@@ -9,6 +9,7 @@ import kr.cosmoisland.cosmoislands.api.player.MemberRank;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.bukkit.World;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -24,6 +25,9 @@ public class IslandPreconditions {
         @Getter
         @Setter
         private IslandPlayerRegistry playerRegistry;
+        @Getter
+        @Setter
+        private IslandRegistry islandRegistry;
 
         IslandPreconditions build(Island island){
             return new IslandPreconditions(playerRegistry, island);
@@ -71,5 +75,21 @@ public class IslandPreconditions {
             throw new NullPointerException("could not found player registry");
         }
         return factory.build(island);
+    }
+
+    public static IslandPreconditions of(World world){
+        if(world == null){
+            throw new IllegalArgumentException("world is null");
+        }
+        try {
+            int id = Integer.parseInt(world.getName().substring(7));
+            Island island = factory.getIslandRegistry().getIsland(id);
+            if (island == null) {
+                throw new IllegalArgumentException("island "+id+" is not exist");
+            }
+            return of(island);
+        }catch (NumberFormatException | IndexOutOfBoundsException e){
+            throw new IllegalArgumentException("this world is not island world");
+        }
     }
 }

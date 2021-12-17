@@ -1,11 +1,9 @@
 package kr.cosmoislands.cosmoislands.bukkit.settings;
 
-import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
-import com.minepalm.arkarangutils.bukkit.ItemStackBuilder;
-import com.minepalm.arkarangutils.bukkit.Pair;
-import com.minepalm.arkarangutils.bukkit.SimpleGUI;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettings;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettingsMap;
+import com.minepalm.arkarangutils.bukkit.*;
+import kr.cosmoisland.cosmoislands.api.Island;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoisland.cosmoislands.bukkit.CosmoIslandsBukkitBootstrap;
 import kr.cosmoisland.cosmoislands.bukkit.island.IslandLocal;
 import org.bukkit.Bukkit;
@@ -20,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class SettingGUI extends ArkarangGUI {
@@ -37,8 +36,15 @@ public class SettingGUI extends ArkarangGUI {
         biome = new ItemStackBuilder(new ItemStack(Material.GRASS)).setName("§f§l[§2§l섬 바이옴 §f§l]").getHandle();
     }
 
-    public SettingGUI(IslandLocal island) {
+    final Island island;
+    final IslandSettingsMap settings;
+    final BukkitExecutor executor;
+
+    public SettingGUI(Island island, BukkitExecutor executor) {
         super(3, "§f§l[§7§l섬 관리 §f§l]");
+        this.island = island;
+        this.settings = island.getComponent(IslandSettingsMap.class);
+        this.executor = executor;
         for(int i = 0; i < 3; i++){
             for(int j = 0 ; j < 9 ; j ++){
                 inv.setItem(i*9+j, glass[i]);
@@ -49,21 +55,12 @@ public class SettingGUI extends ArkarangGUI {
         inv.setItem(12, weather);
         inv.setItem(14, time);
 
-        final IslandSettingsMap settings;
-        try {
-            settings = island.getSettings().get();
-        }catch (ExecutionException | InterruptedException exception){
-            //todo: remove this after testing
-            exception.printStackTrace();
-            return;
-        }
-
         funcs.put(10, event->{
             Player player = (Player) event.getWhoClicked();
             if(settings != null) {
                 Bukkit.getScheduler().runTaskAsynchronously(CosmoIslandsBukkitBootstrap.getInst(), () -> {
                     try {
-                        SimpleGUI gui = new Misc(settings);
+                        ArkarangGUI gui = new Misc(settings);
                         Bukkit.getScheduler().runTask(CosmoIslandsBukkitBootstrap.getInst(), () -> gui.openGUI((Player) event.getWhoClicked()));
                     } catch (ExecutionException | InterruptedException e) {
                         player.closeInventory();
@@ -109,7 +106,7 @@ public class SettingGUI extends ArkarangGUI {
     }
 
 
-    public static class Misc extends SimpleGUI{
+    public static class Misc extends ArkarangGUI{
 
         private static final ItemStack pvp, physics, glass;
 
@@ -127,8 +124,8 @@ public class SettingGUI extends ArkarangGUI {
                 inv.setItem(i, glass);
             }
             ItemStack pvpIcon, physicsIcon;
-            boolean isPVP = Boolean.parseBoolean(settings.getSetting(IslandSettings.ALLOW_PVP).get());
-            boolean isPhysics = Boolean.parseBoolean(settings.getSetting(IslandSettings.BUILDERS_UTILITY).get());
+            boolean isPVP = Boolean.parseBoolean(settings.getSettingAsync(IslandSettings.ALLOW_PVP).get());
+            boolean isPhysics = Boolean.parseBoolean(settings.getSettingAsync(IslandSettings.BUILDERS_UTILITY).get());
             ItemStackBuilder builder1, builder2;
             builder1 = new ItemStackBuilder(pvp.clone());
             builder2 = new ItemStackBuilder(physics.clone());
@@ -140,12 +137,12 @@ public class SettingGUI extends ArkarangGUI {
             funcs.put(15, buildFunction(inv, settings, IslandSettings.BUILDERS_UTILITY, new ItemStackBuilder(physics.clone()), 15, new Pair<>("§c§l건축 모드가 활성화 되어 있습니다.", "§a§l건축 모드가 비활성화 되어 있습니다")));
         }
 
-        static Function<InventoryClickEvent, Boolean> buildFunction(Inventory inv, IslandSettingsMap map, IslandSettings setting, ItemStackBuilder builder, int slot, Pair<String, String> text){
+        static Consumer<InventoryClickEvent> buildFunction(Inventory inv, IslandSettingsMap map, IslandSettings setting, ItemStackBuilder builder, int slot, Pair<String, String> text){
             return event -> {
                 Bukkit.getScheduler().runTask(CosmoIslandsBukkitBootstrap.getInst(), ()->{
                     Player player = ((Player)event.getWhoClicked());
                     try {
-                        boolean b = Boolean.parseBoolean(map.getSetting(setting).get());
+                        boolean b = Boolean.parseBoolean(map.getSettingAsync(setting).get());
                         b = !b;
                         map.setSetting(setting, Boolean.toString(b)).get();
                         inv.setItem(slot, get(b, builder, text.getKey(), text.getValue()));
@@ -155,12 +152,11 @@ public class SettingGUI extends ArkarangGUI {
                         player.sendMessage("실행 중 오류가 발생했습니다. 다시 시도해주세요.");
                     }
                 });
-                return true;
             };
         }
     }
 
-    public static class Weather extends SimpleGUI{
+    public static class Weather extends ArkarangGUI{
 
         private static final ItemStack glass, weather, rainy;
 
@@ -175,13 +171,13 @@ public class SettingGUI extends ArkarangGUI {
             for(int i = 0 ; i < 27 ; i ++){
                 inv.setItem(i, glass);
             }
-            boolean isWeather = Boolean.parseBoolean(settings.getSetting(IslandSettings.SUNNY).get());
+            boolean isWeather = Boolean.parseBoolean(settings.getSettingAsync(IslandSettings.SUNNY).get());
             updateIcon(isWeather);
             funcs.put(11, event->{
                 Bukkit.getScheduler().runTask(CosmoIslandsBukkitBootstrap.getInst(), ()->{
                     Player player = ((Player)event.getWhoClicked());
                     try {
-                        boolean b = Boolean.parseBoolean(settings.getSetting(IslandSettings.SUNNY).get());
+                        boolean b = Boolean.parseBoolean(settings.getSettingAsync(IslandSettings.SUNNY).get());
                         if(!b) {
                             b = true;
                             settings.setSetting(IslandSettings.SUNNY, Boolean.toString(b)).get();
@@ -202,7 +198,7 @@ public class SettingGUI extends ArkarangGUI {
                 Bukkit.getScheduler().runTask(CosmoIslandsBukkitBootstrap.getInst(), ()->{
                     Player player = ((Player)event.getWhoClicked());
                     try {
-                        boolean b = Boolean.parseBoolean(settings.getSetting(IslandSettings.SUNNY).get());
+                        boolean b = Boolean.parseBoolean(settings.getSettingAsync(IslandSettings.SUNNY).get());
                         if(b) {
                             b = false;
                             settings.setSetting(IslandSettings.SUNNY, Boolean.toString(b)).get();
@@ -274,7 +270,7 @@ public class SettingGUI extends ArkarangGUI {
         }
 
         private void updateIcons(IslandSettingsMap settings) throws ExecutionException, InterruptedException {
-            String val = settings.getSetting(IslandSettings.TIME).get();
+            String val = settings.getSettingAsync(IslandSettings.TIME).get();
             inv.setItem(9, get(val.equals("DAWN"), dawn, "§a§l선택되었습니다", "§e§l클릭 시 새벽이 됩니다"));
             inv.setItem(11, get(val.equals("BREAKFAST"), breakfast, "§a§l선택되었습니다", "§e§l클릭 시 아침이 됩니다"));
             inv.setItem(13, get(val.equals("NOON"), noon, "§a§l선택되었습니다", "§e§l클릭 시 낮이 됩니다"));
@@ -328,7 +324,7 @@ public class SettingGUI extends ArkarangGUI {
     }
 
     static boolean switchSetting(IslandSettingsMap map, IslandSettings setting) throws ExecutionException, InterruptedException {
-        boolean b = Boolean.parseBoolean(map.getSetting(setting).get());
+        boolean b = Boolean.parseBoolean(map.getSettingAsync(setting).get());
         b = !b;
         map.setSetting(setting, Boolean.toString(b)).get();
         return b;

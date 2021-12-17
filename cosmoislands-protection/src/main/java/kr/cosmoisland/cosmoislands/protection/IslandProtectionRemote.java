@@ -3,7 +3,7 @@ package kr.cosmoisland.cosmoislands.protection;
 import com.google.common.collect.ImmutableMap;
 import kr.cosmoisland.cosmoislands.api.IslandCloud;
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettingsMap;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
 import kr.cosmoisland.cosmoislands.api.player.MemberRank;

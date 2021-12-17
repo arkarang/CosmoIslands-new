@@ -1,10 +1,9 @@
 package kr.cosmoislands.cosmoislands.warp;
 
 import kr.cosmoisland.cosmoislands.api.ComponentLifecycle;
-import kr.cosmoisland.cosmoislands.api.IslandComponent;
 import kr.cosmoisland.cosmoislands.api.IslandContext;
 import kr.cosmoisland.cosmoislands.api.ModulePriority;
-import kr.cosmoisland.cosmoislands.api.warp.IslandWarp;
+import kr.cosmoisland.cosmoislands.api.warp.IslandWarpMap;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
@@ -22,13 +21,13 @@ public class IslandWarpLifecycle implements ComponentLifecycle {
 
     @Override
     public CompletableFuture<Void> onLoad(IslandContext island) {
-        island.register(IslandWarp.class, module.get(island.getIslandId()));
+        island.register(IslandWarpMap.class, module.get(island.getIslandId()));
         return CompletableFuture.completedFuture(null);
     }
 
     @Override
     public CompletableFuture<Void> onCreate(UUID owner, IslandContext island) {
-        island.register(IslandWarp.class, module.get(island.getIslandId()));
+        island.register(IslandWarpMap.class, module.get(island.getIslandId()));
         return CompletableFuture.completedFuture(null);
     }
 

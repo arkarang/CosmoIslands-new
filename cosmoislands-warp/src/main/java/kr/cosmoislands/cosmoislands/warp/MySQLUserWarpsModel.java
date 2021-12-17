@@ -23,7 +23,8 @@ public class MySQLUserWarpsModel extends MySQLAbstractLocationDataModel{
         database.execute(connection -> {
             PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS "+table+" " +
                     "(`column_id` BIGINT UNIQUE AUTO_INCREMENT, " +
-                    "`name` VARCHAR(64), " +
+                    "`uuid` VARCHAR(36), " +
+                    "`name` VARCHAR(32), " +
                     "`island_id` INT, " +
                     "`x` DOUBLE, " +
                     "`y` DOUBLE, " +
@@ -31,32 +32,35 @@ public class MySQLUserWarpsModel extends MySQLAbstractLocationDataModel{
                     "`yaw` FLOAT, " +
                     "`pitch` FLOAT, " +
                     "FOREIGN KEY (`island_id`) REFERENCES "+islandTable+"(`island_id`) ON DELETE CASCADE), " +
-                    "PRIMARY KEY(`name`)) " +
+                    "PRIMARY KEY(`uuid`, `name`)) " +
                     "charset=utf8mb4");
             ps.execute();
         });
     }
 
-    CompletableFuture<IslandLocation> getLocation(String name){
+    CompletableFuture<IslandLocation> getLocation(UUID uuid, String name){
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("SELECT `x`, `y`, `z`, `yaw`, `pitch`, `island_id` WHERE `name`=?");
+            PreparedStatement ps = connection.prepareStatement("SELECT `x`, `y`, `z`, `yaw`, `pitch`, `island_id` WHERE `name`=? AND `uuid`=?");
             ps.setString(1, name);
+            ps.setString(2, uuid.toString());
             ResultSet rs = ps.executeQuery();
             return getIslandLocation(rs);
         });
     }
 
-    CompletableFuture<Void> setLocation(UUID uuid, IslandLocation location){
+    CompletableFuture<Void> setLocation(UUID uuid, String name, IslandLocation location){
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO "+table+" (`name`, `island_id`, `x`, `y`, `z`, `yaw`, `pitch`) VALUES(?, ?, ?, ?, ?, ?, ?)"+" " +
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO "+table+" (`uuid`, `name`, `island_id`, `x`, `y`, `z`, `yaw`, `pitch`) " +
+                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?)"+" " +
                     "ON DUPLICATE KEY UPDATE `island_id`=VALUES(`island_id`), `x`=VALUES(`x`), `y`=VALUES(`y`), `z`=VALUES(`z`), `yaw`=VALUES(`yaw`), `pitch`=VALUES(`pitch`)");
             ps.setString(1, uuid.toString());
-            ps.setInt(2, location.getIslandID());
-            ps.setDouble(3, location.getX());
-            ps.setDouble(4, location.getY());
-            ps.setDouble(5, location.getZ());
-            ps.setFloat(6, location.getYaw());
-            ps.setFloat(7, location.getPitch());
+            ps.setString(2, name);
+            ps.setInt(3, location.getIslandID());
+            ps.setDouble(4, location.getX());
+            ps.setDouble(5, location.getY());
+            ps.setDouble(6, location.getZ());
+            ps.setFloat(7, location.getYaw());
+            ps.setFloat(8, location.getPitch());
             ps.execute();
             return null;
         });

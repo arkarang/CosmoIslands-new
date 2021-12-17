@@ -5,7 +5,7 @@ import com.minepalm.hellobungee.api.HelloEveryone;
 import kr.cosmoisland.cosmoislands.api.IslandCloud;
 import kr.cosmoisland.cosmoislands.api.IslandModule;
 import kr.cosmoisland.cosmoislands.api.IslandService;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettingsMap;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMapModule;
@@ -18,7 +18,6 @@ import kr.cosmoisland.cosmoislands.protection.hellobungee.ProtectionUpdatePacket
 import kr.cosmoisland.cosmoislands.settings.IslandSettingsModule;
 import lombok.*;
 
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;

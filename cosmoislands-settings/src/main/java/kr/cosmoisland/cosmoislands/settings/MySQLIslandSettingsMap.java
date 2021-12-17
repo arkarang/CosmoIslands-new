@@ -1,8 +1,8 @@
 package kr.cosmoisland.cosmoislands.settings;
 
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettings;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettingsMap;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
@@ -33,7 +33,7 @@ public class MySQLIslandSettingsMap implements IslandSettingsMap {
 
     @Override
     public CompletableFuture<String> getDisplayname() {
-        return getSetting(IslandSettings.DISPLAY_NAME);
+        return getSettingAsync(IslandSettings.DISPLAY_NAME);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class MySQLIslandSettingsMap implements IslandSettingsMap {
     }
 
     @Override
-    public CompletableFuture<String> getSetting(IslandSettings setting) {
+    public CompletableFuture<String> getSettingAsync(IslandSettings setting) {
         return model.getValue(islandId, setting);
     }
 

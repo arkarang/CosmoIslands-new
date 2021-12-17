@@ -2,8 +2,8 @@ package kr.cosmoisland.cosmoislands.settings;
 
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettings;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettingsMap;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
@@ -58,7 +58,7 @@ public class RedisIslandSettingsMap implements IslandSettingsMap {
     }
 
     @Override
-    public CompletableFuture<String> getSetting(IslandSettings setting) {
+    public CompletableFuture<String> getSettingAsync(IslandSettings setting) {
         return async.hget(redisKey, setting.name()).toCompletableFuture();
     }
 

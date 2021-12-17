@@ -1,6 +1,7 @@
 package kr.cosmoisland.cosmoislands.api.warp;
 
 import kr.cosmoisland.cosmoislands.api.AbstractLocation;
+import kr.cosmoisland.cosmoislands.api.player.MemberRank;
 import lombok.Getter;
 
 public class IslandLocation extends AbstractLocation {

@@ -2,8 +2,8 @@ package kr.cosmoisland.cosmoislands.bukkit.listeners;
 
 import kr.cosmoisland.cosmoislands.api.AbstractLocation;
 import kr.cosmoisland.cosmoislands.api.Island;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettings;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettingsMap;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoisland.cosmoislands.api.internship.IslandInternsMap;
 import kr.cosmoisland.cosmoislands.api.IslandPlayer;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
@@ -275,7 +275,7 @@ public class ProtectionListener implements org.bukkit.event.Listener{
             try {
                 IslandLocal local = optional.get();
                 IslandSettingsMap map = local.getSettings().get();
-                String val = map.getSetting(IslandSettings.BUILDERS_UTILITY).get();
+                String val = map.getSettingAsync(IslandSettings.BUILDERS_UTILITY).get();
                 return Boolean.parseBoolean(val);
 
             } catch (InterruptedException | ExecutionException ignored) {
@@ -421,7 +421,7 @@ public class ProtectionListener implements org.bukkit.event.Listener{
                  */
                 try {
                     IslandSettingsMap map = local.getSettings().get();
-                    String val = map.getSetting(IslandSettings.BUILDERS_UTILITY).get();
+                    String val = map.getSettingAsync(IslandSettings.BUILDERS_UTILITY).get();
                     boolean bool = Boolean.parseBoolean(val);
                     event.setCancelled(bool);
                 } catch (InterruptedException | ExecutionException ignored) {

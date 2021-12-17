@@ -1,8 +1,8 @@
 package kr.cosmoisland.cosmoislands.settings;
 
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettings;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettingsMap;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
@@ -36,7 +36,7 @@ public class CosmoIslandSettingsMap implements IslandSettingsMap {
 
     @Override
     public CompletableFuture<String> getDisplayname() {
-        return getSetting(IslandSettings.DISPLAY_NAME);
+        return getSettingAsync(IslandSettings.DISPLAY_NAME);
     }
 
     @Override
@@ -45,10 +45,10 @@ public class CosmoIslandSettingsMap implements IslandSettingsMap {
     }
 
     @Override
-    public CompletableFuture<String> getSetting(IslandSettings setting) {
-        return redis.getSetting(setting).thenCompose(value -> {
+    public CompletableFuture<String> getSettingAsync(IslandSettings setting) {
+        return redis.getSettingAsync(setting).thenCompose(value -> {
             if(value == null){
-                CompletableFuture<String> future = mysql.getSetting(setting);
+                CompletableFuture<String> future = mysql.getSettingAsync(setting);
                 future.thenAccept(mysqlValue->redis.setSetting(setting, mysqlValue));
                 return future;
             }else

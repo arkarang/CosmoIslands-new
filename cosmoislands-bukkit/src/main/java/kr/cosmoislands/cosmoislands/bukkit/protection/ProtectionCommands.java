@@ -4,12 +4,9 @@ import co.aikar.commands.annotation.Subcommand;
 import kr.cosmoisland.cosmoislands.api.Island;
 import kr.cosmoisland.cosmoislands.core.CosmoIslands;
 import kr.cosmoisland.cosmoislands.core.IslandLocal;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class ProtectionCommands {
 
@@ -17,8 +14,6 @@ public class ProtectionCommands {
 
         @Subcommand("잠금")
         public void lock(Player player){
-            Bukkit.getScheduler().runTaskAsynchronously(CosmoIslands.getInst(), ()->{
-                try {
                     IslandPlayer ip = CosmoIslands.getInst().getIslandPlayer(player.getUniqueId());
                     if(ip.getIslandID() == Island.NIL_ID){
                         player.sendMessage("섬이 존재하지 않습니다.");
@@ -59,10 +54,7 @@ public class ProtectionCommands {
                         }
 
                     }
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
-            });
+
         }
     }
 }

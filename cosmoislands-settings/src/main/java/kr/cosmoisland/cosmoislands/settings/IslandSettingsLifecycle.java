@@ -4,7 +4,7 @@ import kr.cosmoisland.cosmoislands.api.ComponentLifecycle;
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
 import kr.cosmoisland.cosmoislands.api.IslandContext;
 import kr.cosmoisland.cosmoislands.api.ModulePriority;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettingsMap;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;

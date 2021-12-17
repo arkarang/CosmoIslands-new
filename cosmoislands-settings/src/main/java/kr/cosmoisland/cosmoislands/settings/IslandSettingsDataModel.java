@@ -1,7 +1,7 @@
 package kr.cosmoisland.cosmoislands.settings;
 
 import com.google.common.collect.ImmutableMap;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
 import kr.cosmoisland.cosmoislands.core.AbstractDataModel;
 import kr.cosmoisland.cosmoislands.core.Database;
 

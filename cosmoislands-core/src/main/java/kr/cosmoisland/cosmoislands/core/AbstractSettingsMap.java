@@ -1,7 +1,7 @@
 package kr.cosmoisland.cosmoislands.core;
 
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettings;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettingsMap;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import lombok.Getter;
 
 import java.util.Map;
@@ -23,7 +23,7 @@ public abstract class AbstractSettingsMap implements IslandSettingsMap {
     }
 
     @Override
-    public CompletableFuture<String> getSetting(IslandSettings setting) {
+    public CompletableFuture<String> getSettingAsync(IslandSettings setting) {
         return CompletableFuture.completedFuture(map.get(setting));
     }
 

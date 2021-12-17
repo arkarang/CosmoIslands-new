@@ -10,22 +10,19 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class MySQLUserWarp implements IslandUserWarp {
 
+    private static final String HOME  = "HOME";
+
     private final UUID uuid;
     private final MySQLUserWarpsModel model;
 
     @Override
-    public String getName() {
-        return uuid.toString();
-    }
-
-    @Override
     public CompletableFuture<IslandLocation> getLocation() {
-        return model.getLocation(getName());
+        return model.getLocation(uuid, HOME);
     }
 
     @Override
     public CompletableFuture<Void> setLocation(IslandLocation loc) {
-        return model.setLocation(uuid, loc);
+        return model.setLocation(uuid, HOME, loc);
     }
 
     @Override

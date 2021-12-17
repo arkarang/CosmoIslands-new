@@ -4,8 +4,8 @@ import com.google.common.cache.*;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import kr.cosmoisland.cosmoislands.api.IslandModule;
 import kr.cosmoisland.cosmoislands.api.IslandService;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettings;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettingsMap;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoisland.cosmoislands.core.Database;
 import lombok.Getter;
 

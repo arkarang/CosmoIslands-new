@@ -2,18 +2,14 @@ package kr.cosmoislands.cosmoislands.bukkit.utils;
 
 import com.minepalm.helloplayer.core.HelloPlayers;
 import kr.cosmoisland.cosmoislands.api.Island;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettings;
-import kr.cosmoisland.cosmoislands.api.generic.IslandSettingsMap;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoisland.cosmoislands.api.level.IslandLevel;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
 import kr.cosmoisland.cosmoislands.api.player.MemberRank;
 import kr.cosmoisland.cosmoislands.api.points.IslandPoints;
-import kr.cosmoisland.cosmoislands.core.CosmoIslands;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.val;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -122,7 +118,7 @@ public class IslandIcon {
         return new IslandIcon(island);
     }
 
-    private ItemStack getInfoIcon(IconData data) throws ExecutionException, InterruptedException {
+    public ItemStack getInfoIcon(IconData data) throws ExecutionException, InterruptedException {
         ItemStack item = new ItemStack(Material.GRASS);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName("§a§l섬 정보");

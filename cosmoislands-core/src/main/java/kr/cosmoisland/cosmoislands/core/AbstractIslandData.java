@@ -1,7 +1,7 @@
 package kr.cosmoisland.cosmoislands.core;
 
 import kr.cosmoisland.cosmoislands.api.AbstractLocation;
-import kr.cosmoisland.cosmoislands.api.generic.IslandData;
+import kr.cosmoisland.cosmoislands.api.settings.IslandData;
 import lombok.AllArgsConstructor;
 
 import java.util.concurrent.CompletableFuture;

@@ -1,5 +1,6 @@
 package kr.cosmoislands.cosmoislands.bukkit.level;
 
+import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
 import com.minepalm.arkarangutils.bukkit.SimpleGUI;
 import kr.cosmoisland.cosmoislands.bukkit.CosmoIslandsBukkitBootstrap;
 import kr.cosmoisland.cosmoislands.bukkit.database.RewardSettingLoader;
@@ -10,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IslandRewardEditGUI extends SimpleGUI {
+public class IslandRewardEditGUI extends ArkarangGUI {
 
     int slot;
     RewardSetting setting;

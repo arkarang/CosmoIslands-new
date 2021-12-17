@@ -5,10 +5,12 @@ import co.aikar.commands.PaperCommandManager;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
+import com.minepalm.helloplayer.core.HelloPlayers;
 import kr.cosmoisland.cosmoislands.api.IslandService;
 import kr.cosmoisland.cosmoislands.api.level.IslandAchievements;
 import kr.cosmoisland.cosmoislands.api.level.IslandLevel;
 import kr.cosmoisland.cosmoislands.api.level.IslandRewardsRegistry;
+import kr.cosmoisland.cosmoislands.api.points.IslandPoints;
 import kr.cosmoisland.cosmoislands.core.CosmoIslands;
 import kr.cosmoisland.cosmoislands.core.Database;
 import kr.cosmoisland.cosmoislands.level.IslandAchievementsModule;
@@ -22,11 +24,25 @@ import org.bukkit.entity.Player;
 
 public class LevelCommands {
 
-    public static void init(IslandService service, PaperCommandManager manager, BukkitExecutor executor){
+    public static void init(IslandService service, PaperCommandManager manager, HelloPlayers players, BukkitExecutor executor){
         IslandAchievementsModule achievementsModule = (IslandAchievementsModule)service.getModule(IslandAchievements.class);
         IslandLevelModule levelModule = (IslandLevelModule) service.getModule(IslandLevel.class);
         IslandRewardsRegistry registry = achievementsModule.getRewardDataRegistry();
-        manager.registerCommand(new User(executor, levelModule, registry));
+        AbstractRankingGUI.Factory factory = new AbstractRankingGUI.Factory(players, new AbstractRankingGUI.RankingComponents() {
+            @Override
+            public String getTitle() {
+                return "섬 랭킹";
+            }
+
+            @Override
+            public String formatData(int value) {
+                return "§a§l섬 §b§l레벨 §f§l: "+value+" §f§l레벨";
+            }
+        }, service.getRegistry(), island -> {
+            IslandLevel level = island.getComponent(IslandLevel.class);
+            return level.getLevel();
+        });
+        manager.registerCommand(new User(factory, executor, levelModule, registry));
         manager.registerCommand(new Admin(executor, registry));
     }
 
@@ -34,6 +50,7 @@ public class LevelCommands {
     @CommandAlias("섬")
     protected static class User extends BaseCommand {
 
+        private final AbstractRankingGUI.Factory factory;
         private final BukkitExecutor executor;
         private final IslandLevelModule module;
         private final IslandRewardsRegistry registry;
@@ -77,20 +94,8 @@ public class LevelCommands {
         @Subcommand("레벨 랭킹")
         public void ranking(Player player){
             player.sendMessage("랭킹 로드중...");
-
             module.getRanking().getTopOf(3).thenAccept(list ->{
-                final AbstractRankingGUI gui = new AbstractRankingGUI(new AbstractRankingGUI.RankingComponents() {
-                    @Override
-                    public String getTitle() {
-                        return "섬 랭킹";
-                    }
-
-                    @Override
-                    public String formatData(int value) {
-                        return "§a§l섬 §b§l레벨 §f§l: "+value+" §f§l레벨";
-                    }
-                }, list);
-                executor.sync(()->gui.openGUI(player));
+                factory.build(list).thenAccept(gui-> executor.sync(()->gui.openGUI(player)));
             });
         }
     }

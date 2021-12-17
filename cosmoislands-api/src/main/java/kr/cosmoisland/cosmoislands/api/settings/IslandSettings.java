@@ -1,4 +1,4 @@
-package kr.cosmoisland.cosmoislands.api.generic;
+package kr.cosmoisland.cosmoislands.api.settings;
 
 public enum IslandSettings {
 
@@ -12,6 +12,9 @@ public enum IslandSettings {
     //ENTER_MESSAGE,
     //EXIT_MESSAGE,
     //JUKE_BOX,
-    BUILDERS_UTILITY;
+    BUILDERS_UTILITY,
+    MAX_INTERNS,
+    MAX_MEMBERS,
+    MAX_WARPS;
 
 }

@@ -1,18 +1,26 @@
 package kr.cosmoisland.cosmoislands.api.warp;
 
 import kr.cosmoisland.cosmoislands.api.AbstractLocation;
-import kr.cosmoisland.cosmoislands.api.IslandComponent;
+import kr.cosmoisland.cosmoislands.api.player.MemberRank;
+import lombok.Data;
+import lombok.Getter;
 
-import java.util.concurrent.CompletableFuture;
+public class IslandWarp extends AbstractLocation{
 
-public interface IslandWarp extends IslandComponent {
+    @Getter
+    final String name;
+    @Getter
+    final MemberRank rank;
 
-    CompletableFuture<IslandLocation> getSpawnLocation();
+    public IslandWarp(String name, MemberRank rank, double x, double y, double z, float yaw, float pitch) {
+        super(x, y, z, yaw, pitch);
+        this.name = name;
+        this.rank = rank;
+    }
 
-    CompletableFuture<Void> setSpawnLocation(AbstractLocation location);
-
-    CompletableFuture<IslandLocation> getWarp(String name);
-
-    CompletableFuture<Void> deleteWarp(String name);
-
+    public IslandWarp(String name, MemberRank rank, AbstractLocation location){
+        super(location);
+        this.name = name;
+        this.rank = rank;
+    }
 }

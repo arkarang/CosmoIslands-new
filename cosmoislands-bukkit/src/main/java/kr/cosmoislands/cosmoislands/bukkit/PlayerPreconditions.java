@@ -66,19 +66,19 @@ public class PlayerPreconditions {
         return playerRegistry.get(uuid).getIsland();
     }
 
-    public CompletableFuture<Boolean> isMemberOf(UUID uuid){
+    public CompletableFuture<Boolean> isMember(UUID uuid){
         return hasRank(uuid, MemberRank.INTERN);
     }
 
-    public CompletableFuture<Boolean> isInternOf(UUID uuid){
+    public CompletableFuture<Boolean> isIntern(UUID uuid){
         return rankAs(uuid, MemberRank.INTERN);
     }
 
-    public CompletableFuture<Boolean> isOwnerOf(UUID uuid){
+    public CompletableFuture<Boolean> isOwner(UUID uuid){
         return rankAs(uuid, MemberRank.OWNER);
     }
 
-    public CompletableFuture<Boolean> isPlayerOf(UUID uuid){
+    public CompletableFuture<Boolean> isPlayer(UUID uuid){
         return rankAs(uuid, MemberRank.MEMBER);
     }
 

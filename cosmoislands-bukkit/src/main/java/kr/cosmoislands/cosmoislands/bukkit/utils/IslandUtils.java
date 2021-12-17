@@ -1,4 +1,4 @@
-package kr.cosmoisland.cosmoislands.bukkit.utils;
+package kr.cosmoislands.cosmoislands.bukkit.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,8 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class IslandUtils {
-
-    private static ObjectMapper mapper = JacksonBuilder.build();
 
     private IslandUtils(){}
 
@@ -63,27 +61,6 @@ public class IslandUtils {
 
     public static AbstractLocation convertBukkit(Location loc){
         return new AbstractLocation(loc.getBlockX()+0.5, loc.getY(), loc.getBlockZ()+0.5, loc.getYaw(), loc.getPitch());
-    }
-
-    public static List<ItemStack> deserialize(String base64){
-        try {
-            return Arrays.asList(InventorySerializer.itemStackArrayFromBase64(base64));
-        }catch (IOException ignored){
-
-        }
-        return new ArrayList<>();
-    }
-
-    public static String serialize(List<ItemStack> list){
-        return InventorySerializer.itemStackArrayToBase64(list.toArray(new ItemStack[0]));
-    }
-
-    public static AbstractLocation deserializeLocation(String locationString) throws IllegalArgumentException, JsonProcessingException {
-        return mapper.readValue(locationString, AbstractLocation.class);
-    }
-
-    public static String serialize(AbstractLocation loc) throws IllegalArgumentException, JsonProcessingException {
-        return mapper.writeValueAsString(loc);
     }
 
     public static LocationData convertLocation(String world, AbstractLocation loc){
