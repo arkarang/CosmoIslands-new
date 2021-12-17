@@ -1,0 +1,12 @@
+CosmoDataSource:
+  mysql: 'default'
+Database:
+  address: '127.0.0.1'
+  port: '3306'
+  database: 'test'
+  username: 'root'
+  password: 'test'
+MaxIslands: 100
+StorageServers:
+  - 'lobby'
+  - 'server1'

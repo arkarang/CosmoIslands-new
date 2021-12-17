@@ -1,0 +1,5 @@
+main: kr.cosmoisland.cosmoislands.bungee.CosmoIslandsBungee
+name: CosmoIslandsBungee
+version: 0.0.1
+author: arkarang
+depends: [CosmoDataSource, ManyWorldsBungee, HelloBungee, HelloPlayers]

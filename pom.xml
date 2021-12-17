@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>kr.cosmoisland</groupId>
+    <artifactId>CosmoIslands</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <modules>
+        <module>cosmoislands-legacy-bukkit</module>
+        <module>cosmoislands-proxy</module>
+        <module>cosmoislands-api</module>
+        <module>cosmoislands-core</module>
+        <module>cosmoislands-world</module>
+        <module>cosmoislands-protection</module>
+        <module>cosmoislands-players</module>
+        <module>cosmoislands-level</module>
+        <module>cosmoislands-chat</module>
+        <module>cosmoislands-warp</module>
+        <module>cosmoislands-bank</module>
+        <module>cosmoislands-settings</module>
+        <module>cosmoislands-points</module>
+        <module>cosmoislands-bukkit</module>
+        <module>cosmoislands-upgrade</module>
+        <module>cosmoislands-bungee</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <lettuce.version>6.1.5.RELEASE</lettuce.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.16</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>30.1.1-jre</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>kr.msleague</groupId>
+            <artifactId>mslibrary-database</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+            <version>${lettuce.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>

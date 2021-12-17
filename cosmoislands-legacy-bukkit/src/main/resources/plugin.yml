@@ -1,0 +1,6 @@
+main: kr.cosmoisland.cosmoislands.core.CosmoIslands
+name: CosmoIslands
+api-version: 1.16
+version: 0.0.1
+author: arkarang
+depend: [CosmoDataSource, SlimeWorldManager, HelloBukkit, ManyWorlds, HelloPlayers, HelloTeleport, Vault, CosmoChat]
