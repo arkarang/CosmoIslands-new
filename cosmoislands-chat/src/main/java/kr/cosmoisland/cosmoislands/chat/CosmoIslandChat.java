@@ -2,6 +2,7 @@ package kr.cosmoisland.cosmoislands.chat;
 
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
 import kr.cosmoisland.cosmoislands.api.chat.IslandChat;
+import kr.cosmoisland.cosmoislands.core.CosmoIslands;
 import kr.cosmoislands.cosmochat.core.CosmoChat;
 import kr.cosmoislands.cosmochat.core.api.ChatPlayer;
 import kr.cosmoislands.cosmochat.privatechat.PrivateChat;
@@ -31,7 +32,13 @@ public class CosmoIslandChat implements IslandChat {
 
     @Override
     public CompletableFuture<Void> remove(UUID uuid) {
-        return chat.remove(core.getChatPlayerRegistry().getPlayer(uuid));
+        ChatPlayer cp = core.getChatPlayerRegistry().getPlayer(uuid);
+        CompletableFuture<Void> resetChannelFuture = cp.getSpeaking().thenAccept(speaking->{
+            if(speaking.getCategory().getType().name().equalsIgnoreCase("ISLAND")){
+                core.getDefaultChannel().thenAccept(cp::setSpeaking);
+            }
+        });
+        return chat.remove(core.getChatPlayerRegistry().getPlayer(uuid)).thenCombine(resetChannelFuture, (future1, future2)->null);
     }
 
     @Override
