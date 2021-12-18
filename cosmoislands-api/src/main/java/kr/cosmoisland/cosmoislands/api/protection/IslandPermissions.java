@@ -3,6 +3,7 @@ package kr.cosmoisland.cosmoislands.api.protection;
 public enum IslandPermissions {
 
     // 4 2 1 0
+    ENTER,
     WOOD_DOOR,
     IRON_DOOR,
     FENCE_GATE,

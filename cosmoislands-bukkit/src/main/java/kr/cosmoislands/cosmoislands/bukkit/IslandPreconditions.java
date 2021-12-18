@@ -38,6 +38,10 @@ public class IslandPreconditions {
     private final IslandPlayerRegistry playerRegistry;
     private final Island island;
 
+    public Island getIsland(){
+        return island;
+    }
+
     public CompletableFuture<Boolean> isMemberOf(UUID uuid){
         return hasRank(uuid, MemberRank.INTERN);
     }

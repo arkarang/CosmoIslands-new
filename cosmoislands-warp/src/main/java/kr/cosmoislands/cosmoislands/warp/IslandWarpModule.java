@@ -7,7 +7,7 @@ import kr.cosmoisland.cosmoislands.api.IslandModule;
 import kr.cosmoisland.cosmoislands.api.IslandRegistry;
 import kr.cosmoisland.cosmoislands.api.IslandService;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
-import kr.cosmoisland.cosmoislands.api.warp.IslandWarpMap;
+import kr.cosmoisland.cosmoislands.api.warp.IslandWarpsMap;
 import kr.cosmoisland.cosmoislands.core.Database;
 import kr.cosmoisland.cosmoislands.settings.IslandSettingsModule;
 import kr.cosmoislands.cosmoteleport.CosmoTeleport;
@@ -17,7 +17,7 @@ import lombok.SneakyThrows;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
-public class IslandWarpModule implements IslandModule<IslandWarpMap> {
+public class IslandWarpModule implements IslandModule<IslandWarpsMap> {
 
     private final IslandSettingsModule settingsModule;
     @Getter
@@ -28,9 +28,9 @@ public class IslandWarpModule implements IslandModule<IslandWarpMap> {
     @Getter
     private final Logger logger;
 
-    LoadingCache<Integer, IslandWarpMap> cache = CacheBuilder.newBuilder().build(new CacheLoader<Integer, IslandWarpMap>() {
+    LoadingCache<Integer, IslandWarpsMap> cache = CacheBuilder.newBuilder().build(new CacheLoader<Integer, IslandWarpsMap>() {
         @Override
-        public IslandWarpMap load(Integer integer) throws Exception {
+        public IslandWarpsMap load(Integer integer) throws Exception {
             return new MySQLIslandWarpsMap(integer, settingsModule.get(integer), islandWarpsModel);
         }
     });
@@ -52,13 +52,13 @@ public class IslandWarpModule implements IslandModule<IslandWarpMap> {
     }
 
     @Override
-    public CompletableFuture<IslandWarpMap> getAsync(int islandId) {
+    public CompletableFuture<IslandWarpsMap> getAsync(int islandId) {
         return CompletableFuture.completedFuture(get(islandId));
     }
 
     @Override
     @SneakyThrows
-    public IslandWarpMap get(int islandId) {
+    public IslandWarpsMap get(int islandId) {
         return cache.get(islandId);
     }
 

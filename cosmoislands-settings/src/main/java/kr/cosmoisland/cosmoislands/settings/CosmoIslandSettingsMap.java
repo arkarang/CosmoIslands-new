@@ -1,15 +1,17 @@
 package kr.cosmoisland.cosmoislands.settings;
 
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
+import kr.cosmoisland.cosmoislands.core.utils.Cached;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
-public class CosmoIslandSettingsMap implements IslandSettingsMap {
+public abstract class CosmoIslandSettingsMap implements IslandSettingsMap {
 
     final MySQLIslandSettingsMap mysql;
     final RedisIslandSettingsMap redis;
@@ -21,7 +23,7 @@ public class CosmoIslandSettingsMap implements IslandSettingsMap {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends IslandComponent> CompletableFuture<T> sync() {
-        return mysql.asMap().thenCompose(redis::migrate).thenApply(ignored->(T)this);
+        return this.migrate().thenApply(ignored->(T)this);
     }
 
     @Override
@@ -36,16 +38,16 @@ public class CosmoIslandSettingsMap implements IslandSettingsMap {
 
     @Override
     public CompletableFuture<String> getDisplayname() {
-        return getSettingAsync(IslandSettings.DISPLAY_NAME);
+        return getSettingAsync(IslandSetting.DISPLAY_NAME);
     }
 
     @Override
     public CompletableFuture<Void> setDisplayname(String name) throws IllegalArgumentException {
-        return setSetting(IslandSettings.DISPLAY_NAME, name);
+        return setSetting(IslandSetting.DISPLAY_NAME, name);
     }
 
     @Override
-    public CompletableFuture<String> getSettingAsync(IslandSettings setting) {
+    public CompletableFuture<String> getSettingAsync(IslandSetting setting) {
         return redis.getSettingAsync(setting).thenCompose(value -> {
             if(value == null){
                 CompletableFuture<String> future = mysql.getSettingAsync(setting);
@@ -57,14 +59,14 @@ public class CosmoIslandSettingsMap implements IslandSettingsMap {
     }
 
     @Override
-    public CompletableFuture<Void> setSetting(IslandSettings setting, String value) {
+    public CompletableFuture<Void> setSetting(IslandSetting setting, String value) {
         CompletableFuture<Void> mysqlFuture = mysql.setSetting(setting, value);
         CompletableFuture<Void> redisFuture = redis.setSetting(setting, value);
         return CompletableFuture.allOf(mysqlFuture, redisFuture);
     }
 
     @Override
-    public CompletableFuture<Map<IslandSettings, String>> asMap() {
+    public CompletableFuture<Map<IslandSetting, String>> asMap() {
         return redis.asMap();
     }
 }

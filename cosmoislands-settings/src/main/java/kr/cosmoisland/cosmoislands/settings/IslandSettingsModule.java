@@ -1,10 +1,12 @@
 package kr.cosmoisland.cosmoislands.settings;
 
 import com.google.common.cache.*;
+import com.google.common.collect.ImmutableMap;
 import io.lettuce.core.api.async.RedisAsyncCommands;
+import kr.cosmoisland.cosmoislands.api.IslandCloud;
 import kr.cosmoisland.cosmoislands.api.IslandModule;
 import kr.cosmoisland.cosmoislands.api.IslandService;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoisland.cosmoislands.core.Database;
 import lombok.Getter;
@@ -17,8 +19,10 @@ import java.util.logging.Logger;
 
 public class IslandSettingsModule implements IslandModule<IslandSettingsMap> {
 
+    private final ImmutableMap<IslandSetting, String> defaultValues;
     private final RedisAsyncCommands<String, String> async;
     private final IslandSettingsDataModel model;
+    private final IslandCloud cloud;
     @Getter
     private final Logger logger;
     private final LoadingCache<Integer, IslandSettingsMap> proxiedCache = CacheBuilder.newBuilder()
@@ -28,7 +32,7 @@ public class IslandSettingsModule implements IslandModule<IslandSettingsMap> {
                 public IslandSettingsMap load(Integer integer) throws Exception {
                     MySQLIslandSettingsMap mysql = new MySQLIslandSettingsMap(integer, model);
                     RedisIslandSettingsMap redis = new RedisIslandSettingsMap(integer, async);
-                    return new CosmoIslandSettingsMap(mysql, redis);
+                    return new IslandSettingsMapRemote(integer, mysql, redis, cloud);
                 }
             });
     private final LoadingCache<Integer, CompletableFuture<IslandSettingsMap>> localCache = CacheBuilder.newBuilder()
@@ -37,13 +41,19 @@ public class IslandSettingsModule implements IslandModule<IslandSettingsMap> {
                 public CompletableFuture<IslandSettingsMap> load(Integer integer) throws Exception {
                     MySQLIslandSettingsMap mysql = new MySQLIslandSettingsMap(integer, model);
                     RedisIslandSettingsMap redis = new RedisIslandSettingsMap(integer, async);
-                    CosmoIslandSettingsMap cosmo = new CosmoIslandSettingsMap(mysql, redis);
-                    return cosmo.migrate().thenApply(ignored->cosmo);
+                    CosmoIslandSettingsMap cached = new CachedIslandSettingsMap(mysql, redis, defaultValues);
+                    return cached.migrate().thenApply(ignored->cached);
                 }
             });
 
-    public IslandSettingsModule(Database database, RedisAsyncCommands<String, String> async, Map<IslandSettings, String> map, Logger logger){
+    public IslandSettingsModule(Database database,
+                                IslandCloud cloud,
+                                RedisAsyncCommands<String, String> async,
+                                Map<IslandSetting, String> map,
+                                Logger logger){
         this.async = async;
+        this.cloud = cloud;
+        this.defaultValues = ImmutableMap.copyOf(map);
         this.model = new IslandSettingsDataModel("cosmoislands_settings", "cosmoislands_islands", database, map);
         this.logger = logger;
     }
@@ -72,6 +82,12 @@ public class IslandSettingsModule implements IslandModule<IslandSettingsMap> {
         }catch (InterruptedException | ExecutionException e){
             return null;
         }
+    }
+
+    @Override
+    public void invalidate(int islandId) {
+        this.proxiedCache.invalidate(islandId);
+        this.localCache.invalidate(islandId);
     }
 
     @Override

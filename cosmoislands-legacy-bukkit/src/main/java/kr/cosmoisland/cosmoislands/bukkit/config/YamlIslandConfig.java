@@ -6,7 +6,7 @@ import com.minepalm.arkarangutils.bukkit.SimpleConfig;
 import com.minepalm.helloteleport.LocationData;
 import kr.cosmoisland.cosmoislands.api.AbstractLocation;
 import kr.cosmoisland.cosmoislands.api.protection.IslandPermissions;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoisland.cosmoislands.api.player.MemberRank;
 import lombok.Getter;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
@@ -43,7 +43,7 @@ public class YamlIslandConfig extends SimpleConfig {
     @Getter
     final ImmutableMap<IslandPermissions, MemberRank> defaultPermissions;
     @Getter
-    final ImmutableMap<IslandSettings, String> defaultSettings;
+    final ImmutableMap<IslandSetting, String> defaultSettings;
 
     public YamlIslandConfig(JavaPlugin plugin) throws IllegalStateException{
         super(plugin, "globalconfig.yml");
@@ -75,12 +75,12 @@ public class YamlIslandConfig extends SimpleConfig {
         return achievementLevels.getOrDefault(index, -1);
     }
 
-    private ImmutableMap<IslandSettings, String> readDefaultSettings(){
-        HashMap<IslandSettings, String> map = new HashMap<>();
+    private ImmutableMap<IslandSetting, String> readDefaultSettings(){
+        HashMap<IslandSetting, String> map = new HashMap<>();
         ConfigurationSection section = config.getConfigurationSection("default.settings");
         for(String key : section.getKeys(false)) {
             try{
-                IslandSettings setting = IslandSettings.valueOf(key);
+                IslandSetting setting = IslandSetting.valueOf(key);
                 map.put(setting, section.getString(key));
             }catch (IllegalArgumentException ignored){
 

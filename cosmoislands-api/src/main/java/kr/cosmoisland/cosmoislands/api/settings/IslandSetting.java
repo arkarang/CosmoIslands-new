@@ -1,6 +1,6 @@
 package kr.cosmoisland.cosmoislands.api.settings;
 
-public enum IslandSettings {
+public enum IslandSetting {
 
     DISPLAY_NAME,
     PRIVATE,

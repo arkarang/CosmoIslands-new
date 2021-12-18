@@ -19,13 +19,10 @@ public class CosmoIslandVoter implements IslandVoter {
     }
 
     @Override
-    public boolean canVote(){
-        try {
-            long time = getLatestTime().get();
+    public CompletableFuture<Boolean> canVote(){
+        return getLatestTime().thenApply(time->{
             return time + 24*60*60*1000L < getTodayMidnight();
-        }catch (ExecutionException | InterruptedException e){
-            return false;
-        }
+        });
     }
 
     @Override

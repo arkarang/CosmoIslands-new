@@ -117,12 +117,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.minepalm</groupId>
-            <artifactId>HelloTeleport</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.github.MilkBowl</groupId>
             <artifactId>VaultAPI</artifactId>
             <version>1.7</version>
@@ -167,6 +161,24 @@
         <dependency>
             <groupId>kr.cosmoisland</groupId>
             <artifactId>cosmoislands-level</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>kr.cosmoisland</groupId>
+            <artifactId>cosmoislands-protection</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>kr.cosmoislands</groupId>
+            <artifactId>CosmoTeleport</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>kr.cosmoisland</groupId>
+            <artifactId>cosmoislands-points</artifactId>
             <version>1.0.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

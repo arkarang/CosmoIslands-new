@@ -3,11 +3,11 @@ package kr.cosmoislands.cosmoislands.warp;
 import kr.cosmoisland.cosmoislands.api.AbstractLocation;
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
 import kr.cosmoisland.cosmoislands.api.player.MemberRank;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoisland.cosmoislands.api.warp.IslandLocation;
 import kr.cosmoisland.cosmoislands.api.warp.IslandWarp;
-import kr.cosmoisland.cosmoislands.api.warp.IslandWarpMap;
+import kr.cosmoisland.cosmoislands.api.warp.IslandWarpsMap;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
-public class MySQLIslandWarpsMap implements IslandWarpMap {
+public class MySQLIslandWarpsMap implements IslandWarpsMap {
 
     private final int islandId;
     private final IslandSettingsMap settingsMap;
@@ -81,7 +81,7 @@ public class MySQLIslandWarpsMap implements IslandWarpMap {
 
     @Override
     public CompletableFuture<Integer> getMaxWarps() {
-        return settingsMap.getSettingAsync(IslandSettings.MAX_WARPS).thenApply(Integer::parseInt);
+        return settingsMap.getSettingAsync(IslandSetting.MAX_WARPS).thenApply(Integer::parseInt);
     }
 
     @Override

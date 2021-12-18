@@ -2,7 +2,7 @@ package kr.cosmoisland.cosmoislands.protection;
 
 import com.google.common.collect.ImmutableMap;
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
@@ -48,12 +48,12 @@ public class CachedIslandProtection implements IslandProtection {
 
     @Override
     public CompletableFuture<Boolean> isPrivate() {
-        return this.settingsMap.getSettingAsync(IslandSettings.PRIVATE).thenApply(Boolean::parseBoolean);
+        return this.settingsMap.getSettingAsync(IslandSetting.PRIVATE).thenApply(Boolean::parseBoolean);
     }
 
     @Override
     public CompletableFuture<Void> setPrivate(boolean b) {
-        return this.settingsMap.setSetting(IslandSettings.PRIVATE, Boolean.toString(b));
+        return this.settingsMap.setSetting(IslandSetting.PRIVATE, Boolean.toString(b));
     }
 
     @Override

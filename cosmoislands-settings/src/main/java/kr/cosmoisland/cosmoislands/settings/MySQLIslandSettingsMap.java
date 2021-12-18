@@ -1,7 +1,7 @@
 package kr.cosmoisland.cosmoislands.settings;
 
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import lombok.RequiredArgsConstructor;
 
@@ -33,29 +33,34 @@ public class MySQLIslandSettingsMap implements IslandSettingsMap {
 
     @Override
     public CompletableFuture<String> getDisplayname() {
-        return getSettingAsync(IslandSettings.DISPLAY_NAME);
+        return getSettingAsync(IslandSetting.DISPLAY_NAME);
     }
 
     @Override
     public CompletableFuture<Void> setDisplayname(String name) throws IllegalArgumentException {
-        return setSetting(IslandSettings.DISPLAY_NAME, name);
+        return setSetting(IslandSetting.DISPLAY_NAME, name);
     }
 
     @Override
-    public CompletableFuture<String> getSettingAsync(IslandSettings setting) {
+    public CompletableFuture<String> getSettingAsync(IslandSetting setting) {
         return model.getValue(islandId, setting);
     }
 
     @Override
-    public CompletableFuture<Void> setSetting(IslandSettings setting, String value) {
+    public String getSetting(IslandSetting settings) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public CompletableFuture<Void> setSetting(IslandSetting setting, String value) {
         return model.setValue(islandId, setting, value);
     }
 
     @Override
-    public CompletableFuture<Map<IslandSettings, String>> asMap() {
+    public CompletableFuture<Map<IslandSetting, String>> asMap() {
         return model.getSettings(islandId).thenApply(map->{
-            HashMap<IslandSettings, String> hashMap = new HashMap<>();
-            for (IslandSettings key : map.keySet()) {
+            HashMap<IslandSetting, String> hashMap = new HashMap<>();
+            for (IslandSetting key : map.keySet()) {
                 try {
                     hashMap.put(key, map.get(key));
                 }catch (IllegalArgumentException e){

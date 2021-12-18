@@ -1,6 +1,6 @@
 package kr.cosmoisland.cosmoislands.core;
 
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import lombok.Getter;
 
@@ -12,9 +12,9 @@ import java.util.concurrent.ExecutionException;
 public abstract class AbstractSettingsMap implements IslandSettingsMap {
 
     @Getter
-    protected final ConcurrentHashMap<IslandSettings, String> map;
+    protected final ConcurrentHashMap<IslandSetting, String> map;
 
-    public AbstractSettingsMap(Map<IslandSettings, String> origin){
+    public AbstractSettingsMap(Map<IslandSetting, String> origin){
         map = new ConcurrentHashMap<>(origin);
     }
 
@@ -23,12 +23,12 @@ public abstract class AbstractSettingsMap implements IslandSettingsMap {
     }
 
     @Override
-    public CompletableFuture<String> getSettingAsync(IslandSettings setting) {
+    public CompletableFuture<String> getSettingAsync(IslandSetting setting) {
         return CompletableFuture.completedFuture(map.get(setting));
     }
 
     @Override
-    public CompletableFuture<Map<IslandSettings, String>> asMap() {
+    public CompletableFuture<Map<IslandSetting, String>> asMap() {
         return CompletableFuture.completedFuture(getMap());
     }
 }

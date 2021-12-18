@@ -6,8 +6,6 @@ import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
 import kr.cosmoisland.cosmoislands.api.player.MemberRank;
 import kr.cosmoisland.cosmoislands.api.protection.IslandProtection;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoisland.cosmoislands.api.warp.IslandLocation;
 import kr.cosmoisland.cosmoislands.api.warp.TeleportExecutor;
 import kr.cosmoisland.cosmoislands.api.warp.WarpResult;

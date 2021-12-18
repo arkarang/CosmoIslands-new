@@ -1,7 +1,7 @@
 package kr.cosmoisland.cosmoislands.settings;
 
 import com.google.common.collect.ImmutableMap;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoisland.cosmoislands.core.AbstractDataModel;
 import kr.cosmoisland.cosmoislands.core.Database;
 
@@ -15,9 +15,9 @@ import java.util.concurrent.CompletableFuture;
 public class IslandSettingsDataModel extends AbstractDataModel {
 
     private final String islandTable;
-    private final ImmutableMap<IslandSettings, String> defaultMap;
+    private final ImmutableMap<IslandSetting, String> defaultMap;
 
-    public IslandSettingsDataModel(String table, String islandTable, Database database, Map<IslandSettings, String> map) {
+    public IslandSettingsDataModel(String table, String islandTable, Database database, Map<IslandSetting, String> map) {
         super(table, database);
         this.defaultMap = ImmutableMap.copyOf(map);
         this.islandTable = islandTable;
@@ -43,7 +43,7 @@ public class IslandSettingsDataModel extends AbstractDataModel {
         return CompletableFuture.completedFuture(null);
     }
 
-    CompletableFuture<String> getValue(int islandId, IslandSettings setting){
+    CompletableFuture<String> getValue(int islandId, IslandSetting setting){
         return database.executeAsync(connection -> {
             PreparedStatement ps = connection.prepareStatement("SELECT `value` FROM "+table+" WHERE `island_id`=? AND `key`=?");
             ps.setInt(1, islandId);
@@ -56,7 +56,7 @@ public class IslandSettingsDataModel extends AbstractDataModel {
         });
     }
 
-    CompletableFuture<Void> setValue(int islandId, IslandSettings setting, String value){
+    CompletableFuture<Void> setValue(int islandId, IslandSetting setting, String value){
         return database.executeAsync(connection -> {
             PreparedStatement ps = connection.prepareStatement("INSERT INTO "+table+" (`island_id`, `key`, `value`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `key`=?, `value`=?");
             ps.setInt(1, islandId);
@@ -69,15 +69,15 @@ public class IslandSettingsDataModel extends AbstractDataModel {
         });
     }
 
-    CompletableFuture<Map<IslandSettings, String>> getSettings(int islandId){
+    CompletableFuture<Map<IslandSetting, String>> getSettings(int islandId){
         return database.executeAsync(connection -> {
             PreparedStatement ps = connection.prepareStatement("SELECT `key`, `value` FROM "+table+" WHERE `island_id`=?");
             ps.setInt(1, islandId);
             ResultSet rs = ps.executeQuery();
-            Map<IslandSettings, String> map = new HashMap<>(defaultMap);
+            Map<IslandSetting, String> map = new HashMap<>(defaultMap);
             while (rs.next()){
                 try{
-                    IslandSettings setting = IslandSettings.valueOf(rs.getString(1));
+                    IslandSetting setting = IslandSetting.valueOf(rs.getString(1));
                     map.put(setting, rs.getString(2));
                 }catch (IllegalArgumentException e){
                     continue;

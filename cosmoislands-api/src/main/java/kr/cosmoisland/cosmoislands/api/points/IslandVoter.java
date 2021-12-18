@@ -4,9 +4,9 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IslandVoter {
 
-    public boolean canVote();
+    CompletableFuture<Boolean> canVote();
 
-    public long vote(int id, IslandPoints points, int value);
+    long vote(int id, IslandPoints points, int value);
 
     CompletableFuture<Long> getLatestTime();
 

@@ -2,7 +2,7 @@ package kr.cosmoisland.cosmoislands.settings;
 
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettings;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import lombok.RequiredArgsConstructor;
 
@@ -23,9 +23,9 @@ public class RedisIslandSettingsMap implements IslandSettingsMap {
         this.redisKey = "cosmoislands:island:settings:"+islandId;
     }
 
-    CompletableFuture<Void> migrate(Map<IslandSettings, String> map){
+    CompletableFuture<Void> migrate(Map<IslandSetting, String> map){
         Map<String, String> hashMap = new HashMap<>();
-        for (IslandSettings key : map.keySet()) {
+        for (IslandSetting key : map.keySet()) {
             hashMap.put(key.name(), map.get(key));
         }
         return async.hmset(redisKey, hashMap).thenRun(()->{}).toCompletableFuture();
@@ -49,31 +49,36 @@ public class RedisIslandSettingsMap implements IslandSettingsMap {
 
     @Override
     public CompletableFuture<String> getDisplayname() {
-        return async.hget(redisKey, IslandSettings.DISPLAY_NAME.name()).toCompletableFuture();
+        return async.hget(redisKey, IslandSetting.DISPLAY_NAME.name()).toCompletableFuture();
     }
 
     @Override
     public CompletableFuture<Void> setDisplayname(String name) throws IllegalArgumentException {
-        return async.hset(redisKey, IslandSettings.DISPLAY_NAME.name(), name).toCompletableFuture().thenRun(()->{});
+        return async.hset(redisKey, IslandSetting.DISPLAY_NAME.name(), name).toCompletableFuture().thenRun(()->{});
     }
 
     @Override
-    public CompletableFuture<String> getSettingAsync(IslandSettings setting) {
+    public CompletableFuture<String> getSettingAsync(IslandSetting setting) {
         return async.hget(redisKey, setting.name()).toCompletableFuture();
     }
 
     @Override
-    public CompletableFuture<Void> setSetting(IslandSettings setting, String value) {
+    public String getSetting(IslandSetting settings) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public CompletableFuture<Void> setSetting(IslandSetting setting, String value) {
         return async.hset(redisKey, setting.name(), value).toCompletableFuture().thenRun(()->{});
     }
 
     @Override
-    public CompletableFuture<Map<IslandSettings, String>> asMap() {
+    public CompletableFuture<Map<IslandSetting, String>> asMap() {
         return async.hgetall(redisKey).thenApply(map->{
-            Map<IslandSettings, String> hashMap = new HashMap<>();
+            Map<IslandSetting, String> hashMap = new HashMap<>();
             for (String key : map.keySet()) {
                 try {
-                    hashMap.put(IslandSettings.valueOf(key), map.get(key));
+                    hashMap.put(IslandSetting.valueOf(key), map.get(key));
                 }catch (IllegalArgumentException e){
                     continue;
                 }

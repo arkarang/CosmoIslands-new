@@ -71,15 +71,14 @@ public class IslandProtectionModule implements IslandModule<IslandProtection> {
     public IslandProtection get(int islandId) {
         return map.get(islandId);
     }
-    
-    void invalidate(int islandId){
+
+    @Override
+    public void invalidate(int islandId){
         map.remove(islandId);
     }
 
     @Override
     public void onEnable(IslandService service) {
-        networkModule.getGateway().registerAdapter(new ProtectionUpdatePacketAdapter());
-        networkModule.getHandler().registerExecutor(new ProtectionUpdatePacketExecutor(this));
         service.getFactory().addLast("protection", new IslandProtectionLifecycle(this));
         playersMapModule.getStrategyRegistry().addStrategy("protection", new IslandProtectionPlayerModificationStrategy());
     }

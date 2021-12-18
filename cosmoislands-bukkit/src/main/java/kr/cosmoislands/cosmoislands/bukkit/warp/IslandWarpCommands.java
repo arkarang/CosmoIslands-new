@@ -37,7 +37,7 @@ public class IslandWarpCommands {
                     player.sendMessage("섬이 존재하지 않습니다.");
                     return null;
                 }else{
-                    return island.getComponent(IslandWarpMap.class).getSpawnLocation();
+                    return island.getComponent(IslandWarpsMap.class).getSpawnLocation();
                 }
             }).thenCombine(preconditions.isPlayer(player.getUniqueId()), (warp, isMember) -> {
                 if(warp != null){
@@ -70,7 +70,7 @@ public class IslandWarpCommands {
                     player.sendMessage("섬이 존재하지 않습니다.");
                     return null;
                 }else{
-                    return island.getComponent(IslandWarpMap.class);
+                    return island.getComponent(IslandWarpsMap.class);
                 }
             }).thenCombine(preconditions.hasRank(player.getUniqueId(), MemberRank.OWNER), (warpsMap, hasRank)->{
                 if(warpsMap != null){
@@ -96,7 +96,7 @@ public class IslandWarpCommands {
                     player.sendMessage("당신은 섬이 존재하지 않습니다.");
                     return CompletableFuture.completedFuture(null);
                 }else{
-                    IslandWarpMap map = island.getComponent(IslandWarpMap.class);
+                    IslandWarpsMap map = island.getComponent(IslandWarpsMap.class);
                     return map.getWarp(name).thenApply(warp->new IslandLocation(island.getId(), warp));
                 }
             }).thenCompose(warp -> {
@@ -140,7 +140,7 @@ public class IslandWarpCommands {
                 if(isOwner != null){
                     if(isOwner){
                         playerPreconditions.getIsland().thenAccept(island -> {
-                            IslandWarpMap warps = island.getComponent(IslandWarpMap.class);
+                            IslandWarpsMap warps = island.getComponent(IslandWarpsMap.class);
                             AbstractLocation location = IslandUtils.convert(bukkitLocation);
                             IslandWarp warp = new IslandWarp(name, MemberRank.MEMBER, location);
                             warps.insertWarp(warp).handle((result, exception) -> {
@@ -169,7 +169,7 @@ public class IslandWarpCommands {
                 }else{
                     IslandPlayer islandPlayer = playerRegistry.get(player.getUniqueId());
                     CompletableFuture<MemberRank> rankFuture = island.getComponent(IslandPlayersMap.class).getRank(islandPlayer);
-                    IslandWarpMap map = island.getComponent(IslandWarpMap.class);
+                    IslandWarpsMap map = island.getComponent(IslandWarpsMap.class);
                     rankFuture.thenCompose(map::getWarps).thenAccept(warps -> {
                         executor.sync(()->{
                             WarpListGUI gui = new WarpListGUI(island, teleportExecutor, warps);

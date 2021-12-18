@@ -7,7 +7,7 @@ import kr.cosmoisland.cosmoislands.api.player.MemberRank;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public interface IslandWarpMap extends IslandComponent {
+public interface IslandWarpsMap extends IslandComponent {
 
     CompletableFuture<IslandLocation> getSpawnLocation();
 
