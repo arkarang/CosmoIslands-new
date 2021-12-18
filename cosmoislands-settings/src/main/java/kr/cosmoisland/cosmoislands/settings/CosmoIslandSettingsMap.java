@@ -3,12 +3,10 @@ package kr.cosmoisland.cosmoislands.settings;
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
 import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
-import kr.cosmoisland.cosmoislands.core.utils.Cached;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 public abstract class CosmoIslandSettingsMap implements IslandSettingsMap {

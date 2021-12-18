@@ -2,7 +2,6 @@ package kr.cosmoislands.cosmoislands.bank;
 
 import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
-import kr.cosmoisland.cosmoislands.api.bank.IslandBank;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;

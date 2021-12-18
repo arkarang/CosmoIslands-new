@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 public class MemberCommands {
 
     protected static class User{
+
         @Subcommand("양도")
         public void transfer(Player player, String member){
             Bukkit.getScheduler().runTaskAsynchronously(CosmoIslands.getInst(), () -> {
@@ -95,7 +96,7 @@ public class MemberCommands {
                     player.sendMessage("섬원 목록 조회 중...");
                     try {
                         PlayersMapDataModel loader = CosmoIslands.getInst().getDatabase().getLoader(PlayersMapDataModel.class);
-                        PlayersMapGUI gui = new PlayersMapGUI(new ArrayList<>(loader.getMembers(ip.getIslandID()).get().keySet()), executor);
+                        MemberListGUI gui = new MemberListGUI(new ArrayList<>(loader.getMembers(ip.getIslandID()).get().keySet()), executor);
                         Bukkit.getScheduler().runTask(CosmoIslands.getInst(), ()->gui.openGUI(player));
                     } catch (ExecutionException | InterruptedException e) {
                         e.printStackTrace();
@@ -290,7 +291,7 @@ public class MemberCommands {
                     runIslandPlayerExists(player, (ip) -> runIslandExists(player, ip, (i) -> {
                         player.sendMessage("알바 목록 조회 중...");
                         try {
-                            InternsMapGUI gui = new InternsMapGUI(i, executor);
+                            InternListGUI gui = new InternListGUI(i, executor);
                             Bukkit.getScheduler().runTask(CosmoIslands.getInst(), () -> gui.openGUI(player));
                         } catch (ExecutionException | InterruptedException e) {
                             player.sendMessage("명령어 실행 중 오류가 발생했습니다. 관리자에게 문의해주세요.");

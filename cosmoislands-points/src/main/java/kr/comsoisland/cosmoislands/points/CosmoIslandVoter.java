@@ -6,7 +6,6 @@ import kr.cosmoisland.cosmoislands.api.points.IslandVoter;
 import java.util.Calendar;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class CosmoIslandVoter implements IslandVoter {
 

@@ -5,7 +5,6 @@ import kr.cosmoisland.cosmoislands.api.level.IslandLevel;
 import kr.cosmoisland.cosmoislands.api.level.IslandRewardData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;

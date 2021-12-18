@@ -9,7 +9,6 @@ import kr.cosmoisland.cosmoislands.api.IslandRegistry;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
 import kr.cosmoisland.cosmoislands.api.player.ModificationStrategyRegistry;
-import kr.cosmoisland.cosmoislands.api.player.PlayerModificationStrategy;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.Nonnull;

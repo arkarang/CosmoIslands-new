@@ -2,7 +2,6 @@ package kr.cosmoislands.cosmoislands.bukkit.utils;
 
 import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
 import com.minepalm.arkarangutils.bukkit.ItemStackBuilder;
-import kr.cosmoisland.cosmoislands.bukkit.gui.components.ConfirmCompounds;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

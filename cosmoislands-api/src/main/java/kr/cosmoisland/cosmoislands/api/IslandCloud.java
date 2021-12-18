@@ -1,6 +1,5 @@
 package kr.cosmoisland.cosmoislands.api;
 
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public interface IslandCloud {

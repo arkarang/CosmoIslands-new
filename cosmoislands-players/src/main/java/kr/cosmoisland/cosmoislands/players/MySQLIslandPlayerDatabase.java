@@ -2,7 +2,6 @@ package kr.cosmoisland.cosmoislands.players;
 
 import kr.cosmoisland.cosmoislands.api.Island;
 import kr.cosmoisland.cosmoislands.core.Database;
-import kr.msleague.mslibrary.database.impl.internal.MySQLDatabase;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.PreparedStatement;

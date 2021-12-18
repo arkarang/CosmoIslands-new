@@ -6,10 +6,7 @@ import com.minepalm.helloplayer.core.HelloPlayers;
 import kr.cosmoisland.cosmoislands.api.Island;
 import kr.cosmoisland.cosmoislands.api.IslandRanking;
 import kr.cosmoisland.cosmoislands.api.IslandRegistry;
-import kr.cosmoisland.cosmoislands.api.level.IslandLevel;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
-import kr.cosmoisland.cosmoislands.api.points.IslandPoints;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -19,7 +16,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 

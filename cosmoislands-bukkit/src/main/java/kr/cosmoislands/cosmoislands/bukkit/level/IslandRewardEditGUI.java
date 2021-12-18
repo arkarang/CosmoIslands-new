@@ -1,7 +1,6 @@
 package kr.cosmoislands.cosmoislands.bukkit.level;
 
 import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
-import com.minepalm.arkarangutils.bukkit.SimpleGUI;
 import kr.cosmoisland.cosmoislands.bukkit.CosmoIslandsBukkitBootstrap;
 import kr.cosmoisland.cosmoislands.bukkit.database.RewardSettingLoader;
 import kr.cosmoisland.cosmoislands.bukkit.island.RewardSetting;

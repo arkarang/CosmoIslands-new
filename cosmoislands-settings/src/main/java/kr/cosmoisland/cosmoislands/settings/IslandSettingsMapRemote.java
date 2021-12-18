@@ -2,7 +2,6 @@ package kr.cosmoisland.cosmoislands.settings;
 
 import kr.cosmoisland.cosmoislands.api.IslandCloud;
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
-import kr.cosmoisland.cosmoislands.api.protection.IslandProtection;
 import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 

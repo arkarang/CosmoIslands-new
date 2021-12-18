@@ -1,7 +1,6 @@
 package kr.cosmoisland.cosmoislands.players;
 
 import kr.cosmoisland.cosmoislands.api.IslandDataModel;
-import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
 import kr.cosmoisland.cosmoislands.api.player.MemberRank;
 import kr.cosmoisland.cosmoislands.core.AbstractLoader;
 import kr.cosmoisland.cosmoislands.core.Database;

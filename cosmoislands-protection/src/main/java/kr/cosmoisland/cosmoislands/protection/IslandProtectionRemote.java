@@ -3,13 +3,13 @@ package kr.cosmoisland.cosmoislands.protection;
 import com.google.common.collect.ImmutableMap;
 import kr.cosmoisland.cosmoislands.api.IslandCloud;
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
 import kr.cosmoisland.cosmoislands.api.player.MemberRank;
 import kr.cosmoisland.cosmoislands.api.protection.IslandPermissions;
 import kr.cosmoisland.cosmoislands.api.protection.IslandPermissionsMap;
 import kr.cosmoisland.cosmoislands.api.protection.IslandProtection;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;

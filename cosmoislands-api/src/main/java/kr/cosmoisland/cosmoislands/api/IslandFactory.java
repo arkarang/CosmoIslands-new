@@ -1,7 +1,6 @@
 package kr.cosmoisland.cosmoislands.api;
 
 import com.google.common.collect.ImmutableList;
-import kr.cosmoisland.cosmoislands.api.player.PlayerModificationStrategy;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;

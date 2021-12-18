@@ -9,7 +9,6 @@ import kr.cosmoisland.cosmoislands.api.IslandService;
 import kr.cosmoisland.cosmoislands.api.level.IslandLevel;
 import kr.cosmoisland.cosmoislands.core.Database;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.util.concurrent.CompletableFuture;

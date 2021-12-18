@@ -1,7 +1,5 @@
 package kr.cosmoisland.cosmoislands.level;
 
-import kr.cosmoisland.cosmoislands.api.IslandDataModel;
-import kr.cosmoisland.cosmoislands.api.level.IslandLevel;
 import kr.cosmoisland.cosmoislands.core.AbstractDataModel;
 import kr.cosmoisland.cosmoislands.core.Database;
 

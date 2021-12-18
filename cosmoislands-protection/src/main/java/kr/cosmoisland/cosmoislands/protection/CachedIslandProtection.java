@@ -2,14 +2,14 @@ package kr.cosmoisland.cosmoislands.protection;
 
 import com.google.common.collect.ImmutableMap;
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
 import kr.cosmoisland.cosmoislands.api.player.MemberRank;
 import kr.cosmoisland.cosmoislands.api.protection.IslandPermissions;
 import kr.cosmoisland.cosmoislands.api.protection.IslandPermissionsMap;
 import kr.cosmoisland.cosmoislands.api.protection.IslandProtection;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoisland.cosmoislands.core.utils.Cached;
 import lombok.val;
 

@@ -5,9 +5,9 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import kr.cosmoisland.cosmoislands.api.Island;
+import kr.cosmoisland.cosmoislands.api.IslandRegistry;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayer;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
-import kr.cosmoisland.cosmoislands.api.IslandRegistry;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;

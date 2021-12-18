@@ -1,4 +1,4 @@
-package kr.cosmoisland.cosmoislands.bukkit.gui.components;
+package kr.cosmoislands.cosmoislands.bukkit.utils;
 
 import com.minepalm.arkarangutils.bukkit.Pair;
 import lombok.Getter;

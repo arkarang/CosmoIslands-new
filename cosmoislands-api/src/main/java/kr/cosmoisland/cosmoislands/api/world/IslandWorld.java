@@ -4,7 +4,6 @@ import kr.cosmoisland.cosmoislands.api.AbstractLocation;
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public interface IslandWorld extends IslandComponent {
 

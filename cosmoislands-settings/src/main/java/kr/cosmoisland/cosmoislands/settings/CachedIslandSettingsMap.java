@@ -1,7 +1,6 @@
 package kr.cosmoisland.cosmoislands.settings;
 
 import com.google.common.collect.ImmutableMap;
-import kr.cosmoisland.cosmoislands.api.IslandComponent;
 import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoisland.cosmoislands.core.utils.Cached;
 

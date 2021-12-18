@@ -3,7 +3,6 @@ package kr.cosmoisland.cosmoislands.level;
 import kr.cosmoisland.cosmoislands.api.level.IslandRewardData;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
 public class RewardDataFactory {

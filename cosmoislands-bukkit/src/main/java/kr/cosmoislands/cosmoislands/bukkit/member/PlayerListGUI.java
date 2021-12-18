@@ -1,6 +1,8 @@
 package kr.cosmoislands.cosmoislands.bukkit.member;
 
 import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
+import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
+import com.minepalm.helloplayer.core.HelloPlayers;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -57,5 +59,22 @@ public class PlayerListGUI extends ArkarangGUI {
         item.setItemMeta(sm);
         con.accept(player, item);
         return item;
+    }
+
+
+    static BiConsumer<OfflinePlayer, ItemStack> provide(BukkitExecutor executor) {
+        return (off, item) ->{
+            final ItemMeta metaBefore  = item.getItemMeta();
+            metaBefore.setDisplayName("§7§l조회중...");
+            item.setItemMeta(metaBefore);
+            HelloPlayers.inst().getProxied(off.getUniqueId()).isOnline().thenAccept(online->{
+                final ItemMeta meta  = item.getItemMeta();
+                if(online)
+                    meta.setDisplayName("§a§l온라인: "+off.getName());
+                else
+                    meta.setDisplayName("§a§l오프라인: "+off.getName());
+                executor.sync(()-> item.setItemMeta(meta));
+            });
+        };
     }
 }

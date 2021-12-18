@@ -1,6 +1,5 @@
 package kr.comsoisland.cosmoislands.points;
 
-import kr.cosmoisland.cosmoislands.api.IslandDataModel;
 import kr.cosmoisland.cosmoislands.core.Database;
 
 import java.sql.PreparedStatement;

@@ -1,7 +1,9 @@
 package kr.cosmoisland.cosmoislands.core;
 
 import com.google.common.collect.ImmutableMap;
-import kr.cosmoisland.cosmoislands.api.*;
+import kr.cosmoisland.cosmoislands.api.Island;
+import kr.cosmoisland.cosmoislands.api.IslandRegistry;
+import kr.cosmoisland.cosmoislands.api.IslandServer;
 import lombok.Getter;
 
 import java.util.concurrent.ConcurrentHashMap;

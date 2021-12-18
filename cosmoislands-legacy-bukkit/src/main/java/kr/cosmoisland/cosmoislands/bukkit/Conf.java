@@ -3,7 +3,6 @@ package kr.cosmoisland.cosmoislands.bukkit;
 import com.minepalm.arkarangutils.bukkit.SimpleConfig;
 import kr.msleague.mslibrary.database.MSLDatabases;
 import kr.msleague.mslibrary.database.api.DatabaseConfig;
-import lombok.Getter;
 
 public class Conf extends SimpleConfig {
 

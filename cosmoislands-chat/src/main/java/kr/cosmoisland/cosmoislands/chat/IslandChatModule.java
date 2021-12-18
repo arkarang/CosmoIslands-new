@@ -12,7 +12,6 @@ import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMapModule;
 import kr.cosmoislands.cosmochat.core.CosmoChat;
 import kr.cosmoislands.cosmochat.privatechat.CosmoChatPrivateChat;
-import kr.cosmoislands.cosmochat.privatechat.PrivateChatRegistry;
 import kr.msleague.mslibrary.database.impl.internal.MySQLDatabase;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

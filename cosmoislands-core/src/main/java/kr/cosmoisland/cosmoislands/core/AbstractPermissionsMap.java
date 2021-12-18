@@ -1,8 +1,8 @@
 package kr.cosmoisland.cosmoislands.core;
 
+import kr.cosmoisland.cosmoislands.api.player.MemberRank;
 import kr.cosmoisland.cosmoislands.api.protection.IslandPermissions;
 import kr.cosmoisland.cosmoislands.api.protection.IslandPermissionsMap;
-import kr.cosmoisland.cosmoislands.api.player.MemberRank;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;

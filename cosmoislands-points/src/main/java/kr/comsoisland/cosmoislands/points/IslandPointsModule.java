@@ -4,6 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import kr.cosmoisland.cosmoislands.api.IslandModule;
+import kr.cosmoisland.cosmoislands.api.IslandRanking;
 import kr.cosmoisland.cosmoislands.api.IslandService;
 import kr.cosmoisland.cosmoislands.api.points.IslandPoints;
 import kr.cosmoisland.cosmoislands.api.points.IslandVoter;
@@ -19,6 +20,8 @@ public class IslandPointsModule implements IslandModule<IslandPoints> {
 
     @Getter
     private final Logger logger;
+    @Getter
+    private final IslandRanking ranking;
     private final IslandPointDataModel model;
     private final VoteLogDataModel voteModel;
     private final LoadingCache<Integer, IslandPoints> pointsCache = CacheBuilder.newBuilder().build(new CacheLoader<Integer, IslandPoints>() {
