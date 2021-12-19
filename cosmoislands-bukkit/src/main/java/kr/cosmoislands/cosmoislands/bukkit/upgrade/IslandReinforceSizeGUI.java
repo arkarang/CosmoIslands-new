@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.concurrent.ExecutionException;
 
-public class IslandReinforceSizeGUI extends ReinforceGUI<IslandData>{
+public class IslandReinforceSizeGUI extends ReinforceGUI<Island>{
 
     IslandBank bank;
 

@@ -4,6 +4,6 @@ import kr.cosmoisland.cosmoislands.api.IslandComponent;
 
 public interface IslandUpgrade extends IslandComponent {
 
-    UpgradeCondition getCondition(UpgradeType type);
+    IslandUpgradeCondition getCondition(IslandUpgradeType type);
 
 }

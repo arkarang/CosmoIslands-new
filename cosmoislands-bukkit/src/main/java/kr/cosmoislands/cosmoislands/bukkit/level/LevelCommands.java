@@ -14,11 +14,13 @@ import kr.cosmoisland.cosmoislands.api.level.IslandRewardData;
 import kr.cosmoisland.cosmoislands.api.level.IslandRewardsRegistry;
 import kr.cosmoisland.cosmoislands.level.IslandAchievementsModule;
 import kr.cosmoisland.cosmoislands.level.IslandLevelModule;
+import kr.cosmoisland.cosmoislands.level.bukkit.MinecraftItemRewardData;
 import kr.cosmoislands.cosmoislands.bukkit.PlayerPreconditions;
 import kr.cosmoislands.cosmoislands.bukkit.utils.AbstractRankingGUI;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +52,7 @@ public class LevelCommands {
             return level.getLevel();
         });
         manager.registerCommand(new User(factory, executor, levelModule, registry, pattern));
-        manager.registerCommand(new Admin(executor, registry));
+        manager.registerCommand(new Admin(registry));
     }
 
     @RequiredArgsConstructor
@@ -106,11 +108,13 @@ public class LevelCommands {
                             player.sendMessage("당신은 섬이 없습니다.");
                             return;
                         }
+
                         IslandLevel islandLevel = island.getComponent(IslandLevel.class);
                         val levelFuture = islandLevel.getLevel();
                         val listFuture = registry.getAll();
                         IslandAchievements achievements = island.getComponent(IslandAchievements.class);
                         val mapFuture = achievements.asMap();
+
                         mapFuture.thenCombine(listFuture, (map, list)->{
                             Map<Integer, IslandRewardData> rewardDataView = new HashMap<>();
                             list.forEach(data-> rewardDataView.put(data.getId(), data));
@@ -136,18 +140,27 @@ public class LevelCommands {
     @RequiredArgsConstructor
     protected static class Admin extends BaseCommand{
 
-        private final BukkitExecutor executor;
         private final IslandRewardsRegistry registry;
-        //todo: implements this.
 
         @Subcommand("보상설정")
         public void modifyAchievementItem(Player player, int id){
-
+            MinecraftItemRewardData data = (MinecraftItemRewardData) registry.getRewardData(id);
+            if(data == null) {
+                data = new MinecraftItemRewardData(id, 1, new ItemStack[0]);
+                registry.insertRewardData(data).thenRun(()->{
+                    player.sendMessage("해당 id가 존재하지 않아, 새로운 데이터를 생성했습니다.");
+                    player.sendMessage("다시 명령어를 입력해서 보상을 설정해주세요.");
+                });
+            }else {
+                AchievementEditGUI editGUI = new AchievementEditGUI(registry, data);
+                editGUI.openGUI(player);
+            }
         }
 
         @Subcommand("보상레벨")
-        public void modifyAchievementLevel(Player player, int id){
-
+        public void modifyAchievementLevel(Player player, int id, int level){
+            registry.setRequiredLevel(id, level);
+            player.sendMessage("보상 id: "+id+"번의 요구 레벨을 "+level+"로 설정했습니다.");
         }
     }
 }

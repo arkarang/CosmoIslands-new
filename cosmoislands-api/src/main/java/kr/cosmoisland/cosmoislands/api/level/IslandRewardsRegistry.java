@@ -9,5 +9,7 @@ public interface IslandRewardsRegistry {
 
     CompletableFuture<Void> insertRewardData(IslandRewardData data);
 
+    CompletableFuture<Void> setRequiredLevel(int id, int level);
+
     CompletableFuture<List<IslandRewardData>> getAll();
 }

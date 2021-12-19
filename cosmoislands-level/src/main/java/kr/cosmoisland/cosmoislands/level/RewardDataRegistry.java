@@ -9,6 +9,7 @@ import kr.cosmoisland.cosmoislands.core.Database;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -59,6 +60,16 @@ public class RewardDataRegistry implements IslandRewardsRegistry {
         cache.put(data.getId(), CompletableFuture.completedFuture(data));
         lastUpdated.put(data.getId(), data);
         return model.insert(data);
+    }
+
+    @Override
+    public CompletableFuture<Void> setRequiredLevel(int id, int level) {
+        return model.setRequiredLevel(id, level);
+    }
+
+    @Override
+    public CompletableFuture<List<IslandRewardData>> getAll() {
+        return model.getAll();
     }
 
     public void sync(int id){

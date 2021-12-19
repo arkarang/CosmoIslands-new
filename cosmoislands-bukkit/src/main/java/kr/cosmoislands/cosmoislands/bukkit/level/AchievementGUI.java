@@ -4,12 +4,9 @@ import com.google.common.collect.HashBiMap;
 import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import com.minepalm.arkarangutils.bukkit.ItemStackBuilder;
-import com.minepalm.arkarangutils.bukkit.ItemUtils;
-import kr.cosmoisland.cosmoislands.api.Island;
 import kr.cosmoisland.cosmoislands.api.level.IslandAchievements;
 import kr.cosmoisland.cosmoislands.api.level.IslandLevel;
 import kr.cosmoisland.cosmoislands.api.level.IslandRewardData;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -18,29 +15,27 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AchievementGUI extends ArkarangGUI {
 
     private static final ItemStack yellow, white, bottle;
     private static HashMap<Integer, Integer> map = new HashMap<>();
-    private static HashBiMap<Integer, Integer> slot2Slot = HashBiMap.create();
+    private static final HashBiMap<Integer, Integer> ID_TO_SLOT = HashBiMap.create();
 
     static{
         yellow = new ItemStackBuilder(new ItemStack(Material.YELLOW_STAINED_GLASS_PANE, 1)).setName(" ").getHandle();
         white = new ItemStackBuilder(new ItemStack(Material.WHITE_STAINED_GLASS_PANE, 1)).setName(" ").getHandle();
         bottle = new ItemStack(Material.EXPERIENCE_BOTTLE);
-        slot2Slot.put(0, 19);
-        slot2Slot.put(1, 29);
-        slot2Slot.put(2, 21);
-        slot2Slot.put(3, 31);
-        slot2Slot.put(4, 23);
-        slot2Slot.put(5, 33);
-        slot2Slot.put(6, 25);
+        ID_TO_SLOT.put(0, 19);
+        ID_TO_SLOT.put(1, 29);
+        ID_TO_SLOT.put(2, 21);
+        ID_TO_SLOT.put(3, 31);
+        ID_TO_SLOT.put(4, 23);
+        ID_TO_SLOT.put(5, 33);
+        ID_TO_SLOT.put(6, 25);
     }
 
     HashMap<Integer, AtomicBoolean> locks = new HashMap<>();
@@ -75,8 +70,8 @@ public class AchievementGUI extends ArkarangGUI {
         }
 
         inv.setItem(4, getLevelIcon(currentLevel));
-        for(int i = 0; i < slot2Slot.size(); i++){
-            int slot = slot2Slot.getOrDefault(i, -1);
+        for(int i = 0; i < ID_TO_SLOT.size(); i++){
+            int slot = ID_TO_SLOT.getOrDefault(i, -1);
             if(slot != -1) {
                 locks.put(slot, new AtomicBoolean(false));
                 inv.setItem(slot, getRewardIcon(i, map.get(i), currentLevel, achievementView.get(i)));
@@ -105,14 +100,14 @@ public class AchievementGUI extends ArkarangGUI {
                 Player player = (Player)event.getWhoClicked();
                 if(!locks.get(slot).get()) {
                     locks.get(slot).set(true);
-                    int rewardSlot = slot2Slot.inverse().get(slot);
-                    if (!achievementView.get(rewardSlot) && currentLevel >= reqLevel) {
-                        IslandRewardData data = rewardDataView.get(rewardSlot);
+                    int rewardId = ID_TO_SLOT.inverse().get(slot);
+                    if (!achievementView.get(rewardId) && currentLevel >= reqLevel) {
+                        IslandRewardData data = rewardDataView.get(rewardId);
                         try{
                             CompletableFuture<Integer> levelFuture = level.getLevel();
-                            achievements.isAchieved(rewardSlot).thenCombine(levelFuture, (isAchieved, levelValue)->{
+                            achievements.isAchieved(rewardId).thenCombine(levelFuture, (isAchieved, levelValue)->{
                                 if(!isAchieved && levelValue >= reqLevel){
-                                    achievements.setAchieved(rewardSlot, true);
+                                    achievements.setAchieved(rewardId, true);
                                     executor.sync(()->{
                                         data.provide(player.getUniqueId());
                                         player.sendMessage("보상을 받았습니다!");

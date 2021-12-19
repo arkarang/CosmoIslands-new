@@ -1,6 +1,7 @@
 package kr.cosmoislands.cosmoislands.bukkit.level;
 
 import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
+import kr.cosmoisland.cosmoislands.api.level.IslandRewardsRegistry;
 import kr.cosmoisland.cosmoislands.level.IslandAchievementsModule;
 import kr.cosmoisland.cosmoislands.level.bukkit.MinecraftItemRewardData;
 import org.bukkit.Bukkit;
@@ -13,12 +14,12 @@ import java.util.List;
 
 public class AchievementEditGUI extends ArkarangGUI {
 
-    IslandAchievementsModule module;
+    IslandRewardsRegistry registry;
     MinecraftItemRewardData data;
 
-    public AchievementEditGUI(IslandAchievementsModule module, MinecraftItemRewardData data) {
+    public AchievementEditGUI(IslandRewardsRegistry registry, MinecraftItemRewardData data) {
         super(1, data.getRequiredLevel()+"레벨 보상 수정하기");
-        this.module = module;
+        this.registry = registry;
         this.data = data;
         for(int i = 0; i < data.getItems().length && i < 9 ; i++){
             inv.setItem(i, data.getItems()[i]);
@@ -34,6 +35,6 @@ public class AchievementEditGUI extends ArkarangGUI {
                 newList.add(inv.getItem(i));
             }
         }
-        this.module.getRewardDataRegistry().insertRewardData(new MinecraftItemRewardData(data.getId(), data.getRequiredLevel(), newList.toArray(new ItemStack[0])));
+        registry.insertRewardData(new MinecraftItemRewardData(data.getId(), data.getRequiredLevel(), newList.toArray(new ItemStack[0])));
     }
 }

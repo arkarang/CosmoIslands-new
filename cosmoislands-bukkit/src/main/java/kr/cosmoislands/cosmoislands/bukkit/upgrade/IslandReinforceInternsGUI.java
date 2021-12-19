@@ -2,7 +2,6 @@ package kr.cosmoislands.cosmoislands.bukkit.upgrade;
 
 import com.minepalm.arkarangutils.bukkit.ItemStackBuilder;
 import kr.cosmoisland.cosmoislands.api.bank.IslandBank;
-import kr.cosmoisland.cosmoislands.bukkit.config.ReinforceSetting;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,12 +31,12 @@ public class IslandReinforceInternsGUI extends ReinforceGUI<IslandData>{
     }
 
     @Override
-    boolean hasCost(int lv, IslandData islandData) throws ExecutionException, InterruptedException {
+    boolean hasCost(int lv, IslandData islandData) {
         return setting.getComponent(lv).getCost() <= bank.getMoney().get();
     }
 
     @Override
-    void takeAndLevelUp(int lv, IslandData islandData) throws ExecutionException, InterruptedException {
+    void takeAndLevelUp(int lv, IslandData islandData) {
         bank.takeMoney(getCost(lv)).get();
         islandData.setMaxInterns(setting.getComponent(lv).getValue());
     }
@@ -62,7 +61,7 @@ public class IslandReinforceInternsGUI extends ReinforceGUI<IslandData>{
     }
 
     @Override
-    int getCurrentLevel(IslandData islandData) throws ExecutionException, InterruptedException {
+    int getCurrentLevel(IslandData islandData) {
         for(int k = 0; k <= setting.getMaxLevel(); k ++){
             if( islandData.getMaxInterns().get() <= setting.getComponent(k).getValue())
                 return setting.getComponent(k).getLevel();
@@ -74,4 +73,5 @@ public class IslandReinforceInternsGUI extends ReinforceGUI<IslandData>{
     void executeAlreadyReached(Player player, int cl) throws ExecutionException, InterruptedException {
         player.sendMessage("이미 강화했습니다.");
     }
+
 }

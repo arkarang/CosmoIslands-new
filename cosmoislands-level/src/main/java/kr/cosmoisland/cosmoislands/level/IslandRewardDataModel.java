@@ -64,6 +64,20 @@ public class IslandRewardDataModel {
         });
     }
 
+    public CompletableFuture<Void> setRequiredLevel(int id, int level) {
+        return get(id).thenAccept(data->{
+            if(data != null){
+                database.executeAsync(connection -> {
+                    PreparedStatement ps = connection.prepareStatement("UPDATE "+table+" SET `requiredLevel`=? WHERE `island_id`=?");
+                    ps.setInt(1, level);
+                    ps.setInt(2, id);
+                    ps.execute();
+                    return null;
+                });
+            }
+        });
+    }
+
     CompletableFuture<Void> delete(int id){
         return database.executeAsync(connection -> {
             PreparedStatement ps = connection.prepareStatement("DELETE FROM "+table+" WHERE `id`=?");

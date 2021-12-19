@@ -1,6 +1,6 @@
 package kr.cosmoisland.cosmoislands.api.upgrade;
 
-public enum UpgradeType {
+public enum IslandUpgradeType {
 
     MAX_PLAYERS, MAX_INTERNS, BORDER_SIZE, INVENTORY_SIZE;
 }

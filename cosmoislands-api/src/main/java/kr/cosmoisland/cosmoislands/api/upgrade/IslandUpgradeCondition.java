@@ -2,11 +2,11 @@ package kr.cosmoisland.cosmoislands.api.upgrade;
 
 import kr.cosmoisland.cosmoislands.api.Island;
 
-public interface UpgradeCondition {
+public interface IslandUpgradeCondition {
 
-    UpgradeType getType();
+    IslandUpgradeType getType();
 
-    UpgradeSettings getSettings();
+    IslandUpgradeSettings getSettings();
 
     boolean canUpgrade(Island island);
 
