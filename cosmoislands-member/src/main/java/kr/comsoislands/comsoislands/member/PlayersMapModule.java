@@ -1,4 +1,4 @@
-package kr.cosmoisland.cosmoislands.players;
+package kr.comsoislands.comsoislands.member;
 
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import kr.cosmoisland.cosmoislands.api.IslandRegistry;
@@ -8,6 +8,7 @@ import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMapModule;
 import kr.cosmoisland.cosmoislands.api.player.ModificationStrategyRegistry;
 import kr.cosmoisland.cosmoislands.core.Database;
+import kr.cosmoisland.cosmoislands.settings.IslandSettingsModule;
 import lombok.Getter;
 
 import java.util.concurrent.CompletableFuture;
@@ -23,21 +24,24 @@ public final class PlayersMapModule implements IslandPlayersMapModule {
     private final PlayersMapRegistry playersMapRegistry;
     @Getter
     private final IslandPlayerRegistry registry;
+    private final IslandSettingsModule settingsModule;
     private final PlayersMapDataModel model;
     @Getter
     private final ModificationStrategyRegistry strategyRegistry;
 
     public PlayersMapModule(IslandRegistry islandRegistry,
                             IslandPlayerRegistry registry,
+                            IslandSettingsModule settingsModule,
                             Database database,
                             RedisAsyncCommands<String, String> redis, Logger logger){
         this.database = database;
         this.redis = redis;
         this.logger = logger;
         this.registry = registry;
+        this.settingsModule = settingsModule;
         this.strategyRegistry = new CosmoPlayerModificationStrategyRegistry();
-        this.model = new PlayersMapDataModel("cosmoislands_members", "cosmoislands_interns ", "cosmoislands_islands", database);
-        this.playersMapRegistry = new PlayersMapRegistry(islandRegistry, this.registry, model, this.redis, this.strategyRegistry);
+        this.model = new PlayersMapDataModel("cosmoislands_members", "cosmoislands_islands", database);
+        this.playersMapRegistry = new PlayersMapRegistry(islandRegistry, this.registry, model, settingsModule, this.redis, this.strategyRegistry);
     }
 
     @Override

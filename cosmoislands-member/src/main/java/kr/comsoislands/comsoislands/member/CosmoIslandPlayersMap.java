@@ -1,4 +1,4 @@
-package kr.cosmoisland.cosmoislands.players;
+package kr.comsoislands.comsoislands.member;
 
 import com.google.common.collect.ImmutableMap;
 import kr.cosmoisland.cosmoislands.api.Island;
@@ -7,6 +7,8 @@ import kr.cosmoisland.cosmoislands.api.player.IslandPlayer;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
 import kr.cosmoisland.cosmoislands.api.player.MemberRank;
 import kr.cosmoisland.cosmoislands.api.player.PlayerModificationStrategy;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
+import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -20,6 +22,7 @@ public class CosmoIslandPlayersMap implements IslandPlayersMap {
     final Island island;
     final MySQLPlayersMap mysql;
     final RedisPlayersMap redis;
+    final IslandSettingsMap settings;
     final ImmutableMap<String, PlayerModificationStrategy> strategies;
 
     @Override
@@ -144,5 +147,37 @@ public class CosmoIslandPlayersMap implements IslandPlayersMap {
     @Override
     public CompletableFuture<Boolean> isIntern(UUID uuid) {
         return redis.isIntern(uuid);
+    }
+
+    @Override
+    public CompletableFuture<Void> setMaxPlayers(int i) {
+        return settings.setSetting(IslandSetting.MAX_MEMBERS, Integer.toString(i));
+    }
+
+    @Override
+    public CompletableFuture<Integer> getMaxInterns() {
+        return settings.getSettingAsync(IslandSetting.MAX_INTERNS).thenApply(value->{
+            return parseOrDefault(value, 5);
+        });
+    }
+
+    @Override
+    public CompletableFuture<Void> setMaxInterns(int i) {
+        return settings.setSetting(IslandSetting.MAX_INTERNS, Integer.toString(i));
+    }
+
+    @Override
+    public CompletableFuture<Integer> getMaxPlayers() {
+        return settings.getSettingAsync(IslandSetting.MAX_MEMBERS).thenApply(value->{
+            return parseOrDefault(value, 5);
+        });
+    }
+
+    private int parseOrDefault(String value, int defaultValue){
+        try{
+            return Integer.parseInt(value);
+        }catch (IllegalArgumentException e ){
+            return defaultValue;
+        }
     }
 }

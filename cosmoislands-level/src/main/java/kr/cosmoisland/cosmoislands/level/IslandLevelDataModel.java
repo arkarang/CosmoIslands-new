@@ -64,6 +64,15 @@ public class IslandLevelDataModel extends AbstractDataModel {
         });
     }
 
+    CompletableFuture<Void> addLevel(int islandId, int value){
+        return database.executeAsync(connection -> {
+            PreparedStatement ps = connection.prepareStatement("UPDATE " + table + " SET `level`=`level`+" + value + " WHERE `island_id`=?");
+            ps.setInt(1, islandId);
+            ps.execute();
+            return null;
+        });
+    }
+
     @Override
     public CompletableFuture<Void> delete(int id) {
         return database.executeAsync(connection -> {

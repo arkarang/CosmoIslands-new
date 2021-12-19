@@ -10,10 +10,7 @@ import com.minepalm.helloplayer.core.HelloPlayers;
 import kr.cosmoisland.cosmoislands.api.Island;
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
 import kr.cosmoisland.cosmoislands.api.chat.IslandChat;
-import kr.cosmoisland.cosmoislands.api.player.IslandPlayer;
-import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
-import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
-import kr.cosmoisland.cosmoislands.api.player.MemberRank;
+import kr.cosmoisland.cosmoislands.api.player.*;
 import kr.cosmoisland.cosmoislands.core.CosmoIslands;
 import kr.cosmoislands.cosmochat.core.api.ChatPlayer;
 import kr.cosmoislands.cosmochat.core.helper.CosmoChatHelper;
@@ -487,9 +484,6 @@ public class MemberCommands {
                     return CompletableFuture.completedFuture(null);
                 });
 
-                //todo: 개인 알바 최대 개수
-                CompletableFuture<Boolean> exceededPersonalMaxInterns = CompletableFuture.completedFuture(false);
-
                 preconditions.getIsland().thenCombine(receiverUuidFuture, (island, receiverUuid) -> {
                     if(island == null){
                         player.sendMessage("당신은 섬에 소속되어 있지 않습니다.");
@@ -533,6 +527,12 @@ public class MemberCommands {
                     CompletableFuture<Boolean> isMemberFuture, isInternFuture;
                     isMemberFuture = preconditions.isMember(receiverUuid);
                     isInternFuture = preconditions.isIntern(receiverUuid);
+
+                    IslandPlayer ip = playerRegistry.get(receiverUuid);
+                    IslandInternship internship = ip.getInternship();
+                    CompletableFuture<Boolean> exceededPersonalMaxInterns = internship.getMaxInternships()
+                            .thenCombine(internship.getHiredIslands(), (max, list)-> max <= list.size());
+
                     isMemberFuture.thenCombine(isInternFuture, (isMember, isIntern)->{
                         if(isMember){
                             player.sendMessage("해당 플레이어는 섬원입니다.");
@@ -677,8 +677,11 @@ public class MemberCommands {
                         }
                         return CompletableFuture.completedFuture(null);
                     });
-                    //todo: 개인 알바 최대 개수
-                    CompletableFuture<Boolean> exceededPersonalMaxInterns = CompletableFuture.completedFuture(false);
+
+                    IslandPlayer ip = playerRegistry.get(player.getUniqueId());
+                    IslandInternship internship = ip.getInternship();
+                    CompletableFuture<Boolean> exceededPersonalMaxInterns = internship.getMaxInternships()
+                            .thenCombine(internship.getHiredIslands(), (max, list)-> max <= list.size());
 
                     playerPreconditions.hasIsland().thenCombine(senderHasIslandFuture, (hasIsland, senderHasIsland)->{
                         if(hasIsland){

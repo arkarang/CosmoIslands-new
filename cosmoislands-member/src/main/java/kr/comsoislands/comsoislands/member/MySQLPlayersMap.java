@@ -1,4 +1,4 @@
-package kr.cosmoisland.cosmoislands.players;
+package kr.comsoislands.comsoislands.member;
 
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayer;
@@ -94,5 +94,25 @@ public class MySQLPlayersMap implements IslandPlayersMap {
     @Override
     public CompletableFuture<Boolean> isIntern(UUID uuid) {
         return model.isIntern(islandId, uuid);
+    }
+
+    @Override
+    public CompletableFuture<Void> setMaxPlayers(int i) {
+        throw new UnsupportedOperationException("not supported");
+    }
+
+    @Override
+    public CompletableFuture<Integer> getMaxInterns() {
+        throw new UnsupportedOperationException("not supported");
+    }
+
+    @Override
+    public CompletableFuture<Void> setMaxInterns(int i) {
+        throw new UnsupportedOperationException("not supported");
+    }
+
+    @Override
+    public CompletableFuture<Integer> getMaxPlayers() {
+        throw new UnsupportedOperationException("not supported");
     }
 }

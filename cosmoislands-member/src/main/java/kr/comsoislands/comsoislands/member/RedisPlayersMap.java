@@ -1,4 +1,4 @@
-package kr.cosmoisland.cosmoislands.players;
+package kr.comsoislands.comsoislands.member;
 
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
@@ -156,5 +156,25 @@ public class RedisPlayersMap implements IslandPlayersMap {
     @Override
     public CompletableFuture<Boolean> isIntern(UUID uuid) {
         return async.sismember(internsKey, uuid.toString()).toCompletableFuture();
+    }
+
+    @Override
+    public CompletableFuture<Void> setMaxPlayers(int i) {
+        throw new UnsupportedOperationException("not supported");
+    }
+
+    @Override
+    public CompletableFuture<Integer> getMaxInterns() {
+        throw new UnsupportedOperationException("not supported");
+    }
+
+    @Override
+    public CompletableFuture<Void> setMaxInterns(int i) {
+        throw new UnsupportedOperationException("not supported");
+    }
+
+    @Override
+    public CompletableFuture<Integer> getMaxPlayers() {
+        throw new UnsupportedOperationException("not supported");
     }
 }

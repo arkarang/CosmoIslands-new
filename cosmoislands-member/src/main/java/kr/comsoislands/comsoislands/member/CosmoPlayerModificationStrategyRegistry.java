@@ -1,4 +1,4 @@
-package kr.cosmoisland.cosmoislands.players;
+package kr.comsoislands.comsoislands.member;
 
 import com.google.common.collect.ImmutableMap;
 import kr.cosmoisland.cosmoislands.api.player.ModificationStrategyRegistry;

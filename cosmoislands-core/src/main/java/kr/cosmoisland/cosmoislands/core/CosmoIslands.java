@@ -13,6 +13,7 @@ import kr.cosmoisland.cosmoislands.core.thread.IslandThreadFactory;
 import kr.cosmoisland.cosmoislands.players.MySQLIslandPlayerDatabase;
 import kr.cosmoisland.cosmoislands.players.RedisIslandPlayerRegistry;
 import kr.cosmoislands.cosmochat.core.CosmoChat;
+import kr.msleague.mslibrary.database.impl.internal.MySQLDatabase;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -47,13 +48,10 @@ public class CosmoIslands implements IslandService {
                   CosmoChat chatService,
                   ManyWorlds manyworlds,
                   Database database,
+                  MySQLDatabase msMySQLDatabase,
                   IslandFactory factory ){
         StatefulRedisConnection<String, String> connection = client.connect();
         RedisAsyncCommands<String, String> async = connection.async();
-        MySQLIslandPlayerDatabase playerDatabase = new MySQLIslandPlayerDatabase(
-                database,
-                "cosmoislands_players",
-                "cosmoislands_islands");
         this.redis = client;
         this.externalRepository = new CosmoExternalRepository();
         this.threadFactory = new IslandThreadFactory("cosmoislands");
@@ -65,7 +63,8 @@ public class CosmoIslands implements IslandService {
         this.factory = factory;
         this.cloud = new RedisIslandCloud(networkModule, this, async);
         this.registry = new CosmoIslandRegistry(100, this.cloud.getLocalServer());
-        this.playerRegistry = new RedisIslandPlayerRegistry(this.registry, playerDatabase, async);
+        this.playerRegistry = RedisIslandPlayerRegistry
+                .build("cosmoislands_players", "cosmoislands_islands", msMySQLDatabase, async, registry);
         this.garbageCollector = new CosmoIslandGarbageCollector(this, 1000*30*60L);
         this.executors = Executors.newScheduledThreadPool(4, this.threadFactory);
         this.modules = new ConcurrentHashMap<>();
@@ -127,8 +126,8 @@ public class CosmoIslands implements IslandService {
                     e.printStackTrace();
                 }
             }
+            isInitialized.set(true);
         }
-
     }
 
     @Override

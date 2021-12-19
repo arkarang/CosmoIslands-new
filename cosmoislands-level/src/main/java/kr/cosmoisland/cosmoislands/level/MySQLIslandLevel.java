@@ -18,6 +18,11 @@ public class MySQLIslandLevel implements IslandLevel {
     }
 
     @Override
+    public CompletableFuture<Void> addLevel(int value) {
+        return model.addLevel(islandId, value);
+    }
+
+    @Override
     public CompletableFuture<Void> setLevel(int value) {
         return model.setLevel(islandId, value);
     }

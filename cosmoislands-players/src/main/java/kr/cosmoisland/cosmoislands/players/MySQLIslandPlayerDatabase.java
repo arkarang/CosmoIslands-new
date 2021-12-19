@@ -1,7 +1,7 @@
 package kr.cosmoisland.cosmoislands.players;
 
 import kr.cosmoisland.cosmoislands.api.Island;
-import kr.cosmoisland.cosmoislands.core.Database;
+import kr.msleague.mslibrary.database.impl.internal.MySQLDatabase;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.PreparedStatement;
@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class MySQLIslandPlayerDatabase {
 
-    final Database database;
+    final MySQLDatabase database;
     final String table;
     final String islandTable;
 
@@ -45,15 +45,15 @@ public class MySQLIslandPlayerDatabase {
         });
     }
 
-    public CompletableFuture<List<Integer>> getPlayers(int id){
+    public CompletableFuture<List<UUID>> getPlayers(int id){
         return database.executeAsync(connection -> {
             PreparedStatement ps = connection.prepareStatement("SELECT `uuid` FROM "+table+" WHERE `island_id`=?");
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
-            List<Integer> list = new ArrayList<>();
+            List<UUID> list = new ArrayList<>();
             while (rs.next()){
                 try {
-                    list.add(id);
+                    list.add(UUID.fromString(rs.getString(1)));
                 }catch (IllegalArgumentException ignored){
 
                 }

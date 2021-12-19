@@ -2,6 +2,7 @@ package kr.cosmoisland.cosmoislands.players;
 
 import kr.cosmoisland.cosmoislands.api.Island;
 import kr.cosmoisland.cosmoislands.api.IslandRegistry;
+import kr.cosmoisland.cosmoislands.api.player.IslandInternship;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayer;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
 import lombok.Getter;
@@ -17,6 +18,8 @@ public class CosmoIslandPlayer implements IslandPlayer {
     @Getter
     private final UUID uniqueId;
     private final IslandRegistry registry;
+    @Getter
+    private final IslandInternship internship;
     private final IslandPlayerRegistry playerRegistry;
 
     @Override

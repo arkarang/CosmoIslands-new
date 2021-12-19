@@ -2,6 +2,7 @@ package kr.cosmoisland.cosmoislands.level.bukkit;
 
 import com.minepalm.arkarangutils.bukkit.ItemUtils;
 import kr.cosmoisland.cosmoislands.level.AbstractRewardData;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -11,7 +12,8 @@ import java.util.UUID;
 
 public class MinecraftItemRewardData extends AbstractRewardData {
 
-    ItemStack[] items;
+    @Getter
+    final ItemStack[] items;
 
     public MinecraftItemRewardData(int id, int requiredLevel, ItemStack[] items) {
         super(id, requiredLevel);

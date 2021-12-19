@@ -9,6 +9,8 @@ public interface IslandLevel extends IslandComponent {
     //level
     CompletableFuture<Integer> getLevel();
 
+    CompletableFuture<Void> addLevel(int value);
+
     //level
     CompletableFuture<Void> setLevel(int value);
 }

@@ -1,8 +1,8 @@
-package kr.cosmoisland.cosmoislands.players;
+package kr.comsoislands.comsoislands.member;
 
 import kr.cosmoisland.cosmoislands.api.IslandDataModel;
 import kr.cosmoisland.cosmoislands.api.player.MemberRank;
-import kr.cosmoisland.cosmoislands.core.AbstractLoader;
+import kr.cosmoisland.cosmoislands.core.AbstractDataModel;
 import kr.cosmoisland.cosmoislands.core.Database;
 
 import java.sql.PreparedStatement;
@@ -10,14 +10,12 @@ import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-public class PlayersMapDataModel extends AbstractLoader implements IslandDataModel {
+public class PlayersMapDataModel extends AbstractDataModel implements IslandDataModel {
 
     final String islandTable;
-    final String internsTable;
 
-    public PlayersMapDataModel(String table, String interns, String islandTable, Database database) {
+    public PlayersMapDataModel(String table, String islandTable, Database database) {
         super(table, database);
-        this.internsTable = interns;
         this.islandTable = islandTable;
     }
 
@@ -28,16 +26,6 @@ public class PlayersMapDataModel extends AbstractLoader implements IslandDataMod
                     "`island_id` BIGINT, " +
                     "`uuid` VARCHAR(36), " +
                     "`member_rank` TINYINT, "+
-                    "PRIMARY KEY(`island_id`, `uuid`), " +
-                    "FOREIGN KEY (`island_id`) REFERENCES "+islandTable+"(`island_id`) ON DELETE CASCADE) " +
-                    "charset=utf8mb4");
-            ps.execute();
-        });
-        database.execute(connection -> {
-            PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS "+internsTable+" " +
-                    "(`column_id` BIGINT UNIQUE AUTO_INCREMENT, " +
-                    "`island_id` BIGINT, " +
-                    "`uuid` VARCHAR(36), " +
                     "PRIMARY KEY(`island_id`, `uuid`), " +
                     "FOREIGN KEY (`island_id`) REFERENCES "+islandTable+"(`island_id`) ON DELETE CASCADE) " +
                     "charset=utf8mb4");
@@ -62,10 +50,7 @@ public class PlayersMapDataModel extends AbstractLoader implements IslandDataMod
         return database.executeAsync(connection -> {
             PreparedStatement ps = connection.prepareStatement("DELETE FROM "+table+" WHERE `island_id`=?");
             ps.setInt(1, id);
-            ps.execute();
-            PreparedStatement ps2 = connection.prepareStatement("DELETE FROM "+internsTable+" WHERE `island_id`=?");
-            ps2.setInt(1, id);
-            ps2.execute();
+            ps.execute();;
             return null;
         });
     }
@@ -117,14 +102,6 @@ public class PlayersMapDataModel extends AbstractLoader implements IslandDataMod
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 return MemberRank.get(rs.getInt(1));
-            }else{
-                PreparedStatement ps2 = connection.prepareStatement("SELECT 1 FROM "+internsTable+" WHERE `island_id`=? AND `uuid`=?");
-                ps.setInt(1, islandId);
-                ps.setString(2, uuid.toString());
-                ResultSet rs2 = ps2.executeQuery();
-                if(rs2.next()){
-                    return MemberRank.INTERN;
-                }
             }
             return MemberRank.NONE;
         });
@@ -155,7 +132,7 @@ public class PlayersMapDataModel extends AbstractLoader implements IslandDataMod
     
     public CompletableFuture<Boolean> isMember(int islandId, UUID uuid) {
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("SELECT 1 FROM "+table+" WHERE `island_id`=? AND `uuid`=?");
+            PreparedStatement ps = connection.prepareStatement("SELECT `island_id` FROM "+table+" WHERE `island_id`=? AND `uuid`=?");
             ps.setInt(1, islandId);
             ps.setString(2, uuid.toString());
             ResultSet rs = ps.executeQuery();
@@ -184,9 +161,11 @@ public class PlayersMapDataModel extends AbstractLoader implements IslandDataMod
 
     public CompletableFuture<Void> removeIntern(int islandId, UUID uuid) {
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("DELETE FROM "+internsTable+" WHERE `island_id`=? AND `uuid`=?");
+            PreparedStatement ps = connection.prepareStatement("DELETE FROM "+table+" " +
+                    "WHERE `island_id`=? AND `uuid`=? AND `member_rank` <= ?");
             ps.setInt(1, islandId);
             ps.setString(2, uuid.toString());
+            ps.setInt(3, MemberRank.INTERN.getPriority());
             ps.execute();
             return null;
         });
@@ -194,10 +173,13 @@ public class PlayersMapDataModel extends AbstractLoader implements IslandDataMod
     
     public CompletableFuture<Void> addIntern(int islandId, UUID uuid) {
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO "+internsTable+" (`island_id`, `uuid`) VALUES(?, ?) ON DUPLICATE KEY UPDATE `uuid`=?");
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO "+table+" " +
+                    "(`island_id`, `uuid`, `member_rank`) " +
+                    "VALUES(?, ?, ?) " +
+                    "ON DUPLICATE KEY UPDATE `member_rank`=VALUES(`member_rank`)");
             ps.setInt(1, islandId);
             ps.setString(2, uuid.toString());
-            ps.setString(3, uuid.toString());
+            ps.setInt(3, MemberRank.INTERN.getPriority());
             ps.execute();
             return null;
         });
@@ -205,8 +187,10 @@ public class PlayersMapDataModel extends AbstractLoader implements IslandDataMod
 
     public CompletableFuture<List<UUID>> getInterns(int islandId) {
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("SELECT `uuid` FROM "+internsTable+" WHERE `island_id`=?");
+            PreparedStatement ps = connection.prepareStatement("SELECT `uuid` FROM "+table+" " +
+                    "WHERE `island_id`=? AND `member_rank`=?");
             ps.setInt(1, islandId);
+            ps.setInt(2, MemberRank.INTERN.getPriority());
             ResultSet rs = ps.executeQuery();
             List<UUID> list = new ArrayList<>();
             while (rs.next()){
@@ -222,9 +206,11 @@ public class PlayersMapDataModel extends AbstractLoader implements IslandDataMod
 
     public CompletableFuture<Boolean> isIntern(int islandId, UUID uuid) {
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("SELECT 1 FROM "+internsTable+" WHERE `island_id`=? AND `uuid`=?");
+            PreparedStatement ps = connection.prepareStatement("SELECT `uuid` FROM "+table+" " +
+                    "WHERE `island_id`=? AND `uuid`=? AND `member_rank`=?");
             ps.setInt(1, islandId);
             ps.setString(2, uuid.toString());
+            ps.setInt(3, MemberRank.INTERN.getPriority());
             return ps.executeQuery().next();
         });
     }

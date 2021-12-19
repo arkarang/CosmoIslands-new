@@ -1,4 +1,4 @@
-package kr.cosmoisland.cosmoislands.players;
+package kr.comsoislands.comsoislands.member;
 
 import kr.cosmoisland.cosmoislands.api.ComponentLifecycle;
 import kr.cosmoisland.cosmoislands.api.IslandContext;

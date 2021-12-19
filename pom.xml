@@ -26,6 +26,7 @@
         <module>cosmoislands-bukkit</module>
         <module>cosmoislands-upgrade</module>
         <module>cosmoislands-bungee</module>
+        <module>cosmoislands-member</module>
     </modules>
 
     <properties>
