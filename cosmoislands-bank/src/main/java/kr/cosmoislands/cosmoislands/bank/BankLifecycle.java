@@ -31,11 +31,13 @@ public class BankLifecycle implements ComponentLifecycle {
 
     @Override
     public CompletableFuture<Void> onUnload(IslandContext island) {
+        module.invalidate(island.getIslandId());
         return island.getComponent(IslandBank.class).invalidate();
     }
 
     @Override
     public CompletableFuture<Void> onDelete(IslandContext island) {
+        module.invalidate(island.getIslandId());
         return island.getComponent(IslandBank.class).invalidate();
     }
 }

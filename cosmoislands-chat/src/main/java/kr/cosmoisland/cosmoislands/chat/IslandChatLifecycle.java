@@ -21,25 +21,27 @@ public class IslandChatLifecycle implements ComponentLifecycle {
 
     @Override
     public CompletableFuture<Void> onLoad(IslandContext island) {
-        island.register(IslandChat.class, module.get(island.getIslandId()));
-        return CompletableFuture.completedFuture(null);
+        return module.getAsync(island.getIslandId()).thenAccept(component->{
+            island.register(IslandChat.class, component);
+        });
     }
 
     @Override
     public CompletableFuture<Void> onCreate(UUID owner, IslandContext island) {
-        island.register(IslandChat.class, module.get(island.getIslandId()));
-        return CompletableFuture.completedFuture(null);
+        return module.getAsync(island.getIslandId()).thenAccept(component->{
+            island.register(IslandChat.class, component);
+        });
     }
 
     @Override
     public CompletableFuture<Void> onUnload(IslandContext island) {
-        island.getComponent(IslandChat.class).invalidate();
-        return CompletableFuture.completedFuture(null);
+        module.invalidate(island.getIslandId());
+        return island.getComponent(IslandChat.class).invalidate();
     }
 
     @Override
     public CompletableFuture<Void> onDelete(IslandContext island) {
-        island.getComponent(IslandChat.class).invalidate();
-        return CompletableFuture.completedFuture(null);
+        module.invalidate(island.getIslandId());
+        return island.getComponent(IslandChat.class).invalidate();
     }
 }

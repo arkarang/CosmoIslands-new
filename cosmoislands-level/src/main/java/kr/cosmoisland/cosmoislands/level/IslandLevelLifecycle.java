@@ -33,11 +33,13 @@ public class IslandLevelLifecycle implements ComponentLifecycle {
 
     @Override
     public CompletableFuture<Void> onUnload(IslandContext island) {
+        module.invalidate(island.getIslandId());
         return CompletableFuture.completedFuture(null);
     }
 
     @Override
     public CompletableFuture<Void> onDelete(IslandContext island) {
+        module.invalidate(island.getIslandId());
         return CompletableFuture.completedFuture(null);
     }
 }

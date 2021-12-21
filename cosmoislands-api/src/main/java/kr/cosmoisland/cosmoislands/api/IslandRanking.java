@@ -11,8 +11,8 @@ public interface IslandRanking {
     @Data
     @RequiredArgsConstructor
     class RankingData{
-        int islandId;
-        int value;
+        final int islandId;
+        final int value;
     }
 
     CompletableFuture<List<RankingData>> getTopOf(int rank);

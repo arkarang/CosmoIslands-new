@@ -49,6 +49,11 @@ public class IslandAchievementsModule implements IslandModule<IslandAchievements
     }
 
     @Override
+    public void invalidate(int islandId) {
+        cache.invalidate(islandId);
+    }
+
+    @Override
     public void onEnable(IslandService service) {
         this.model.init();
         service.getFactory().addLast("achievements", new IslandAchievementsLifecycle(this));

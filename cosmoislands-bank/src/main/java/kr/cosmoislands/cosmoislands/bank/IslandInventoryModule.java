@@ -61,6 +61,11 @@ public class IslandInventoryModule implements IslandModule<IslandBank> {
     }
 
     @Override
+    public void invalidate(int islandId) {
+        cache.invalidate(islandId);
+    }
+
+    @Override
     public void onEnable(IslandService service) {
         model.init();
         service.getFactory().addLast("inventory", new BankLifecycle(this));

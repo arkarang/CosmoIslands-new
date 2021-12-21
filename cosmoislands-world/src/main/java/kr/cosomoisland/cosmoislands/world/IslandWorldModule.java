@@ -4,7 +4,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
-import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import com.minepalm.manyworlds.api.ManyWorld;
 import com.minepalm.manyworlds.api.WorldService;
 import com.minepalm.manyworlds.api.entity.WorldInform;
@@ -17,7 +16,6 @@ import kr.cosmoisland.cosmoislands.api.IslandService;
 import kr.cosmoisland.cosmoislands.api.world.IslandWorld;
 import kr.cosmoisland.cosmoislands.core.Database;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 import java.util.Properties;
@@ -31,7 +29,7 @@ public class IslandWorldModule implements IslandModule<IslandWorld> {
     private final WorldService worldService;
     private final MySQLIslandWorldDataModel model;
     private final ImmutableMap<String, Integer> defaultValues;
-    private final ConcurrentHashMap<Integer, CompletableFuture<IslandWorld>> map = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, CompletableFuture<IslandWorld>> local = new ConcurrentHashMap<>();
     private final LoadingCache<Integer, IslandManyWorld> proxiedCache = CacheBuilder.newBuilder()
             .expireAfterWrite(1, TimeUnit.HOURS)
             .build(new CacheLoader<Integer, IslandManyWorld>() {
@@ -65,8 +63,8 @@ public class IslandWorldModule implements IslandModule<IslandWorld> {
 
     @Override
     public CompletableFuture<IslandWorld> getAsync(int islandId) {
-        if(map.containsKey(islandId))
-            return map.get(islandId);
+        if(local.containsKey(islandId))
+            return local.get(islandId);
         else {
             try {
                 return CompletableFuture.completedFuture(proxiedCache.get(islandId));
@@ -79,8 +77,8 @@ public class IslandWorldModule implements IslandModule<IslandWorld> {
     @Override
     public IslandWorld get(int islandId) {
         try {
-            if(map.containsKey(islandId))
-                return map.get(islandId).get();
+            if(local.containsKey(islandId))
+                return local.get(islandId).get();
             else
                 return proxiedCache.get(islandId);
         }catch (InterruptedException | ExecutionException e){
@@ -88,12 +86,18 @@ public class IslandWorldModule implements IslandModule<IslandWorld> {
         }
     }
 
+    @Override
+    public void invalidate(int islandId) {
+        unregister(islandId);
+        proxiedCache.invalidate(islandId);
+    }
+
     void register(int islandId, CompletableFuture<IslandWorld> future){
-        map.put(islandId, future);
+        local.put(islandId, future);
     }
 
     void unregister(int islandId){
-        map.remove(islandId);
+        local.remove(islandId);
     }
 
     @Override
@@ -104,7 +108,7 @@ public class IslandWorldModule implements IslandModule<IslandWorld> {
 
     @Override
     public void onDisable(IslandService service) {
-        map.clear();
+        local.clear();
         proxiedCache.invalidateAll();
     }
 

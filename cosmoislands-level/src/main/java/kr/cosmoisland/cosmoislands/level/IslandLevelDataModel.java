@@ -1,10 +1,13 @@
 package kr.cosmoisland.cosmoislands.level;
 
+import kr.cosmoisland.cosmoislands.api.IslandRanking;
 import kr.cosmoisland.cosmoislands.core.AbstractDataModel;
 import kr.cosmoisland.cosmoislands.core.Database;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -80,6 +83,34 @@ public class IslandLevelDataModel extends AbstractDataModel {
             ps.setInt(1, id);
             ps.execute();
             return null;
+        });
+    }
+
+    CompletableFuture<List<IslandRanking.RankingData>> getTopOf(int count){
+        return database.executeAsync(connection -> {
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( SELECT `island_id`, `level`, dense_rank() over (order by `level`) as ranking FROM "+table+") ranks WHERE ranks.ranking <= ?");
+            ps.setInt(1, count);
+            ResultSet rs = ps.executeQuery();
+            List<IslandRanking.RankingData> list = new ArrayList<>();
+            while (rs.next()){
+                int islandId = rs.getInt(1);
+                int level = rs.getInt(2);
+                IslandRanking.RankingData data = new IslandRanking.RankingData(islandId, level);
+                list.add(data);
+            }
+            return list;
+        });
+    }
+
+    CompletableFuture<Integer> getRank(int islandId){
+        return database.executeAsync(connection -> {
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( SELECT `island_id`, `level`, dense_rank() over (order by `level`) as ranking FROM "+table+") ranks WHERE ranks.island_id = ?");
+            ps.setInt(1, islandId);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                return rs.getInt(3);
+            }
+            return -1;
         });
     }
 }

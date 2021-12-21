@@ -1,0 +1,11 @@
+main: kr.cosmoislands.cosmoislands.bukkit.CosmoIslandsBukkit
+name: CosmoIslands
+version: 1.0.0-SNAPSHOT
+author: arkarang
+depend:
+  - CosmoChat
+  - HelloBukkit
+  - HelloPlayers
+  - ManyWorlds
+  - CosmoTeleport
+  - CosmoDataSource

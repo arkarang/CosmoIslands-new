@@ -49,6 +49,11 @@ public class IslandVaultModule implements IslandModule<IslandVault> {
     }
 
     @Override
+    public void invalidate(int islandId) {
+        cache.invalidate(islandId);
+    }
+
+    @Override
     public void onEnable(IslandService service) {
         model.init();
         service.getFactory().addLast("money", new VaultLifecycle(this));

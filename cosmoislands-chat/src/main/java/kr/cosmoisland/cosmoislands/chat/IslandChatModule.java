@@ -62,6 +62,11 @@ public class IslandChatModule implements IslandModule<IslandChat> {
     }
 
     @Override
+    public void invalidate(int islandId) {
+        cache.invalidate(islandId);
+    }
+
+    @Override
     public void onEnable(IslandService service) {
         IslandRankChatPlaceholder placeholder = new IslandRankChatPlaceholder(service.getRegistry(), playerRegistry);
         this.chatService.getFormatRegistry().registerPlaceholder(placeholder.getIdentifier(), placeholder);

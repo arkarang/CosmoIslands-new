@@ -55,6 +55,11 @@ public final class PlayersMapModule implements IslandPlayersMapModule {
     }
 
     @Override
+    public void invalidate(int islandId) {
+        playersMapRegistry.invalidate(islandId);
+    }
+
+    @Override
     public void onEnable(IslandService service) {
         this.model.init();
         this.database.register(PlayersMapDataModel.class, this.model);

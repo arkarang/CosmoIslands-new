@@ -37,6 +37,11 @@ public class IslandPermissionsMapModule implements IslandModule<IslandPermission
     }
 
     @Override
+    public void invalidate(int islandId) {
+
+    }
+
+    @Override
     public void onEnable(IslandService service) {
         service.getFactory().addLast("permissions", new IslandPermissionsLifecycle(this));
     }

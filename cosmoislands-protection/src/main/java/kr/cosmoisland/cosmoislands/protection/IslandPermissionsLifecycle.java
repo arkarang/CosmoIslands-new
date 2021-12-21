@@ -34,12 +34,14 @@ public class IslandPermissionsLifecycle implements ComponentLifecycle {
     @Override
     public CompletableFuture<Void> onUnload(IslandContext island) {
         island.getComponent(IslandPermissionsMap.class).invalidate();
+        module.invalidate(island.getIslandId());
         return CompletableFuture.completedFuture(null);
     }
 
     @Override
     public CompletableFuture<Void> onDelete(IslandContext island) {
         island.getComponent(IslandPermissionsMap.class).invalidate();
+        module.invalidate(island.getIslandId());
         return CompletableFuture.completedFuture(null);
     }
 }

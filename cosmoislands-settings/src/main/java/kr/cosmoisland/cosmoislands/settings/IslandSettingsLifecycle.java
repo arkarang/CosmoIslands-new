@@ -32,6 +32,7 @@ public class IslandSettingsLifecycle implements ComponentLifecycle {
 
     @Override
     public CompletableFuture<Void> onUnload(IslandContext island) {
+        module.invalidate(island.getIslandId());
         return module.getAsync(island.getIslandId()).thenAccept(IslandComponent::invalidate);
     }
 

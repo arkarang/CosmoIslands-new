@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 public class YamlIslandConfiguration extends SimpleConfig implements IslandConfiguration {
 
-    protected YamlIslandConfiguration(CosmoIslandsBukkit plugin) {
+    public YamlIslandConfiguration(CosmoIslandsBukkit plugin) {
         super(plugin, "config.yml");
     }
 

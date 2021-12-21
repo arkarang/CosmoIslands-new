@@ -99,7 +99,6 @@ public class IslandWarpCommands {
         @Subcommand("워프")
         public void warp(Player player, String name){
             PlayerPreconditions preconditions = PlayerPreconditions.of(player.getUniqueId());
-            final World world = player.getWorld();
             preconditions.getIsland().thenCompose(island -> {
                 if(island == null){
                     player.sendMessage("당신은 섬이 존재하지 않습니다.");

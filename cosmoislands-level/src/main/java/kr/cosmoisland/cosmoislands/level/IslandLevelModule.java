@@ -30,6 +30,7 @@ public class IslandLevelModule implements IslandModule<IslandLevel> {
 
     public IslandLevelModule(Database database, Logger logger){
         this.model = new IslandLevelDataModel("cosmoislands_level", "cosmoislands_islands", database);
+        this.ranking = new LevelRanking(model);
         this.logger = logger;
     }
 
@@ -42,6 +43,11 @@ public class IslandLevelModule implements IslandModule<IslandLevel> {
     @SneakyThrows
     public IslandLevel get(int islandId) {
         return cache.get(islandId);
+    }
+
+    @Override
+    public void invalidate(int islandId) {
+        cache.invalidate(islandId);
     }
 
     @Override

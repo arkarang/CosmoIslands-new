@@ -40,6 +40,7 @@ public class IslandPointsModule implements IslandModule<IslandPoints> {
     public IslandPointsModule(Database database, Logger logger){
         this.model = new IslandPointDataModel("cosmoislands_points", "cosmoislands_islands", database);
         this.voteModel = new VoteLogDataModel("cosmoislands_vote_log", database);
+        this.ranking = new PointRanking(model);
         this.logger = logger;
     }
 
@@ -55,6 +56,11 @@ public class IslandPointsModule implements IslandModule<IslandPoints> {
         }catch (ExecutionException e){
             return null;
         }
+    }
+
+    @Override
+    public void invalidate(int islandId) {
+        pointsCache.invalidate(islandId);
     }
 
     public CosmoIslandVoter getVoter(UUID uuid){

@@ -47,14 +47,14 @@ public class IslandWorldLifecycle implements ComponentLifecycle {
     @Override
     public CompletableFuture<Void> onUnload(IslandContext island) {
         IslandManyWorld imw = (IslandManyWorld)(module.get(island.getIslandId()));
-        module.unregister(island.getIslandId());
+        module.invalidate(island.getIslandId());
         return imw.getManyWorld().unload().thenRun(()->{});
     }
 
     @Override
     public CompletableFuture<Void> onDelete(IslandContext island) {
-        module.unregister(island.getIslandId());
-        return service.unload(toInform(island));
+        module.invalidate(island.getIslandId());
+        return service.unload(toInform(island)).thenRun(()->{});
     }
 
     private WorldInform toInform(IslandContext island){

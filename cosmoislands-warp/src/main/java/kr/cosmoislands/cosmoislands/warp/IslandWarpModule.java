@@ -64,7 +64,7 @@ public class IslandWarpModule implements IslandModule<IslandWarpsMap> {
 
     @Override
     public void invalidate(int islandId) {
-        //todo: implements this.
+        cache.invalidate(islandId);
     }
 
     @Override
