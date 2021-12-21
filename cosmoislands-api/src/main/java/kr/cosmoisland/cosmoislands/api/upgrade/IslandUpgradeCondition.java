@@ -2,13 +2,23 @@ package kr.cosmoisland.cosmoislands.api.upgrade;
 
 import kr.cosmoisland.cosmoislands.api.Island;
 
+import java.util.concurrent.CompletableFuture;
+
 public interface IslandUpgradeCondition {
+
+    enum Result{
+        SUCCESSFUL, NOT_ENOUGH_MONEY, REACHED_MAX_LEVEL, ALREADY_REACHED, FAILED;
+    }
 
     IslandUpgradeType getType();
 
-    IslandUpgradeSettings getSettings();
+    CompletableFuture<IslandUpgradeSettings> getSettings();
 
-    boolean canUpgrade(Island island);
+    CompletableFuture<Boolean> canUpgrade();
 
-    void upgrade(Island island);
+    CompletableFuture<Boolean> hasCost();
+
+    CompletableFuture<Boolean> isReachedMaxLevel();
+
+    CompletableFuture<Result> upgrade();
 }
