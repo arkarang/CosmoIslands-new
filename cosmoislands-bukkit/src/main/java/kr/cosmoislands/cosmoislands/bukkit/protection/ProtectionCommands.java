@@ -1,5 +1,7 @@
 package kr.cosmoislands.cosmoislands.bukkit.protection;
 
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.PaperCommandManager;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
 import kr.cosmoisland.cosmoislands.api.protection.IslandPermissions;
@@ -17,9 +19,13 @@ import java.util.UUID;
 
 public class ProtectionCommands {
 
+    public static void init(PaperCommandManager manager, CosmoTeleport teleport){
+        manager.registerCommand(new User(teleport));
+    }
+
     @CommandAlias("섬")
     @RequiredArgsConstructor
-    protected static class User{
+    protected static class User extends BaseCommand {
 
         private final CosmoTeleport teleportService;
 

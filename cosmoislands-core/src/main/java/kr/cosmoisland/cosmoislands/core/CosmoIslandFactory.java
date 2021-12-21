@@ -20,7 +20,7 @@ public class CosmoIslandFactory implements IslandFactory {
 
     private final ExecutorService service;
     private final Database database;
-    private final boolean isLocal;
+    private final boolean isLocal = true;
 
     private final LinkedList<String> orders = new LinkedList<>();
     private final ConcurrentHashMap<String, ComponentLifecycle> lifecycles = new ConcurrentHashMap<>();

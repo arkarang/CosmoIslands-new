@@ -27,14 +27,13 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class IslandProtectionModule implements IslandModule<IslandProtection> {
 
-    HelloEveryone networkModule;
-    IslandPermissionsMapModule permissionsMapModule;
-    IslandPlayersMapModule playersMapModule;
-    IslandSettingsModule settingsModule;
-    IslandPlayerRegistry playerRegistry;
-    IslandCloud cloud;
+    final IslandPermissionsMapModule permissionsMapModule;
+    final IslandPlayersMapModule playersMapModule;
+    final IslandSettingsModule settingsModule;
+    final IslandPlayerRegistry playerRegistry;
+    final IslandCloud cloud;
     @Getter(AccessLevel.PUBLIC)
-    Logger logger;
+    final Logger logger;
 
     ConcurrentHashMap<Integer, IslandProtection> map = new ConcurrentHashMap<>();
 

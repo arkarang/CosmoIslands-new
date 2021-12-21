@@ -1,22 +1,50 @@
 package kr.cosmoislands.cosmoislands.bukkit.upgrade;
 
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.PaperCommandManager;
+import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import kr.cosmoisland.cosmoislands.api.IslandRegistry;
+import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeType;
 import kr.cosmoisland.cosmoislands.core.CosmoIslands;
 import kr.cosmoislands.cosmoislands.bukkit.PlayerPreconditions;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class UpgradeCommands {
 
-    protected static class User{
+    public static void init(PaperCommandManager manager, BukkitExecutor executor){
+        manager.registerCommand(new User(executor));
+    }
 
-        BukkitExecutor executor;
+    public static void init(PaperCommandManager manager, BukkitExecutor executor, Map<IslandUpgradeType, UpgradeMainGUI.IconMap> icons){
+        manager.registerCommand(new User(executor, icons));
+    }
+
+    @CommandAlias("섬")
+    @RequiredArgsConstructor
+    protected static class User extends BaseCommand {
+
+        final BukkitExecutor executor;
+        final Map<IslandUpgradeType, UpgradeMainGUI.IconMap> iconMaps;
+
+        protected User(BukkitExecutor executor){
+            this.executor = executor;
+            this.iconMaps = new HashMap<>();
+            for (IslandUpgradeType value : IslandUpgradeType.values()) {
+                iconMaps.put(value, UpgradeMainGUI.IconMap.singletonIconMap(new ItemStack(Material.GRASS_BLOCK)));
+            }
+        }
 
         @Subcommand("강화")
         public void upgrade(Player player){
@@ -42,7 +70,10 @@ public class UpgradeCommands {
                     }).thenCompose(inIsland -> {
                         if(inIsland != null){
                             if(inIsland){
-                                UpgradeMainGUI gui;
+                                preconditions.getIsland().thenAccept(island->{
+                                    UpgradeMainGUI gui = new UpgradeMainGUI(iconMaps, island, executor);
+                                    executor.sync(()->gui.openGUI(player));
+                                });
                             }else{
                                 player.sendMessage("섬 안에서만 명령어를 실행할수 있습니다.");
                             }

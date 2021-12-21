@@ -37,7 +37,7 @@ public class IslandPointsModule implements IslandModule<IslandPoints> {
         }
     });
 
-    IslandPointsModule(Database database, Logger logger){
+    public IslandPointsModule(Database database, Logger logger){
         this.model = new IslandPointDataModel("cosmoislands_points", "cosmoislands_islands", database);
         this.voteModel = new VoteLogDataModel("cosmoislands_vote_log", database);
         this.logger = logger;

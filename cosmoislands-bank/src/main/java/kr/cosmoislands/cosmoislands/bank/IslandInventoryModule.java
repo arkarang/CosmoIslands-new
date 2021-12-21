@@ -36,7 +36,7 @@ public class IslandInventoryModule implements IslandModule<IslandBank> {
                 }
             });
 
-    IslandInventoryModule(Database database, BukkitExecutor executor, Logger logger){
+    public IslandInventoryModule(Database database, BukkitExecutor executor, Logger logger){
         this.executor = executor;
         this.model = new IslandInventoryDataModel("cosmoislands_inventory", "cosmoislands_islands", database);
         this.logger = logger;

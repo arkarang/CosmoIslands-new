@@ -20,7 +20,6 @@ import lombok.SneakyThrows;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
-@RequiredArgsConstructor
 public class IslandChatModule implements IslandModule<IslandChat> {
 
     private final CosmoChat chatService;

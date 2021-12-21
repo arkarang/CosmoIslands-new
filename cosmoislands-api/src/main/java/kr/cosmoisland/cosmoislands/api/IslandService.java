@@ -1,5 +1,7 @@
 package kr.cosmoisland.cosmoislands.api;
 
+import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
+
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -9,6 +11,8 @@ public interface IslandService {
     ExternalRepository getExternalRepository();
 
     IslandFactory getFactory();
+
+    IslandPlayerRegistry getPlayerRegistry();
 
     IslandRegistry getRegistry();
 

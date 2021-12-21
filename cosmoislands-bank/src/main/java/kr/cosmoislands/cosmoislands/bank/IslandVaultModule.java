@@ -25,7 +25,7 @@ public class IslandVaultModule implements IslandModule<IslandVault> {
         }
     });
 
-    IslandVaultModule(Database database, Logger logger){
+    public IslandVaultModule(Database database, Logger logger){
         this.logger = logger;
         this.model = new IslandVaultDataModel("cosmoislands_money", "cosmoislands_islands", database);
     }

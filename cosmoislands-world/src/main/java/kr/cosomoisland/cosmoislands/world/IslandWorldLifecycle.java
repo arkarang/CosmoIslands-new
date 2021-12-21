@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class IslandWorldLifecycle implements ComponentLifecycle {
 
-    private final CosmoIslandWorldModule module;
+    private final IslandWorldModule module;
     private final WorldService service;
     private final WorldCategory category = WorldToken.get("ISLAND");
     private final WorldInform defaultWorld = new WorldInform(WorldTokens.TYPE, "ISLAND");
@@ -54,7 +54,7 @@ public class IslandWorldLifecycle implements ComponentLifecycle {
     @Override
     public CompletableFuture<Void> onDelete(IslandContext island) {
         module.unregister(island.getIslandId());
-        return service.delete(toInform(island));
+        return service.unload(toInform(island));
     }
 
     private WorldInform toInform(IslandContext island){

@@ -1,6 +1,7 @@
 package kr.cosmoislands.cosmoislands.bukkit.member;
 
 import co.aikar.commands.BaseCommand;
+import co.aikar.commands.PaperCommandManager;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
@@ -9,6 +10,7 @@ import com.minepalm.arkarangutils.invitation.InvitationService;
 import com.minepalm.helloplayer.core.HelloPlayers;
 import kr.cosmoisland.cosmoislands.api.Island;
 import kr.cosmoisland.cosmoislands.api.IslandComponent;
+import kr.cosmoisland.cosmoislands.api.IslandService;
 import kr.cosmoisland.cosmoislands.api.chat.IslandChat;
 import kr.cosmoisland.cosmoislands.api.player.*;
 import kr.cosmoisland.cosmoislands.core.CosmoIslands;
@@ -28,9 +30,19 @@ import java.util.concurrent.ExecutionException;
 
 public class MemberCommands {
 
+    public static void init(PaperCommandManager manager,
+                            IslandService service,
+                            HelloPlayers players,
+                            InvitationService member,
+                            InvitationService intern,
+                            CosmoChatHelper helper,
+                            BukkitExecutor executor){
+        manager.registerCommand(new User(service.getPlayerRegistry(), players, member, intern, helper, executor));
+    }
+
     @CommandAlias("섬")
     @RequiredArgsConstructor
-    protected static class User{
+    protected static class User extends BaseCommand{
 
         private final IslandPlayerRegistry playerRegistry;
         private final HelloPlayers playersModule;

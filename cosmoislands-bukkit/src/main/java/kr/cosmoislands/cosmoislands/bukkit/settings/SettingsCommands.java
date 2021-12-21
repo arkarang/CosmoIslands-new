@@ -1,5 +1,8 @@
 package kr.cosmoislands.cosmoislands.bukkit.settings;
 
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.PaperCommandManager;
+import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
@@ -13,8 +16,13 @@ import java.util.concurrent.CompletableFuture;
 
 public class SettingsCommands {
 
+    public static void init(PaperCommandManager manager, BukkitExecutor executor){
+        manager.registerCommand(new User(executor));
+    }
+
     @RequiredArgsConstructor
-    protected static class User {
+    @CommandAlias("섬")
+    protected static class User extends BaseCommand {
 
         private final BukkitExecutor executor;
 

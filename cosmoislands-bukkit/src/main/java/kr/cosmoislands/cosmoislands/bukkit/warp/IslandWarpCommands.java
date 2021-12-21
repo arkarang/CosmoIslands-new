@@ -1,10 +1,12 @@
 package kr.cosmoislands.cosmoislands.bukkit.warp;
 
 import co.aikar.commands.BaseCommand;
+import co.aikar.commands.PaperCommandManager;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import kr.cosmoisland.cosmoislands.api.AbstractLocation;
+import kr.cosmoisland.cosmoislands.api.IslandService;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayer;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
@@ -12,6 +14,9 @@ import kr.cosmoisland.cosmoislands.api.player.MemberRank;
 import kr.cosmoisland.cosmoislands.api.warp.*;
 import kr.cosmoislands.cosmoislands.bukkit.PlayerPreconditions;
 import kr.cosmoislands.cosmoislands.bukkit.utils.IslandUtils;
+import kr.cosmoislands.cosmoislands.warp.CosmoTeleportExecutor;
+import kr.cosmoislands.cosmoislands.warp.IslandWarpModule;
+import kr.cosmoislands.cosmoteleport.CosmoTeleport;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -20,6 +25,10 @@ import org.bukkit.entity.Player;
 import java.util.concurrent.CompletableFuture;
 
 public class IslandWarpCommands {
+
+    public static void init(PaperCommandManager manager, IslandService service, IslandWarpModule module, BukkitExecutor executor){
+        manager.registerCommand(new User(service.getPlayerRegistry(), module.getTeleportExecutor(), executor));
+    }
 
     @CommandAlias("섬")
     @RequiredArgsConstructor

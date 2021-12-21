@@ -18,7 +18,7 @@ import java.text.DecimalFormat;
 
 public class BankCommands {
 
-    public void init(IslandService service, PaperCommandManager manager){
+    public static void init(IslandService service, PaperCommandManager manager){
         Economy economy = service.getExternalRepository().getRegisteredService(Economy.class);
         manager.registerCommand(new Admin());
         manager.registerCommand(new User(economy));

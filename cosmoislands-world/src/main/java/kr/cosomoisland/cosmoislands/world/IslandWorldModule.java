@@ -24,8 +24,7 @@ import java.util.Properties;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 
-@RequiredArgsConstructor
-public class CosmoIslandWorldModule implements IslandModule<IslandWorld> {
+public class IslandWorldModule implements IslandModule<IslandWorld> {
 
     @Getter
     private final Logger logger;
@@ -42,12 +41,11 @@ public class CosmoIslandWorldModule implements IslandModule<IslandWorld> {
                 }
             });
 
-    public CosmoIslandWorldModule(WorldService worldService,
-                                  Database islandDatabase,
-                                  Properties properties,
-                                  Map<String, Integer> defaultValues,
-                                  BukkitExecutor executor,
-                                  Logger logger){
+    public IslandWorldModule(WorldService worldService,
+                             Database islandDatabase,
+                             Properties properties,
+                             Map<String, Integer> defaultValues,
+                             Logger logger){
         this.worldService = worldService;
         this.logger = logger;
         this.defaultValues = ImmutableMap.copyOf(defaultValues);

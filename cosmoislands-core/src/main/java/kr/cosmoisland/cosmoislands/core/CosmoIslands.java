@@ -14,6 +14,7 @@ import kr.cosmoisland.cosmoislands.players.MySQLIslandPlayerDatabase;
 import kr.cosmoisland.cosmoislands.players.RedisIslandPlayerRegistry;
 import kr.cosmoislands.cosmochat.core.CosmoChat;
 import kr.msleague.mslibrary.database.impl.internal.MySQLDatabase;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -25,16 +26,24 @@ public class CosmoIslands implements IslandService {
     private final HelloPlayers playerModule;
     private final CosmoChat cosmoChat;
     private final RedisClient redis;
-    private final ManyWorlds manyWorlds;
 
+    @Getter
     private final Database database;
+    @Getter
     private final ExternalRepository externalRepository;
+    @Getter
     private final IslandFactory factory;
+    @Getter
     private final IslandRegistry registry;
+    @Getter
     private final IslandPlayerRegistry playerRegistry;
+    @Getter
     private final IslandGarbageCollector garbageCollector;
+    @Getter
     private final IslandPacemaker pacemaker;
+    @Getter
     private final IslandCloud cloud;
+    @Getter
     private final ThreadFactory threadFactory;
     private final ExecutorService executors;
 
@@ -42,14 +51,12 @@ public class CosmoIslands implements IslandService {
 
     private final ConcurrentHashMap<Class<? extends IslandComponent>, IslandModule<? extends IslandComponent>> modules;
 
-    CosmoIslands( HelloEveryone network,
+    public CosmoIslands( HelloEveryone network,
                   RedisClient client,
                   HelloPlayers players,
                   CosmoChat chatService,
-                  ManyWorlds manyworlds,
                   Database database,
-                  MySQLDatabase msMySQLDatabase,
-                  IslandFactory factory ){
+                  MySQLDatabase msMySQLDatabase ){
         StatefulRedisConnection<String, String> connection = client.connect();
         RedisAsyncCommands<String, String> async = connection.async();
         this.redis = client;
@@ -58,9 +65,8 @@ public class CosmoIslands implements IslandService {
         this.networkModule = network;
         this.playerModule = players;
         this.cosmoChat = chatService;
-        this.manyWorlds = manyworlds;
         this.database = database;
-        this.factory = factory;
+        this.factory = new CosmoIslandFactory(Executors.newScheduledThreadPool(4, this.threadFactory), database);
         this.cloud = new RedisIslandCloud(networkModule, this, async);
         this.registry = new CosmoIslandRegistry(100, this.cloud.getLocalServer());
         this.playerRegistry = RedisIslandPlayerRegistry
@@ -69,31 +75,6 @@ public class CosmoIslands implements IslandService {
         this.executors = Executors.newScheduledThreadPool(4, this.threadFactory);
         this.modules = new ConcurrentHashMap<>();
         this.pacemaker = new CosmoIslandPacemaker(this.registry, this.garbageCollector, this.threadFactory, 1000L);
-    }
-
-    @Override
-    public ExternalRepository getExternalRepository() {
-        return externalRepository;
-    }
-
-    @Override
-    public IslandFactory getFactory() {
-        return factory;
-    }
-
-    @Override
-    public IslandRegistry getRegistry() {
-        return registry;
-    }
-
-    @Override
-    public IslandPacemaker getPacemaker() {
-        return pacemaker;
-    }
-
-    @Override
-    public IslandCloud getCloud() {
-        return cloud;
     }
 
     @Override
@@ -133,13 +114,13 @@ public class CosmoIslands implements IslandService {
     @Override
     public void shutdown() throws ExecutionException, InterruptedException {
         pacemaker.shutdown();
-        modules.values().forEach(module-> module.onDisable(this));
         ImmutableMap<Integer, Island> islands = registry.getLocals();
         List<CompletableFuture<?>> futures = new ArrayList<>(islands.size());
         for (int id : islands.keySet()) {
             futures.add(unloadIsland(id));
         }
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
+        modules.values().forEach(module-> module.onDisable(this));
     }
 
     @Override
