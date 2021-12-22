@@ -40,8 +40,8 @@ public class CosmoIsland implements Island {
     }
 
     @Override
-    public CompletableFuture<Boolean> isLoaded() {
-        return getLocated().thenApply(Objects::nonNull);
+    public CompletableFuture<IslandStatus> getStatus() {
+        return cloud.getStatus(this.id);
     }
 
     @Override

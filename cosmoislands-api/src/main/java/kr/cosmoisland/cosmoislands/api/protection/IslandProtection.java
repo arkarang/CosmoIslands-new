@@ -7,6 +7,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IslandProtection extends IslandComponent {
 
+    byte COMPONENT_ID = 9;
+
     CompletableFuture<Boolean> isPrivate();
 
     CompletableFuture<Void> setPrivate(boolean b);

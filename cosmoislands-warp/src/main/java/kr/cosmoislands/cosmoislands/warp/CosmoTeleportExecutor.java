@@ -26,27 +26,33 @@ public class CosmoTeleportExecutor implements TeleportExecutor {
 
     @Override
     public CompletableFuture<WarpResult> teleportPlayer(UUID uuid, IslandLocation location) {
-        Island island = this.registry.getIsland(location.getIslandID());
-        val isPrivateFuture = island.getComponent(IslandProtection.class).isPrivate();
-        val rankFuture = island.getComponent(IslandPlayersMap.class).getRank(playerRegistry.get(uuid));
-        return island.getLocated().thenCompose(islandServer -> {
-            String serverName = islandServer.getName();
-            if(serverName != null) {
-                return isPrivateFuture.thenCombine(rankFuture, (isPrivate, rank) -> {
-                    WarpResult result;
-                    if(isPrivate){
-                        if(rank.getPriority() < MemberRank.INTERN.getPriority()){
-                            return new WarpResult(false, new IllegalStateException("island is private"));
-                        }
-                    }
-                    teleportService.teleportLocation(uuid, serverName, toTeleportLocation(location));
-                    result = new WarpResult(true, null);
-                    return result;
-                });
-            }else{
-                return CompletableFuture.completedFuture(new WarpResult(false, new IllegalStateException("island is not loaded")));
-            }
+        CompletableFuture<Island> islandFuture = this.registry.getIsland(location.getIslandID());
+        val isPrivateFuture = islandFuture.thenCompose(island->{
+            return island.getComponent(IslandProtection.class).isPrivate();
         });
+        val rankFuture = islandFuture.thenCompose(island->{
+            return island.getComponent(IslandPlayersMap.class).getRank(playerRegistry.get(uuid));
+        });
+        return islandFuture
+                .thenCompose(Island::getLocated)
+                .thenCompose(islandServer -> {
+                    String serverName = islandServer.getName();
+                    if(serverName != null) {
+                        return isPrivateFuture.thenCombine(rankFuture, (isPrivate, rank) -> {
+                            WarpResult result;
+                            if(isPrivate){
+                                if(rank.getPriority() < MemberRank.INTERN.getPriority()){
+                                    return new WarpResult(false, new IllegalStateException("island is private"));
+                                }
+                            }
+                            teleportService.teleportLocation(uuid, serverName, toTeleportLocation(location));
+                            result = new WarpResult(true, null);
+                            return result;
+                        });
+                    }else{
+                        return CompletableFuture.completedFuture(new WarpResult(false, new IllegalStateException("island is not loaded")));
+                    }
+                });
     }
 
     private TeleportLocation toTeleportLocation(IslandLocation location){

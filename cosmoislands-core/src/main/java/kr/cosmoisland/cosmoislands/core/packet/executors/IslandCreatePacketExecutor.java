@@ -8,15 +8,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class IslandCreatePacketExecutor implements HelloExecutor<IslandCreatePacket> {
 
-    private final CosmoIslands service;
-
     @Override
     public String getIdentifier() {
-        return null;
+        return IslandCreatePacket.class.getSimpleName();
     }
 
     @Override
-    public void executeReceived(IslandCreatePacket islandCreatePacket) {
-
+    public void executeReceived(IslandCreatePacket packet) {
+        //do nothing.
     }
 }

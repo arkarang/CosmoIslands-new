@@ -9,6 +9,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IslandPlayersMap extends IslandComponent {
 
+    byte COMPONENT_ID = 6;
+
     CompletableFuture<IslandPlayer> getOwner();
 
     CompletableFuture<Void> setOwner(IslandPlayer player);

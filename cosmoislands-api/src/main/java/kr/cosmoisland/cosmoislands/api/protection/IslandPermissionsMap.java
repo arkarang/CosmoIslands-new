@@ -9,6 +9,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IslandPermissionsMap extends IslandComponent {
 
+    byte COMPONENT_ID = 8;
+
     CompletableFuture<List<IslandPermissions>> getPermissions(MemberRank rank);
 
     CompletableFuture<Boolean> hasPermission(IslandPermissions perm, MemberRank rank);

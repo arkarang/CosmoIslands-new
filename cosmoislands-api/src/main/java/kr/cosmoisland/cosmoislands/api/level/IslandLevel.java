@@ -6,6 +6,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IslandLevel extends IslandComponent {
 
+    byte COMPONENT_ID = 5;
+
     //level
     CompletableFuture<Integer> getLevel();
 

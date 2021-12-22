@@ -185,7 +185,7 @@
         <dependency>
             <groupId>kr.cosmoisland</groupId>
             <artifactId>cosmoislands-chat</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

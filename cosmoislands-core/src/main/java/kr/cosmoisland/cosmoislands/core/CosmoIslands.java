@@ -60,6 +60,7 @@ public class CosmoIslands implements IslandService {
         this.garbageCollector = new CosmoIslandGarbageCollector(this, 1000*30*60L);
         this.modules = new ConcurrentHashMap<>();
         this.pacemaker = new CosmoIslandPacemaker(this.registry, this.garbageCollector, this.threadFactory, 1000L);
+        OperationPrecondition.init(playerRegistry, cloud);
     }
 
     @Override
@@ -80,6 +81,7 @@ public class CosmoIslands implements IslandService {
     @Override
     public synchronized void init() {
         if(!isInitialized.get()){
+            //todo: ModulePriority 구현
             Map<ModulePriority, List<IslandModule<?>>> map = new HashMap<>();
             for (ModulePriority value : ModulePriority.values()) {
                 map.put(value, new ArrayList<>());
@@ -112,45 +114,65 @@ public class CosmoIslands implements IslandService {
 
     @Override
     public CompletableFuture<Island> loadIsland(int id, boolean isLocal) {
-        return factory.fireLoad(id, isLocal)
-                .thenApply(context-> new CosmoIsland(context, cloud))
-                .thenApply(island->{
-                    this.registry.registerIsland(island);
-                    return island;
-                });
+        return OperationPrecondition.canUpdate(id, true).thenCompose(canExecute->{
+            if (canExecute) {
+                return factory.fireLoad(id, isLocal)
+                        .thenApply(context-> new CosmoIsland(context, cloud))
+                        .thenApply(island->{
+                            this.registry.registerIsland(island);
+                            return island;
+                        });
+            }else {
+                return CompletableFuture.completedFuture(null);
+            }
+        });
     }
 
     @Override
     public CompletableFuture<Boolean> unloadIsland(int id) {
-        Island island = registry.getLocalIsland(id);
-        if(island != null){
-            return factory.fireUnload(island).thenApply(context-> {
-                if(context != null){
-                    registry.unregisterIsland(id);
-                    return true;
-                }else
-                    return false;
-            });
-        }else
+        return OperationPrecondition.canUpdate(id, false).thenCompose(canExecute->{
+            if(canExecute) {
+                Island island = registry.getLocalIsland(id);
+                if (island != null) {
+                    return factory.fireUnload(island).thenApply(context -> {
+                        if (context != null) {
+                            registry.unregisterIsland(id);
+                            return true;
+                        } else
+                            return false;
+                    });
+                }
+            }
             return CompletableFuture.completedFuture(false);
+        });
     }
 
     @Override
     public CompletableFuture<Island> createIsland(UUID uuid) {
-        return factory.fireCreate(uuid)
-                .thenApply(context-> new CosmoIsland(context, cloud))
-                .thenApply(island -> {
-                    this.registry.registerIsland(island);
-                    return island;
-                });
+        return OperationPrecondition.canCreate(uuid).thenCompose(canExecute->{
+            if(canExecute){
+                return factory.fireCreate(uuid)
+                        .thenApply(context-> new CosmoIsland(context, cloud))
+                        .thenApply(island -> {
+                            this.registry.registerIsland(island);
+                            return island;
+                        });
+            }else {
+                return CompletableFuture.completedFuture(null);
+            }
+        });
     }
 
     @Override
     public CompletableFuture<Boolean> deleteIsland(int id) {
-        Island island = this.registry.getLocalIsland(id);
-        if(island != null){
-            return factory.fireDelete(island).thenApply(ignored->true);
-        }else
+        return OperationPrecondition.canDelete(id).thenCompose(canExecute->{
+            if(canExecute){
+                Island island = this.registry.getLocalIsland(id);
+                if(island != null){
+                    return factory.fireDelete(island).thenApply(ignored->true);
+                }
+            }
             return CompletableFuture.completedFuture(false);
+        });
     }
 }

@@ -15,6 +15,7 @@ import kr.cosmoisland.cosmoislands.api.IslandConfiguration;
 import kr.cosmoisland.cosmoislands.api.warp.IslandWarpsMap;
 import kr.cosmoisland.cosmoislands.core.CosmoIslands;
 import kr.cosmoisland.cosmoislands.core.Database;
+import kr.cosmoisland.cosmoislands.core.HelloBungeeInitializer;
 import kr.cosmoislands.cosmochat.bukkit.CosmoChatBukkit;
 import kr.cosmoislands.cosmochat.core.CosmoChat;
 import kr.cosmoislands.cosmochat.core.helper.CosmoChatHelper;
@@ -64,7 +65,6 @@ public class CosmoIslandsBukkit extends JavaPlugin {
         CosmoChatPrivateChat privateChatAddon = CosmoChatBukkit.getPrivateChatAddon();
         CosmoTeleport cosmoTeleport = CosmoTeleportBukkit.getService();
         ManyWorlds manyWorlds = ManyWorlds.getInst();
-        Database database = new Database(msLibMySQLDatabase, "cosmoislands_islands");
         IslandConfiguration config = new YamlIslandConfiguration(this);
         BukkitExecutor executor = new BukkitExecutor(this, Bukkit.getScheduler());
 
@@ -78,29 +78,35 @@ public class CosmoIslandsBukkit extends JavaPlugin {
             return;
         }
 
-        cosmoIslands = new CosmoIslands(networkModule, redis, msLibMySQLDatabase, this.getLogger());
-        CosmoIslandsLauncher launcher = new CosmoIslandsLauncher(cosmoIslands, redis, msLibMySQLDatabase, this.getLogger());
+        try {
+            cosmoIslands = new CosmoIslands(networkModule, redis, msLibMySQLDatabase, this.getLogger());
+            HelloBungeeInitializer.initBukkit(networkModule, cosmoIslands);
+            CosmoIslandsLauncher launcher = new CosmoIslandsLauncher(cosmoIslands, redis, msLibMySQLDatabase, this.getLogger());
 
-        launcher.registerExternalDependency(HelloEveryone.class, networkModule);
-        launcher.registerExternalDependency(HelloPlayers.class, playersModule);
-        launcher.registerExternalDependency(CosmoChat.class, cosmoChat);
-        launcher.registerExternalDependency(CosmoChatPrivateChat.class, privateChatAddon);
-        launcher.registerExternalDependency(CosmoTeleport.class, cosmoTeleport);
-        launcher.registerExternalDependency(ManyWorlds.class, manyWorlds);
-        launcher.registerExternalDependency(BukkitExecutor.class, executor);
-        launcher.registerExternalDependency(Economy.class, economy);
+            launcher.registerExternalDependency(HelloEveryone.class, networkModule);
+            launcher.registerExternalDependency(HelloPlayers.class, playersModule);
+            launcher.registerExternalDependency(CosmoChat.class, cosmoChat);
+            launcher.registerExternalDependency(CosmoChatPrivateChat.class, privateChatAddon);
+            launcher.registerExternalDependency(CosmoTeleport.class, cosmoTeleport);
+            launcher.registerExternalDependency(ManyWorlds.class, manyWorlds);
+            launcher.registerExternalDependency(BukkitExecutor.class, executor);
+            launcher.registerExternalDependency(Economy.class, economy);
 
-        launcher.initializeModules(config);
-        launcher.launch();
+            launcher.initializeModules(config);
+            launcher.launch();
 
-        PlayerPreconditions.getFactory().setPlayerRegistry(cosmoIslands.getPlayerRegistry());
-        PlayerPreconditions.getFactory().setExecutor(Executors.newScheduledThreadPool(4, cosmoIslands.getThreadFactory()));
+            PlayerPreconditions.getFactory().setPlayerRegistry(cosmoIslands.getPlayerRegistry());
+            PlayerPreconditions.getFactory().setExecutor(Executors.newScheduledThreadPool(4, cosmoIslands.getThreadFactory()));
 
-        IslandPreconditions.getFactory().setIslandRegistry(cosmoIslands.getRegistry());
-        IslandPreconditions.getFactory().setPlayerRegistry(cosmoIslands.getPlayerRegistry());
+            IslandPreconditions.getFactory().setIslandRegistry(cosmoIslands.getRegistry());
+            IslandPreconditions.getFactory().setPlayerRegistry(cosmoIslands.getPlayerRegistry());
 
-        this.initializeCommands(cosmoIslands, config, async);
-        this.initializeListeners(cosmoIslands, executor);
+            this.initializeCommands(cosmoIslands, config, async);
+            this.initializeListeners(cosmoIslands, executor);
+        }catch (Exception e){
+            e.printStackTrace();
+            Bukkit.getPluginManager().disablePlugin(this);
+        }
     }
 
     private void initializeCommands(CosmoIslands islands, IslandConfiguration configuration, RedisAsyncCommands<String, String> async){

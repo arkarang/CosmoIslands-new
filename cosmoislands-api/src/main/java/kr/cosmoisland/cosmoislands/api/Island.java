@@ -8,6 +8,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface Island extends IslandComponent{
 
+    byte COMPONENT_ID = 0;
+
     int NIL_ID = -1;
 
     int getId();

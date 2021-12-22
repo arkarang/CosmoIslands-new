@@ -7,6 +7,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IslandChat extends IslandComponent {
 
+    byte COMPONENT_ID = 3;
+
     int getIslandID();
 
     CompletableFuture<UUID> getOwner();

@@ -7,6 +7,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IslandBank extends IslandComponent {
 
+    byte COMPONENT_ID = 1;
+
     CompletableFuture<Integer> getLevel();
 
     CompletableFuture<Void> setLevel(int level);

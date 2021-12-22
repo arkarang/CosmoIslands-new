@@ -7,6 +7,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IslandWorld extends IslandComponent {
 
+    byte COMPONENT_ID = 13;
+
     int getMaxX();
 
     //world or protection

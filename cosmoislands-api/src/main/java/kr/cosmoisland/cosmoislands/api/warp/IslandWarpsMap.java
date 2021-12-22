@@ -9,6 +9,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IslandWarpsMap extends IslandComponent {
 
+    byte COMPONENT_ID = 12;
+
     CompletableFuture<IslandLocation> getSpawnLocation();
 
     CompletableFuture<Void> setSpawnLocation(AbstractLocation location);

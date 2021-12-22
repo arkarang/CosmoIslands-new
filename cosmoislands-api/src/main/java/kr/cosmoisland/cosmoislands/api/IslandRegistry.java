@@ -19,6 +19,12 @@ public interface IslandRegistry {
 
     Island unregisterIsland(int islandId);
 
+    void registerComponentId(Class<? extends IslandComponent> clazz, byte id) throws IllegalArgumentException;
+
+    byte getComponentId(Class<? extends IslandComponent> clazz);
+
+    Class<? extends IslandComponent> getComponentClass(byte id);
+
     void clear();
 
 

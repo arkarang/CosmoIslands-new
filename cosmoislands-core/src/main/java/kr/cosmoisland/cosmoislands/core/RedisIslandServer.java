@@ -82,17 +82,38 @@ public class RedisIslandServer implements IslandServer {
 
     @Override
     public CompletableFuture<Island> create(UUID uuid) {
-        return sender.callback(new IslandCreatePacket(this.name, uuid), Island.class).async();
+        return OperationPrecondition.canCreate(uuid).thenCompose(canCreate->{
+            if(canCreate){
+                return sender.callback(new IslandCreatePacket(this.name, uuid), Island.class).async();
+            }else{
+                return CompletableFuture.completedFuture(null);
+            }
+        });
     }
 
     @Override
     public CompletableFuture<Island> load(int islandId) {
-        return sender.callback(new IslandUpdatePacket(this.name, islandId, true), Island.class).async();
+        return OperationPrecondition.canUpdate(islandId, true).thenCompose(canUpdate->{
+            if(canUpdate){
+                return sender.callback(new IslandUpdatePacket(this.name, islandId, true), Island.class).async();
+            }else{
+                return CompletableFuture.completedFuture(null);
+            }
+        });
     }
 
     @Override
     public CompletableFuture<Boolean> unload(int islandId) {
-        return sender.callback(new IslandUpdatePacket(this.name, islandId, false), Island.class).async().thenApply(Objects::nonNull);
+        return OperationPrecondition.canUpdate(islandId, false).thenCompose(canUpdate->{
+            if(canUpdate){
+                return sender.callback(new IslandUpdatePacket(this.name, islandId, false), Island.class)
+                        .async()
+                        .thenApply(Objects::nonNull);
+
+            }else{
+                return CompletableFuture.completedFuture(false);
+            }
+        });
     }
 
     @Override
@@ -102,11 +123,23 @@ public class RedisIslandServer implements IslandServer {
 
     @Override
     public <T extends IslandComponent> CompletableFuture<Boolean> sync(int islandId, Class<T> component) {
-        return sender.callback(new IslandSyncPacket(islandId, /* todo: resolving component id*/ (byte)0), Boolean.class).async();
+        return OperationPrecondition.shouldSync(islandId).thenCompose(shouldSync->{
+            if(shouldSync){
+                return sender.callback(new IslandSyncPacket(islandId, /* todo: resolving component id*/ (byte)0), Boolean.class)
+                        .async();
+            }else
+                return CompletableFuture.completedFuture(true);
+        });
     }
 
     @Override
     public CompletableFuture<Boolean> syncIsland(int islandId) {
-        return sender.callback(new IslandSyncPacket(islandId, /* todo: resolving component id*/ (byte)0), Boolean.class).async();
+        return OperationPrecondition.shouldSync(islandId).thenCompose(shouldSync->{
+            if(shouldSync){
+                return sender.callback(new IslandSyncPacket(islandId, /* todo: resolving component id*/ (byte)0), Boolean.class)
+                        .async();
+            }else
+                return CompletableFuture.completedFuture(true);
+        });
     }
 }

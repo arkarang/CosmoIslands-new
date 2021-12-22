@@ -9,7 +9,7 @@ public class CosmoExternalRepository implements ExternalRepository {
 
     private final ConcurrentHashMap<Class<?>, Object> registeredServices = new ConcurrentHashMap<>();
 
-    protected CosmoExternalRepository(){}
+    CosmoExternalRepository(){}
 
     @Override
     public <T> T getRegisteredService(Class<T> clazz) {

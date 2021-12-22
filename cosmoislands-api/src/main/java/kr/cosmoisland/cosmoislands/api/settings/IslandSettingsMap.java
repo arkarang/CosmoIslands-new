@@ -7,6 +7,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IslandSettingsMap extends IslandComponent {
 
+    byte COMPONENT_ID = 10;
+
     //generic
     CompletableFuture<String> getDisplayname();
 

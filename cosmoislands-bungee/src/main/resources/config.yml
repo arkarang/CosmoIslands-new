@@ -1,0 +1,13 @@
+CosmoDataSource:
+  mysql: 'island'
+  redis: 'island'
+MaxCount: 100
+UpdateServerList: true
+ServerList:
+  ISLAND:
+    - 'minefarm1'
+    - 'minefarm2'
+  LOBBY:
+    - 'lobby1'
+  PROXY:
+    - 'proxy'

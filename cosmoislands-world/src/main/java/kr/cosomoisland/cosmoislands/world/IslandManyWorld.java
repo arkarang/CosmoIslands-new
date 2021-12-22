@@ -24,7 +24,7 @@ public class IslandManyWorld implements IslandWorld {
     private static final String MAX_X = "maxX", MIN_X = "minX", MAX_Z = "maxZ", MIN_Z = "minZ", LENGTH = "LENGTH", WEIGHT = "WEIGHT";
 
     private final int islandId;
-    private final Map<String, Integer> intialValues;
+    private final Map<String, Integer> initialValues;
     @Getter
     private final ManyWorld manyWorld;
     private final MySQLIslandWorldDataModel model;
@@ -44,7 +44,7 @@ public class IslandManyWorld implements IslandWorld {
     IslandManyWorld(int islandId, ManyWorld world, MySQLIslandWorldDataModel model, Map<String, Integer> intialValues){
         this.islandId = islandId;
         this.manyWorld = world;
-        this.intialValues = intialValues;
+        this.initialValues = intialValues;
         this.model = model;
         this.supplierMap = initSuppliers();
         this.maxX = new Cached<>(intialValues.get(MAX_X), supply(MAX_X));
@@ -71,7 +71,7 @@ public class IslandManyWorld implements IslandWorld {
             try {
                 return cache.get(key);
             }catch (ExecutionException e){
-                return CompletableFuture.completedFuture(intialValues.get(key));
+                return CompletableFuture.completedFuture(initialValues.get(key));
             }
         };
     }

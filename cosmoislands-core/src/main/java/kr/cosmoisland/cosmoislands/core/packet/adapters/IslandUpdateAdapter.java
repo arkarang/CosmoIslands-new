@@ -5,7 +5,7 @@ import com.minepalm.hellobungee.netty.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import kr.cosmoisland.cosmoislands.core.packet.IslandUpdatePacket;
 
-public class IslandStatusChangeAdapter implements HelloAdapter<IslandUpdatePacket> {
+public class IslandUpdateAdapter implements HelloAdapter<IslandUpdatePacket> {
     @Override
     public String getIdentifier() {
         return IslandUpdatePacket.class.getSimpleName();

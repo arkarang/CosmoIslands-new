@@ -105,7 +105,13 @@ public class GenericCommands {
                                 return preconditions.getIsland().thenApply(island -> {
                                     //todo: 섬 삭제시, 섬 내 유저 전체 fallback 서버로 이동
                                     val future = service.deleteIsland(island.getId());
-                                    player.sendMessage("섬을 삭제했습니다.");
+                                    future.thenAccept(completed->{
+                                        if(completed){
+                                            player.sendMessage("섬을 삭제했습니다.");
+                                        }else{
+                                            player.sendMessage("섬을 삭제할수 없습니다.");
+                                        }
+                                    });
                                     return future;
                                 });
                             }else{
