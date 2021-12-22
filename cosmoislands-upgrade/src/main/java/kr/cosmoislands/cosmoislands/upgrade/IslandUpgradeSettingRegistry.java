@@ -11,11 +11,11 @@ public class IslandUpgradeSettingRegistry {
 
     final UpgradeSettingsDataModel model;
 
-    CompletableFuture<IslandUpgradeSettings> getSetting(IslandUpgradeType type){
+    public CompletableFuture<IslandUpgradeSettings> getSetting(IslandUpgradeType type){
         return model.get(type);
     }
 
-    CompletableFuture<Void> setSetting(IslandUpgradeSettings settings){
+    public CompletableFuture<Void> setSetting(IslandUpgradeSettings settings){
         return model.insert(settings);
     }
 

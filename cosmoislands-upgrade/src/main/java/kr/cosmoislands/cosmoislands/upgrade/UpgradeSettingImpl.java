@@ -17,7 +17,7 @@ public class UpgradeSettingImpl implements IslandUpgradeSettings {
     final ImmutableMap<Integer, Integer> valueMap;
     final ImmutableMap<Integer, Integer> requiredCostMap;
 
-    UpgradeSettingImpl(IslandUpgradeType type, Map<Integer, Integer> values, Map<Integer, Integer> requiredCosts){
+    public UpgradeSettingImpl(IslandUpgradeType type, Map<Integer, Integer> values, Map<Integer, Integer> requiredCosts){
         this.type = type;
         this.valueMap = ImmutableMap.copyOf(values);
         this.requiredCostMap = ImmutableMap.copyOf(requiredCosts);
@@ -26,6 +26,28 @@ public class UpgradeSettingImpl implements IslandUpgradeSettings {
             max = Math.max(key, max);
         }
         this.maxLevel = max;
+    }
+
+    public UpgradeSettingImpl(IslandUpgradeType type, Map<Integer, PairData> map){
+        Map<Integer, Integer> costMap, valueMap;
+        costMap = new HashMap<>();
+        valueMap = new HashMap<>();
+
+        int max = 0;
+        for (Integer key : map.keySet()) {
+            max = Math.max(key, max);
+        }
+
+        this.maxLevel = max;
+        this.type = type;
+
+        for(int i = 1; i <= maxLevel; i++){
+            costMap.put(i, map.get(i).getCost());
+            valueMap.put(i, map.get(i).getValue());
+        }
+
+        this.valueMap = ImmutableMap.copyOf(valueMap);
+        this.requiredCostMap = ImmutableMap.copyOf(costMap);
     }
 
     @Override

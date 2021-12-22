@@ -39,7 +39,7 @@ public class MySQLIslandUpgrade implements IslandUpgrade {
 
     @Override
     public IslandUpgradeCondition getCondition(IslandUpgradeType type) {
-        return factory.buildCondition(type, registry.getIsland(islandId));
+        return factory.buildCondition(type, registry.getLocalIsland(islandId));
     }
 
     @Override
