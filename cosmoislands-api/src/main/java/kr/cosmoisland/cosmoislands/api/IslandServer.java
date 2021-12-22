@@ -1,15 +1,26 @@
 package kr.cosmoisland.cosmoislands.api;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public interface IslandServer {
 
+    enum Type{
+        ISLAND, PROXY, LOBBY;
+    }
+
     String getName();
+
+    Type getType();
+
+    CompletableFuture<Boolean> isOnline();
 
     CompletableFuture<Boolean> registerIsland(Island island, long uptime);
 
     CompletableFuture<Boolean> unregisterIsland(Island island);
+
+    CompletableFuture<List<Integer>> getIslands();
 
     CompletableFuture<Integer> getLoadedCount();
 

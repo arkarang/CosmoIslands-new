@@ -1,30 +1,40 @@
 package kr.cosmoisland.cosmoislands.core;
 
 import com.google.common.collect.ImmutableMap;
-import kr.cosmoisland.cosmoislands.api.Island;
-import kr.cosmoisland.cosmoislands.api.IslandRegistry;
-import kr.cosmoisland.cosmoislands.api.IslandServer;
+import kr.cosmoisland.cosmoislands.api.*;
 import lombok.Getter;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CosmoIslandRegistry implements IslandRegistry {
 
     @Getter
     private final int allocatedMaxSize;
-    private final IslandServer localServer;
-    private final ConcurrentHashMap<Integer, IslandLocal> localIslands;
+    private final IslandService service;
+    private final IslandCloud cloud;
+    private final IslandHostServer localServer;
+    private final ConcurrentHashMap<Integer, Island> localIslands;
+    private final ConcurrentHashMap<Integer, Island> remotedIslands;
 
-    CosmoIslandRegistry(int maxSize, IslandServer localServer){
+    CosmoIslandRegistry(int maxSize, IslandService service, IslandCloud cloud){
         this.allocatedMaxSize = maxSize;
-        this.localServer = localServer;
+        this.cloud = cloud;
+        this.localServer = cloud.getHostServer();
+        this.service = service;
         this.localIslands = new ConcurrentHashMap<>();
+        this.remotedIslands = new ConcurrentHashMap<>();
     }
 
     @Override
-    public Island getIsland(int islandId) {
-        //todo: implements this.
-        return localIslands.getOrDefault(islandId, /* todo: create island remote */null);
+    public CompletableFuture<Island> getIsland(int islandId) {
+        if(localIslands.containsKey(islandId)){
+            return CompletableFuture.completedFuture(localIslands.get(islandId));
+        }else if(remotedIslands.containsKey(islandId)) {
+            return CompletableFuture.completedFuture(remotedIslands.get(islandId));
+        }else{
+            return service.loadIsland(islandId, false);
+        }
     }
 
     @Override
@@ -39,11 +49,11 @@ public class CosmoIslandRegistry implements IslandRegistry {
 
     @Override
     public void registerIsland(Island island) {
-        if(island instanceof IslandLocal) {
-            localIslands.put(island.getId(), (IslandLocal) island);
+        if(island.isLocal()) {
+            localIslands.put(island.getId(), island);
             localServer.registerIsland(island, System.currentTimeMillis());
         }else {
-            throw new IllegalArgumentException("only Local island can register");
+            remotedIslands.put(island.getId(), island);
         }
     }
 
@@ -57,5 +67,6 @@ public class CosmoIslandRegistry implements IslandRegistry {
     @Override
     public void clear() {
         localIslands.clear();
+        remotedIslands.clear();
     }
 }

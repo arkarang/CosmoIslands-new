@@ -14,13 +14,14 @@ public class CosmoIsland implements Island {
 
     @Getter
     private final int id;
-    private final IslandPlayerRegistry playerRegistry;
+    @Getter
+    private final boolean isLocal;
     private final IslandCloud cloud;
     private final ImmutableMap<Class<? extends IslandComponent>, IslandComponent> components;
 
-    CosmoIsland(IslandContext context, IslandPlayerRegistry players, IslandCloud cloud){
+    CosmoIsland(IslandContext context, IslandCloud cloud){
         this.id = context.getIslandId();
-        this.playerRegistry = players;
+        this.isLocal = context.isLocal();
         this.cloud = cloud;
         HashMap<Class<? extends IslandComponent>, IslandComponent> map = new HashMap<>();
         context.getApplied().forEach(clazz-> map.put(clazz, context.getComponent(clazz)));

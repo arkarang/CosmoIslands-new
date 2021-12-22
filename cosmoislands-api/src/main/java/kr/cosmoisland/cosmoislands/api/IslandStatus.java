@@ -12,4 +12,19 @@ public enum IslandStatus {
     public byte code(){
         return (byte)code;
     }
+
+    public static IslandStatus byCode(byte b){
+        switch (b){
+            case 0:
+                return OFFLINE;
+            case 1:
+                return ONLINE;
+            case 2:
+                return LOADING;
+            case 3:
+                return UNLOADING;
+            default:
+                return ERROR;
+        }
+    }
 }

@@ -13,13 +13,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
 @RequiredArgsConstructor
 public class CosmoIslandFactory implements IslandFactory {
 
     private final ExecutorService service;
-    private final Database database;
+    private final IslandRegistrationDataModel model;
     private final boolean isLocal = true;
 
     private final LinkedList<String> orders = new LinkedList<>();
@@ -86,10 +87,14 @@ public class CosmoIslandFactory implements IslandFactory {
     }
 
     public CompletableFuture<IslandContext> fireCreate(UUID uuid){
-        CompletableFuture<IslandContext> contextFuture = database.getLoader(IslandRegistrationLoader.class).create(uuid).thenApply(id-> new CosmoIslandContext(id, true));
+        CompletableFuture<IslandContext> contextFuture = model.create(uuid).thenApply(id-> new CosmoIslandContext(id, true));
         contextFuture.thenApplyAsync(context->{
-            for (ComponentLifecycle strategy : orderedList()) {
-                strategy.onCreate(uuid, context);
+            try {
+                for (ComponentLifecycle strategy : orderedList()) {
+                    strategy.onCreate(uuid, context).get();
+                }
+            }catch (InterruptedException | ExecutionException ignored){
+
             }
             return context;
         }, service);
@@ -97,10 +102,14 @@ public class CosmoIslandFactory implements IslandFactory {
     }
 
     @Override
-    public CompletableFuture<IslandContext> fireLoad(int islandId) {
+    public CompletableFuture<IslandContext> fireLoad(int islandId, boolean isLocal) {
         return CompletableFuture.supplyAsync(()->new CosmoIslandContext(islandId, isLocal), service).thenApply(context->{
-            for (ComponentLifecycle strategy : orderedList()) {
-                strategy.onLoad(context);
+            try {
+                for (ComponentLifecycle strategy : orderedList()) {
+                    strategy.onLoad(context).get();
+                }
+            }catch (InterruptedException | ExecutionException ignored){
+
             }
             return context;
         });
@@ -109,8 +118,12 @@ public class CosmoIslandFactory implements IslandFactory {
     @Override
     public CompletableFuture<IslandContext> fireUnload(Island island) {
         return CompletableFuture.supplyAsync(()->new CosmoIslandContext(island, isLocal), service).thenApply(context->{
-            for (ComponentLifecycle strategy : orderedList()) {
-                strategy.onUnload(context);
+            try{
+                for (ComponentLifecycle strategy : orderedList()) {
+                    strategy.onUnload(context).get();
+                }
+            }catch (InterruptedException | ExecutionException ignored){
+
             }
             return context;
         });
@@ -119,8 +132,12 @@ public class CosmoIslandFactory implements IslandFactory {
     @Override
     public CompletableFuture<IslandContext> fireDelete(Island island) {
         return CompletableFuture.supplyAsync(()->new CosmoIslandContext(island, isLocal), service).thenApply(context->{
-            for (ComponentLifecycle strategy : orderedList()) {
-                strategy.onDelete(context);
+            try{
+                for (ComponentLifecycle strategy : orderedList()) {
+                    strategy.onDelete(context).get();
+                }
+            }catch (InterruptedException | ExecutionException ignored){
+
             }
             return context;
         });

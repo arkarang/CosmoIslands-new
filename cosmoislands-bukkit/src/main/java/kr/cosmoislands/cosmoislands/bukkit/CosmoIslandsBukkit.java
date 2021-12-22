@@ -78,7 +78,7 @@ public class CosmoIslandsBukkit extends JavaPlugin {
             return;
         }
 
-        cosmoIslands = new CosmoIslands(networkModule, redis, playersModule, cosmoChat, database, msLibMySQLDatabase);
+        cosmoIslands = new CosmoIslands(networkModule, redis, msLibMySQLDatabase, this.getLogger());
         CosmoIslandsLauncher launcher = new CosmoIslandsLauncher(cosmoIslands, redis, msLibMySQLDatabase, this.getLogger());
 
         launcher.registerExternalDependency(HelloEveryone.class, networkModule);

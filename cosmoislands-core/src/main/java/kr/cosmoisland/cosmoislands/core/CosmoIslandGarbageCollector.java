@@ -25,7 +25,7 @@ public class CosmoIslandGarbageCollector implements IslandGarbageCollector {
 
     @Override
     public boolean validate(Island island) {
-        if(island instanceof IslandLocal){
+        if(island.isLocal()){
             if(markedIslands.containsKey(island.getId())){
                 if (markedIslands.get(island.getId()) > System.currentTimeMillis()) {
                     if(island.validate()){

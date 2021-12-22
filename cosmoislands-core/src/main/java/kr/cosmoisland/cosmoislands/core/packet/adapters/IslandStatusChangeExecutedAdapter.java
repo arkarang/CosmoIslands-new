@@ -3,17 +3,17 @@ package kr.cosmoisland.cosmoislands.core.packet.adapters;
 import com.minepalm.hellobungee.api.HelloAdapter;
 import com.minepalm.hellobungee.netty.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
-import kr.cosmoisland.cosmoislands.core.packet.IslandStatusChangePacket;
+import kr.cosmoisland.cosmoislands.core.packet.IslandUpdatePacket;
 
-public class IslandStatusChangeExecutedAdapter implements HelloAdapter<IslandStatusChangePacket.UpdateExecuted> {
+public class IslandStatusChangeExecutedAdapter implements HelloAdapter<IslandUpdatePacket.UpdateExecuted> {
     
     @Override
     public String getIdentifier() {
-        return IslandStatusChangePacket.UpdateExecuted.class.getSimpleName();
+        return IslandUpdatePacket.UpdateExecuted.class.getSimpleName();
     }
 
     @Override
-    public void encode(ByteBuf buf, IslandStatusChangePacket.UpdateExecuted executed) {
+    public void encode(ByteBuf buf, IslandUpdatePacket.UpdateExecuted executed) {
         ByteBufUtils.writeString(buf, executed.getExecutor());
         buf.writeInt(executed.getId());
         buf.writeBoolean(executed.isLoad());
@@ -21,11 +21,11 @@ public class IslandStatusChangeExecutedAdapter implements HelloAdapter<IslandSta
     }
 
     @Override
-    public IslandStatusChangePacket.UpdateExecuted decode(ByteBuf buf) {
+    public IslandUpdatePacket.UpdateExecuted decode(ByteBuf buf) {
         String executor = ByteBufUtils.readString(buf);
         int id = buf.readInt();
         boolean loadType = buf.readBoolean();
         boolean success = buf.readBoolean();
-        return new IslandStatusChangePacket.UpdateExecuted(executor, id, loadType, success);
+        return new IslandUpdatePacket.UpdateExecuted(executor, id, loadType, success);
     }
 }

@@ -19,7 +19,7 @@ public interface IslandFactory {
 
     CompletableFuture<IslandContext> fireCreate(UUID uuid);
 
-    CompletableFuture<IslandContext> fireLoad(int islandId);
+    CompletableFuture<IslandContext> fireLoad(int islandId, boolean isLocal);
 
     CompletableFuture<IslandContext> fireUnload(Island island);
 

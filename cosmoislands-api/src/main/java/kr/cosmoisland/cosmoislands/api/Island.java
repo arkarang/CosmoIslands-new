@@ -12,11 +12,13 @@ public interface Island extends IslandComponent{
 
     int getId();
 
+    boolean isLocal();
+
     <T extends IslandComponent> T getComponent(Class<T> clazz);
 
     Map<Class<? extends IslandComponent>, ? extends IslandComponent> getComponents();
 
-    CompletableFuture<Boolean> isLoaded();
+    CompletableFuture<IslandStatus> getStatus();
 
     CompletableFuture<IslandServer> getLocated();
 

@@ -28,7 +28,7 @@ public interface IslandService {
 
     void shutdown() throws ExecutionException, InterruptedException;
 
-    CompletableFuture<Island> loadIsland(int id);
+    CompletableFuture<Island> loadIsland(int id, boolean isLocal);
 
     CompletableFuture<Boolean> unloadIsland(int id);
 

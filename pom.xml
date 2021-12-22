@@ -27,6 +27,7 @@
         <module>cosmoislands-upgrade</module>
         <module>cosmoislands-bungee</module>
         <module>cosmoislands-member</module>
+        <module>cosmoislands-ignite</module>
     </modules>
 
     <properties>

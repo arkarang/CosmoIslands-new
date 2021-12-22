@@ -6,10 +6,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
-@RequiredArgsConstructor
 public class Cached<T> {
 
-    private Supplier<CompletableFuture<T>> supplier;
+    private final Supplier<CompletableFuture<T>> supplier;
     private volatile T origin;
 
     public Cached(T origin, Supplier<CompletableFuture<T>> supplier){

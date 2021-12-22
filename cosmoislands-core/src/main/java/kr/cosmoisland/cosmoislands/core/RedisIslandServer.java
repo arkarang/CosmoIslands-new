@@ -2,12 +2,10 @@ package kr.cosmoisland.cosmoislands.core;
 
 import com.minepalm.hellobungee.api.HelloSender;
 import io.lettuce.core.api.async.RedisAsyncCommands;
-import kr.cosmoisland.cosmoislands.api.Island;
-import kr.cosmoisland.cosmoislands.api.IslandComponent;
-import kr.cosmoisland.cosmoislands.api.IslandServer;
+import kr.cosmoisland.cosmoislands.api.*;
 import kr.cosmoisland.cosmoislands.core.packet.IslandCreatePacket;
 import kr.cosmoisland.cosmoislands.core.packet.IslandDeletePacket;
-import kr.cosmoisland.cosmoislands.core.packet.IslandStatusChangePacket;
+import kr.cosmoisland.cosmoislands.core.packet.IslandUpdatePacket;
 import kr.cosmoisland.cosmoislands.core.packet.IslandSyncPacket;
 import lombok.Getter;
 
@@ -15,22 +13,38 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class RedisIslandServer implements IslandServer {
 
     @Getter
     final String name;
+    @Getter
+    final IslandServer.Type type;
     final String islandKey;
     final HelloSender sender;
+    final IslandCloud cloud;
     final RedisAsyncCommands<String, String> async;
     final String redisKey;
 
-    RedisIslandServer(String name, String islandKey, HelloSender sender, RedisAsyncCommands<String, String> async){
+    RedisIslandServer(String name,
+                      IslandServer.Type type,
+                      String islandKey,
+                      IslandCloud cloud,
+                      HelloSender sender,
+                      RedisAsyncCommands<String, String> async){
         this.name = name;
+        this.type = type;
         this.islandKey = islandKey;
         this.sender = sender;
         this.async = async;
+        this.cloud = cloud;
         this.redisKey = "cosmoislands:server:"+name;
+    }
+
+    @Override
+    public CompletableFuture<Boolean> isOnline() {
+        return cloud.isOnline(this.name);
     }
 
     @Override
@@ -42,7 +56,6 @@ public class RedisIslandServer implements IslandServer {
             }else
                 return CompletableFuture.completedFuture(false);
         }).toCompletableFuture();
-
     }
 
     @Override
@@ -57,6 +70,12 @@ public class RedisIslandServer implements IslandServer {
     }
 
     @Override
+    public CompletableFuture<List<Integer>> getIslands() {
+        return async.hkeys(redisKey).thenApply(list->list.stream().map(Integer::parseInt).collect(Collectors.toList()))
+                .toCompletableFuture();
+    }
+
+    @Override
     public CompletableFuture<Integer> getLoadedCount() {
         return async.hkeys(redisKey).thenApply(List::size).toCompletableFuture();
     }
@@ -68,12 +87,12 @@ public class RedisIslandServer implements IslandServer {
 
     @Override
     public CompletableFuture<Island> load(int islandId) {
-        return sender.callback(new IslandStatusChangePacket(this.name, islandId, true), Island.class).async();
+        return sender.callback(new IslandUpdatePacket(this.name, islandId, true), Island.class).async();
     }
 
     @Override
     public CompletableFuture<Boolean> unload(int islandId) {
-        return sender.callback(new IslandStatusChangePacket(this.name, islandId, false), Island.class).async().thenApply(Objects::nonNull);
+        return sender.callback(new IslandUpdatePacket(this.name, islandId, false), Island.class).async().thenApply(Objects::nonNull);
     }
 
     @Override
