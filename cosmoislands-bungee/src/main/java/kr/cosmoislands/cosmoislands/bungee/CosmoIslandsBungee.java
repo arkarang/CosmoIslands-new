@@ -5,17 +5,14 @@ import com.minepalm.hellobungee.bungee.HelloBungee;
 import com.minepalm.helloplayer.core.HelloPlayers;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.async.RedisAsyncCommands;
-import kr.cosmoisland.cosmoislands.api.IslandCloud;
-import kr.cosmoisland.cosmoislands.api.IslandServer;
-import kr.cosmoisland.cosmoislands.api.ServerRegistration;
-import kr.cosmoisland.cosmoislands.api.chat.IslandChat;
-import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
-import kr.cosmoisland.cosmoislands.chat.IslandChatModule;
-import kr.cosmoisland.cosmoislands.core.CosmoIslandCloud;
-import kr.cosmoisland.cosmoislands.core.CosmoIslands;
 import kr.cosmoislands.cosmochat.bungee.CosmoChatBungee;
 import kr.cosmoislands.cosmochat.core.CosmoChat;
 import kr.cosmoislands.cosmochat.privatechat.CosmoChatPrivateChat;
+import kr.cosmoislands.cosmoislands.api.IslandServer;
+import kr.cosmoislands.cosmoislands.api.ServerRegistration;
+import kr.cosmoislands.cosmoislands.api.chat.IslandChat;
+import kr.cosmoislands.cosmoislands.chat.IslandChatModule;
+import kr.cosmoislands.cosmoislands.core.CosmoIslands;
 import kr.cosmoislands.cosmoredis.CosmoDataSource;
 import kr.cosmoislands.cosmoteleport.CosmoTeleport;
 import kr.cosmoislands.cosmoteleport.bungee.CosmoTeleportBungee;
@@ -36,16 +33,17 @@ public class CosmoIslandsBungee extends Plugin {
 
     @Override
     public void onEnable() {
+        Conf conf = new Conf(this);
+
         HelloEveryone networkModule = HelloBungee.getInst().getMain();
         HelloPlayers playersModule = HelloPlayers.getInst();
-        MySQLDatabase msLibMySQLDatabase = CosmoDataSource.mysql("island");
-        RedisClient redis = CosmoDataSource.redis("island");
+        MySQLDatabase msLibMySQLDatabase = CosmoDataSource.mysql(conf.getRedisName());
+        RedisClient redis = CosmoDataSource.redis(conf.getMySQLName());
         RedisAsyncCommands<String, String> async = redis.connect().async();
         CosmoChat cosmoChat = CosmoChatBungee.getService();
         CosmoChatPrivateChat privateChatAddon = CosmoChatBungee.getPrivateChatAddon();
         CosmoTeleport cosmoTeleport = CosmoTeleportBungee.getService();
 
-        Conf conf = new Conf(this);
 
         try {
             cosmoIslands = new CosmoIslands(networkModule, redis, msLibMySQLDatabase, this.getLogger());

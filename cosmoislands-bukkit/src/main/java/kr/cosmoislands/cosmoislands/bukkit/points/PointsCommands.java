@@ -6,13 +6,13 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import com.minepalm.helloplayer.core.HelloPlayers;
-import kr.comsoisland.cosmoislands.points.IslandPointsModule;
-import kr.cosmoisland.cosmoislands.api.Island;
-import kr.cosmoisland.cosmoislands.api.IslandService;
-import kr.cosmoisland.cosmoislands.api.points.IslandPoints;
-import kr.cosmoisland.cosmoislands.api.points.IslandVoter;
+import kr.cosmoislands.cosmoislands.api.Island;
+import kr.cosmoislands.cosmoislands.api.IslandService;
+import kr.cosmoislands.cosmoislands.api.points.IslandPoints;
+import kr.cosmoislands.cosmoislands.api.points.IslandVoter;
 import kr.cosmoislands.cosmoislands.bukkit.IslandPreconditions;
 import kr.cosmoislands.cosmoislands.bukkit.utils.AbstractRankingGUI;
+import kr.cosmoislands.cosmoislands.points.IslandPointsModule;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 

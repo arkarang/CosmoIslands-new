@@ -1,9 +1,9 @@
 package kr.cosmoislands.cosmoislands.upgrade;
 
-import kr.cosmoisland.cosmoislands.api.Island;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeCondition;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeSettings;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeType;
+import kr.cosmoislands.cosmoislands.api.Island;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeCondition;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeSettings;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

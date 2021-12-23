@@ -1,7 +1,7 @@
 package kr.cosmoislands.cosmoislands.bukkit.level;
 
 import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
-import kr.cosmoisland.cosmoislands.api.level.IslandLevel;
+import kr.cosmoislands.cosmoislands.api.level.IslandLevel;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;

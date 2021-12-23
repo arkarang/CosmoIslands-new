@@ -1,9 +1,9 @@
 package kr.cosmoislands.cosmoislands.upgrade;
 
-import kr.cosmoisland.cosmoislands.api.ComponentLifecycle;
-import kr.cosmoisland.cosmoislands.api.IslandContext;
-import kr.cosmoisland.cosmoislands.api.ModulePriority;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgrade;
+import kr.cosmoislands.cosmoislands.api.ComponentLifecycle;
+import kr.cosmoislands.cosmoislands.api.IslandContext;
+import kr.cosmoislands.cosmoislands.api.ModulePriority;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgrade;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;

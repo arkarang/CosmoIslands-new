@@ -1,10 +1,8 @@
 package kr.cosmoislands.cosmoislands.bukkit.level;
 
 import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
-import kr.cosmoisland.cosmoislands.api.level.IslandRewardsRegistry;
-import kr.cosmoisland.cosmoislands.level.IslandAchievementsModule;
-import kr.cosmoisland.cosmoislands.level.bukkit.MinecraftItemRewardData;
-import org.bukkit.Bukkit;
+import kr.cosmoislands.cosmoislands.api.level.IslandRewardsRegistry;
+import kr.cosmoislands.cosmoislands.level.bukkit.MinecraftItemRewardData;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;

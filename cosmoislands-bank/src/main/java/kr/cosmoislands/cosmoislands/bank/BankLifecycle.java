@@ -1,9 +1,9 @@
 package kr.cosmoislands.cosmoislands.bank;
 
-import kr.cosmoisland.cosmoislands.api.ComponentLifecycle;
-import kr.cosmoisland.cosmoislands.api.IslandContext;
-import kr.cosmoisland.cosmoislands.api.ModulePriority;
-import kr.cosmoisland.cosmoislands.api.bank.IslandBank;
+import kr.cosmoislands.cosmoislands.api.ComponentLifecycle;
+import kr.cosmoislands.cosmoislands.api.IslandContext;
+import kr.cosmoislands.cosmoislands.api.ModulePriority;
+import kr.cosmoislands.cosmoislands.api.bank.IslandBank;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;

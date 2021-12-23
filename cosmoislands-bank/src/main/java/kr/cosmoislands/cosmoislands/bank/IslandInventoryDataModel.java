@@ -1,8 +1,8 @@
 package kr.cosmoislands.cosmoislands.bank;
 
 import com.minepalm.arkarangutils.compress.CompressedInventorySerializer;
-import kr.cosmoisland.cosmoislands.api.IslandDataModel;
-import kr.cosmoisland.cosmoislands.core.Database;
+import kr.cosmoislands.cosmoislands.api.IslandDataModel;
+import kr.cosmoislands.cosmoislands.core.Database;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.inventory.ItemStack;
 

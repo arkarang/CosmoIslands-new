@@ -4,8 +4,8 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.PaperCommandManager;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
-import kr.cosmoisland.cosmoislands.api.IslandService;
-import kr.cosmoisland.cosmoislands.api.chat.IslandChat;
+import kr.cosmoislands.cosmoislands.api.IslandService;
+import kr.cosmoislands.cosmoislands.api.chat.IslandChat;
 import kr.cosmoislands.cosmoislands.bukkit.PlayerPreconditions;
 import org.bukkit.entity.Player;
 

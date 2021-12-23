@@ -1,12 +1,12 @@
 package kr.cosmoislands.cosmoislands.bukkit.utils;
 
 import com.minepalm.helloplayer.core.HelloPlayers;
-import kr.cosmoisland.cosmoislands.api.Island;
-import kr.cosmoisland.cosmoislands.api.level.IslandLevel;
-import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
-import kr.cosmoisland.cosmoislands.api.player.MemberRank;
-import kr.cosmoisland.cosmoislands.api.points.IslandPoints;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
+import kr.cosmoislands.cosmoislands.api.Island;
+import kr.cosmoislands.cosmoislands.api.level.IslandLevel;
+import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMap;
+import kr.cosmoislands.cosmoislands.api.member.MemberRank;
+import kr.cosmoislands.cosmoislands.api.points.IslandPoints;
+import kr.cosmoislands.cosmoislands.api.settings.IslandSettingsMap;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.val;

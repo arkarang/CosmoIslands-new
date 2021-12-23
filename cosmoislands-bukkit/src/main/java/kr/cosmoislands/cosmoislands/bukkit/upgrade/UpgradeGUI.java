@@ -2,10 +2,9 @@ package kr.cosmoislands.cosmoislands.bukkit.upgrade;
 
 import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgrade;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeSettings;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeType;
-import lombok.Builder;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgrade;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeSettings;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -16,7 +15,6 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-@Builder
 public class UpgradeGUI extends ArkarangGUI {
 
     final String title;

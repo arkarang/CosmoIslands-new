@@ -15,13 +15,13 @@
             <groupId>kr.cosmoisland</groupId>
             <artifactId>cosmoislands-api</artifactId>
             <version>1.0.0-SNAPSHOT</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>kr.cosmoisland</groupId>
             <artifactId>cosmoislands-core</artifactId>
             <version>1.0.0-SNAPSHOT</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>

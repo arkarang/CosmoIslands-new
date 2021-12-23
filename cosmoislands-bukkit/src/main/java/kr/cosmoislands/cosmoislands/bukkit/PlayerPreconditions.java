@@ -1,10 +1,10 @@
 package kr.cosmoislands.cosmoislands.bukkit;
 
-import kr.cosmoisland.cosmoislands.api.Island;
-import kr.cosmoisland.cosmoislands.api.player.IslandPlayer;
-import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
-import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
-import kr.cosmoisland.cosmoislands.api.player.MemberRank;
+import kr.cosmoislands.cosmoislands.api.Island;
+import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMap;
+import kr.cosmoislands.cosmoislands.api.member.MemberRank;
+import kr.cosmoislands.cosmoislands.api.player.IslandPlayer;
+import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

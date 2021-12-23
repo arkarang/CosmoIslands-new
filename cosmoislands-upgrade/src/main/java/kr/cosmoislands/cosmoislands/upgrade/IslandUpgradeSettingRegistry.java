@@ -1,7 +1,7 @@
 package kr.cosmoislands.cosmoislands.upgrade;
 
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeSettings;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeType;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeSettings;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
 import lombok.RequiredArgsConstructor;
 
 import java.util.concurrent.CompletableFuture;

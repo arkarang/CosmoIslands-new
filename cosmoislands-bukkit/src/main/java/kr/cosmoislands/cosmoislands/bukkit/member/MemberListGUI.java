@@ -1,7 +1,7 @@
 package kr.cosmoislands.cosmoislands.bukkit.member;
 
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
-import kr.cosmoisland.cosmoislands.api.player.MemberRank;
+import kr.cosmoislands.cosmoislands.api.member.MemberRank;
 
 import java.util.*;
 

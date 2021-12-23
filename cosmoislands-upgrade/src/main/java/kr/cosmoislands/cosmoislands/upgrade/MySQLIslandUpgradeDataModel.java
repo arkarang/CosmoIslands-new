@@ -1,8 +1,8 @@
 package kr.cosmoislands.cosmoislands.upgrade;
 
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeType;
-import kr.cosmoisland.cosmoislands.core.AbstractDataModel;
-import kr.cosmoisland.cosmoislands.core.Database;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
+import kr.cosmoislands.cosmoislands.core.AbstractDataModel;
+import kr.cosmoislands.cosmoislands.core.Database;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

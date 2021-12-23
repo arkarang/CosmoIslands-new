@@ -1,8 +1,8 @@
 package kr.cosmoislands.cosmoislands.upgrade;
 
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeSettings;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeType;
-import kr.cosmoisland.cosmoislands.core.Database;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeSettings;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
+import kr.cosmoislands.cosmoislands.core.Database;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.PreparedStatement;

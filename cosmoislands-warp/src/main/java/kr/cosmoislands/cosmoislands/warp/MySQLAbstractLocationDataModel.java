@@ -1,7 +1,7 @@
 package kr.cosmoislands.cosmoislands.warp;
 
-import kr.cosmoisland.cosmoislands.api.AbstractLocation;
-import kr.cosmoisland.cosmoislands.core.Database;
+import kr.cosmoislands.cosmoislands.api.AbstractLocation;
+import kr.cosmoislands.cosmoislands.core.Database;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 

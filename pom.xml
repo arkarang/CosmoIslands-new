@@ -10,8 +10,6 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <modules>
-        <module>cosmoislands-legacy-bukkit</module>
-        <module>cosmoislands-proxy</module>
         <module>cosmoislands-api</module>
         <module>cosmoislands-core</module>
         <module>cosmoislands-world</module>
@@ -27,7 +25,6 @@
         <module>cosmoislands-upgrade</module>
         <module>cosmoislands-bungee</module>
         <module>cosmoislands-member</module>
-        <module>cosmoislands-ignite</module>
     </modules>
 
     <properties>

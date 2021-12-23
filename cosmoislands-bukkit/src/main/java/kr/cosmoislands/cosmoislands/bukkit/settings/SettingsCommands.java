@@ -5,7 +5,7 @@ import co.aikar.commands.PaperCommandManager;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSettingsMap;
+import kr.cosmoislands.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoislands.cosmoislands.bukkit.IslandPreconditions;
 import kr.cosmoislands.cosmoislands.bukkit.PlayerPreconditions;
 import lombok.RequiredArgsConstructor;

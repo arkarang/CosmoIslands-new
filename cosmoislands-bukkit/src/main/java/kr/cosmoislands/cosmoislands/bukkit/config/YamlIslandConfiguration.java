@@ -1,13 +1,12 @@
 package kr.cosmoislands.cosmoislands.bukkit.config;
 
 import com.minepalm.arkarangutils.bukkit.SimpleConfig;
-import com.minepalm.manyworlds.bukkit.ManyWorldsBukkitBootstrap;
-import kr.cosmoisland.cosmoislands.api.IslandConfiguration;
-import kr.cosmoisland.cosmoislands.api.player.MemberRank;
-import kr.cosmoisland.cosmoislands.api.protection.IslandPermissions;
-import kr.cosmoisland.cosmoislands.api.settings.IslandSetting;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeSettings;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeType;
+import kr.cosmoislands.cosmoislands.api.IslandConfiguration;
+import kr.cosmoislands.cosmoislands.api.member.MemberRank;
+import kr.cosmoislands.cosmoislands.api.protection.IslandPermissions;
+import kr.cosmoislands.cosmoislands.api.settings.IslandSetting;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeSettings;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
 import kr.cosmoislands.cosmoislands.bukkit.CosmoIslandsBukkit;
 import kr.cosmoislands.cosmoislands.upgrade.UpgradeSettingImpl;
 import org.bukkit.configuration.ConfigurationSection;

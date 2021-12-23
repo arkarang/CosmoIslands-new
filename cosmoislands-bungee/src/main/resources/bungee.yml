@@ -1,0 +1,11 @@
+main: kr.cosmoislands.cosmoislands.bungee.CosmoIslandsBungee
+version: 1.0.0
+author: arkarang
+name: CosmoIslandsBungee
+depends:
+  - CosmoDataSource
+  - HelloPlayers
+  - HelloBungee
+  - CosmoChat
+softdepends:
+  - CosmoTeleport

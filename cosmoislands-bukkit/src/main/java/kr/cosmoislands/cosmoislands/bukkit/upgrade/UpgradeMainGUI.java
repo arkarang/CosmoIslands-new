@@ -3,12 +3,12 @@ package kr.cosmoislands.cosmoislands.bukkit.upgrade;
 import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import com.minepalm.arkarangutils.bukkit.ItemStackBuilder;
-import kr.cosmoisland.cosmoislands.api.Island;
-import kr.cosmoisland.cosmoislands.api.bank.IslandVault;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgrade;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeCondition;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeSettings;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeType;
+import kr.cosmoislands.cosmoislands.api.Island;
+import kr.cosmoislands.cosmoislands.api.bank.IslandVault;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgrade;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeCondition;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeSettings;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.Material;
@@ -118,44 +118,31 @@ public class UpgradeMainGUI extends ArkarangGUI {
             Player player = (Player)event.getWhoClicked();
             player.closeInventory();
             builder(IslandUpgradeType.BORDER_SIZE, island, "섬 강화: 섬 최대 사이즈")
-                    .thenAccept(builder->{
-                        ArkarangGUI gui = builder.build();
-                        executor.sync(()->gui.openGUI(player));
-                    });
+                    .thenAccept(gui-> executor.sync(()->gui.openGUI(player)));
         });
         funcs.put(12, event->{
             Player player = (Player)event.getWhoClicked();
             player.closeInventory();
             builder(IslandUpgradeType.MAX_PLAYERS, island, "섬 강화: 최대 인원")
-                    .thenAccept(builder->{
-                        ArkarangGUI gui = builder.build();
-                        executor.sync(()->gui.openGUI(player));
-                    });
+                    .thenAccept(gui-> executor.sync(()->gui.openGUI(player)));
         });
         funcs.put(14, event->{
             Player player = (Player)event.getWhoClicked();
             player.closeInventory();
             builder(IslandUpgradeType.INVENTORY_SIZE, island, "섬 강화: 창고")
-                    .thenAccept(builder->{
-                        ArkarangGUI gui = builder.build();
-                        executor.sync(()->gui.openGUI(player));
-                    });
+                    .thenAccept(gui-> executor.sync(()->gui.openGUI(player)));
         });
         funcs.put(16, event->{
             Player player = (Player)event.getWhoClicked();
             player.closeInventory();
             builder(IslandUpgradeType.INVENTORY_SIZE, island, "섬 강화: 최대 알바원")
-                    .thenAccept(builder->{
-                        ArkarangGUI gui = builder.build();
-                        executor.sync(()->gui.openGUI(player));
-                    });
+                    .thenAccept(gui-> executor.sync(()->gui.openGUI(player)));
         });
     }
 
-    private CompletableFuture<UpgradeGUI.UpgradeGUIBuilder> builder(IslandUpgradeType type, Island island, String title){
+    private CompletableFuture<UpgradeGUI> builder(IslandUpgradeType type, Island island, String title){
         IslandUpgrade upgrade = island.getComponent(IslandUpgrade.class);
         IslandVault vault = island.getComponent(IslandVault.class);
-        UpgradeGUI.UpgradeGUIBuilder builder = UpgradeGUI.builder();
 
         IslandUpgradeCondition condition = upgrade.getCondition(type);
         val currentLevelFuture = upgrade.getLevel(type);
@@ -164,32 +151,37 @@ public class UpgradeMainGUI extends ArkarangGUI {
                 .thenApply(IslandUpgradeSettings::getMaxLevel);
         val viewFuture = condition.getSettings()
                 .thenApply(IslandUpgradeSettings::asMap);
+        BiFunction<Integer, IslandUpgradeSettings.PairData, ItemStack> func = null;
 
-        builder.type(type);
-        builder.title(title);
-        currentLevelFuture.thenAccept(builder::currentLevel);
-        currentMoneyFuture.thenAccept(builder::currentMoney);
-        maxLevelFuture.thenAccept(builder::maxLevel);
-        viewFuture.thenAccept(builder::view);
-        builder.upgrade(upgrade);
-        builder.executor(executor);
+
         switch (type){
             case BORDER_SIZE:
-                builder.itemGenerate(itemSize);
+                func = itemSize;
                 break;
             case MAX_INTERNS:
-                builder.itemGenerate(itemIntern);
+                func = itemIntern;
                 break;
             case MAX_PLAYERS:
-                builder.itemGenerate(itemMember);
+                func = itemMember;
                 break;
             case INVENTORY_SIZE:
-                builder.itemGenerate(itemChest);
+                func = itemChest;
                 break;
         }
 
+        final BiFunction<Integer, IslandUpgradeSettings.PairData, ItemStack> finalFunc = func;
         return CompletableFuture.allOf(currentLevelFuture, currentMoneyFuture, maxLevelFuture, viewFuture)
-                .thenApply(ignored->builder);
+                .thenApply(ignored->{
+                    try{
+                        int currentLevel = currentLevelFuture.get();
+                        double currentMoney = currentMoneyFuture.get();
+                        int maxLevel = maxLevelFuture.get();
+                        Map<Integer, IslandUpgradeSettings.PairData> view = viewFuture.get();
+                        return new UpgradeGUI(title, type, maxLevel, view, currentLevel, currentMoney, upgrade, finalFunc, executor);
+                    }catch (Exception e){
+                        return null;
+                    }
+                });
     }
 
 }

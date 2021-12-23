@@ -3,11 +3,11 @@ package kr.cosmoislands.cosmoislands.upgrade;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import kr.cosmoisland.cosmoislands.api.IslandModule;
-import kr.cosmoisland.cosmoislands.api.IslandRegistry;
-import kr.cosmoisland.cosmoislands.api.IslandService;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgrade;
-import kr.cosmoisland.cosmoislands.core.Database;
+import kr.cosmoislands.cosmoislands.api.IslandModule;
+import kr.cosmoislands.cosmoislands.api.IslandRegistry;
+import kr.cosmoislands.cosmoislands.api.IslandService;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgrade;
+import kr.cosmoislands.cosmoislands.core.Database;
 import lombok.Getter;
 import lombok.SneakyThrows;
 

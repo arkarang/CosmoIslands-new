@@ -1,7 +1,7 @@
 package kr.cosmoislands.cosmoislands.warp;
 
-import kr.cosmoisland.cosmoislands.api.warp.IslandLocation;
-import kr.cosmoisland.cosmoislands.core.Database;
+import kr.cosmoislands.cosmoislands.api.warp.IslandLocation;
+import kr.cosmoislands.cosmoislands.core.Database;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.PreparedStatement;

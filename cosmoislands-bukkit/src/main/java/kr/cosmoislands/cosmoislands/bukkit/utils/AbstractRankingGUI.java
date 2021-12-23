@@ -3,10 +3,10 @@ package kr.cosmoislands.cosmoislands.bukkit.utils;
 import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
 import com.minepalm.arkarangutils.bukkit.ItemStackBuilder;
 import com.minepalm.helloplayer.core.HelloPlayers;
-import kr.cosmoisland.cosmoislands.api.Island;
-import kr.cosmoisland.cosmoislands.api.IslandRanking;
-import kr.cosmoisland.cosmoislands.api.IslandRegistry;
-import kr.cosmoisland.cosmoislands.api.player.IslandPlayersMap;
+import kr.cosmoislands.cosmoislands.api.Island;
+import kr.cosmoislands.cosmoislands.api.IslandRanking;
+import kr.cosmoislands.cosmoislands.api.IslandRegistry;
+import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMap;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -51,12 +51,13 @@ public class AbstractRankingGUI extends ArkarangGUI {
         }
 
         private CompletableFuture<RankingIcon> toIcon(IslandRanking.RankingData data){
-            Island island = islandRegistry.getIsland(data.getIslandId());
-            IslandPlayersMap playersMap = island.getComponent(IslandPlayersMap.class);
-            val ownerFuture = playersMap.getOwner();
-            val valueFuture = function.apply(island);
-            val nameFuture = ownerFuture.thenCompose(islandPlayer->playersModule.getUsername(islandPlayer.getUniqueId()));
-            return nameFuture.thenCombine(valueFuture, RankingIcon::new);
+            return islandRegistry.getIsland(data.getIslandId()).thenCompose(island->{
+                IslandPlayersMap playersMap = island.getComponent(IslandPlayersMap.class);
+                val ownerFuture = playersMap.getOwner();
+                val valueFuture = function.apply(island);
+                val nameFuture = ownerFuture.thenCompose(islandPlayer->playersModule.getUsername(islandPlayer.getUniqueId()));
+                return nameFuture.thenCombine(valueFuture, RankingIcon::new);
+            });
         }
     }
 

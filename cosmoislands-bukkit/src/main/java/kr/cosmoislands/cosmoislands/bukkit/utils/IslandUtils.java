@@ -1,9 +1,8 @@
 package kr.cosmoislands.cosmoislands.bukkit.utils;
 
-import com.minepalm.helloteleport.LocationData;
-import kr.cosmoisland.cosmoislands.api.AbstractLocation;
-import kr.cosmoisland.cosmoislands.api.Island;
-import kr.cosmoisland.cosmoislands.api.warp.IslandLocation;
+import kr.cosmoislands.cosmoislands.api.AbstractLocation;
+import kr.cosmoislands.cosmoislands.api.Island;
+import kr.cosmoislands.cosmoislands.api.warp.IslandLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -32,11 +31,6 @@ public class IslandUtils {
         return new Location(world, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
     }
 
-    public static LocationData convertTeleport(IslandLocation location){
-        return new LocationData("island_"+location.getIslandID(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-    }
-
-
     public static IslandLocation convert(Location location) throws IllegalArgumentException{
         int i = getIslandID(location);
         if(i != Island.NIL_ID)
@@ -53,7 +47,4 @@ public class IslandUtils {
         return new AbstractLocation(loc.getBlockX()+0.5, loc.getY(), loc.getBlockZ()+0.5, loc.getYaw(), loc.getPitch());
     }
 
-    public static LocationData convertLocation(String world, AbstractLocation loc){
-        return new LocationData(world, loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
-    }
 }

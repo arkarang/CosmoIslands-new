@@ -5,12 +5,9 @@ import co.aikar.commands.PaperCommandManager;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
-import kr.cosmoisland.cosmoislands.api.IslandRegistry;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeType;
-import kr.cosmoisland.cosmoislands.core.CosmoIslands;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
 import kr.cosmoislands.cosmoislands.bukkit.PlayerPreconditions;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -19,7 +16,6 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class UpgradeCommands {
 

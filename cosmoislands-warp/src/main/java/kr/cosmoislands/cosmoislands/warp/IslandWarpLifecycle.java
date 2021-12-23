@@ -1,9 +1,9 @@
 package kr.cosmoislands.cosmoislands.warp;
 
-import kr.cosmoisland.cosmoislands.api.ComponentLifecycle;
-import kr.cosmoisland.cosmoislands.api.IslandContext;
-import kr.cosmoisland.cosmoislands.api.ModulePriority;
-import kr.cosmoisland.cosmoislands.api.warp.IslandWarpsMap;
+import kr.cosmoislands.cosmoislands.api.ComponentLifecycle;
+import kr.cosmoislands.cosmoislands.api.IslandContext;
+import kr.cosmoislands.cosmoislands.api.ModulePriority;
+import kr.cosmoislands.cosmoislands.api.warp.IslandWarpsMap;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;

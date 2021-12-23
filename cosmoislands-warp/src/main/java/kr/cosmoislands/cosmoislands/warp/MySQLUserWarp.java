@@ -1,7 +1,7 @@
 package kr.cosmoislands.cosmoislands.warp;
 
-import kr.cosmoisland.cosmoislands.api.warp.IslandLocation;
-import kr.cosmoisland.cosmoislands.api.warp.IslandUserWarp;
+import kr.cosmoislands.cosmoislands.api.warp.IslandLocation;
+import kr.cosmoislands.cosmoislands.api.warp.IslandUserWarp;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;

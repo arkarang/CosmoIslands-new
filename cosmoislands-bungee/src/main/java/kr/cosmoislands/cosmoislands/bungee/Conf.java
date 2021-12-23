@@ -1,7 +1,7 @@
 package kr.cosmoislands.cosmoislands.bungee;
 
 import com.minepalm.arkarangutils.bungee.BungeeConfig;
-import kr.cosmoisland.cosmoislands.api.IslandServer;
+import kr.cosmoislands.cosmoislands.api.IslandServer;
 import net.md_5.bungee.config.Configuration;
 
 import java.util.ArrayList;

@@ -1,11 +1,9 @@
 package kr.cosmoislands.cosmoislands.bungee;
 
-import kr.cosmoisland.cosmoislands.api.Island;
-import kr.cosmoisland.cosmoislands.api.player.IslandPlayer;
-import kr.cosmoisland.cosmoislands.api.player.IslandPlayerRegistry;
-import kr.cosmoisland.cosmoislands.core.CosmoIslands;
+import kr.cosmoislands.cosmoislands.api.Island;
+import kr.cosmoislands.cosmoislands.api.player.IslandPlayer;
+import kr.cosmoislands.cosmoislands.core.CosmoIslands;
 import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;

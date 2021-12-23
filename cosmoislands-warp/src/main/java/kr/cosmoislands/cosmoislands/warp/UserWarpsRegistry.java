@@ -3,7 +3,7 @@ package kr.cosmoislands.cosmoislands.warp;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import kr.cosmoisland.cosmoislands.api.warp.IslandUserWarp;
+import kr.cosmoislands.cosmoislands.api.warp.IslandUserWarp;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 

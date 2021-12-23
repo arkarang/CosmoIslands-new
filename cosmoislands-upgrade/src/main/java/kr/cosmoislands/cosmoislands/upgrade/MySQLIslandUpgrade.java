@@ -1,10 +1,10 @@
 package kr.cosmoislands.cosmoislands.upgrade;
 
-import kr.cosmoisland.cosmoislands.api.IslandComponent;
-import kr.cosmoisland.cosmoislands.api.IslandRegistry;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgrade;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeCondition;
-import kr.cosmoisland.cosmoislands.api.upgrade.IslandUpgradeType;
+import kr.cosmoislands.cosmoislands.api.IslandComponent;
+import kr.cosmoislands.cosmoislands.api.IslandRegistry;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgrade;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeCondition;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
 
 import java.util.concurrent.CompletableFuture;
 

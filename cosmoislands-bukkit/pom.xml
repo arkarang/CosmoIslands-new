@@ -33,16 +33,19 @@
             <groupId>co.aikar</groupId>
             <artifactId>acf-paper</artifactId>
             <version>0.5.0-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.minepalm</groupId>
             <artifactId>arkarangutils-bukkit</artifactId>
             <version>1.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.minepalm</groupId>
             <artifactId>arkarangutils-invitation</artifactId>
             <version>1.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>
@@ -101,7 +104,7 @@
         <dependency>
             <groupId>com.grinderwolf</groupId>
             <artifactId>slimeworldmanager-plugin</artifactId>
-            <version>2.2.0-minepalm-SNAPSHOT</version>
+            <version>2.6.2-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -215,6 +218,12 @@
         <dependency>
             <groupId>kr.cosmoisland</groupId>
             <artifactId>cosmoislands-warp</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>kr.cosmoisland</groupId>
+            <artifactId>cosmoislands-settings</artifactId>
             <version>1.0.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

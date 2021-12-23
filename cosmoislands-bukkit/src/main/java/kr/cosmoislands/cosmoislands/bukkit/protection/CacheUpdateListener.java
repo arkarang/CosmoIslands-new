@@ -1,6 +1,6 @@
 package kr.cosmoislands.cosmoislands.bukkit.protection;
 
-import kr.cosmoisland.cosmoislands.api.protection.IslandProtection;
+import kr.cosmoislands.cosmoislands.api.protection.IslandProtection;
 import kr.cosmoislands.cosmoislands.bukkit.IslandPreconditions;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -2,7 +2,7 @@ package kr.cosmoislands.cosmoislands.bukkit;
 
 import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
-import kr.cosmoisland.cosmoislands.api.Island;
+import kr.cosmoislands.cosmoislands.api.Island;
 import kr.cosmoislands.cosmoislands.bukkit.utils.IslandIcon;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryType;

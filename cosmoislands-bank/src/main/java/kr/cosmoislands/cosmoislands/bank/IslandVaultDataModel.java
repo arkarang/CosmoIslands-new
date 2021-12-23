@@ -1,7 +1,7 @@
 package kr.cosmoislands.cosmoislands.bank;
 
-import kr.cosmoisland.cosmoislands.api.IslandDataModel;
-import kr.cosmoisland.cosmoislands.core.Database;
+import kr.cosmoislands.cosmoislands.api.IslandDataModel;
+import kr.cosmoislands.cosmoislands.core.Database;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.PreparedStatement;

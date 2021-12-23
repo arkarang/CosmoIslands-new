@@ -1,7 +1,7 @@
 package kr.cosmoislands.cosmoislands.bank;
 
-import kr.cosmoisland.cosmoislands.api.IslandComponent;
-import kr.cosmoisland.cosmoislands.api.bank.IslandVault;
+import kr.cosmoislands.cosmoislands.api.IslandComponent;
+import kr.cosmoislands.cosmoislands.api.bank.IslandVault;
 import lombok.RequiredArgsConstructor;
 
 import java.util.concurrent.CompletableFuture;
