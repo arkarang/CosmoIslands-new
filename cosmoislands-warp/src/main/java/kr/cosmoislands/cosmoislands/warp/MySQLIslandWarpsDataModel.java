@@ -24,7 +24,7 @@ public class MySQLIslandWarpsDataModel extends MySQLAbstractLocationDataModel{
         database.execute(connection -> {
             PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS "+table+" " +
                     "(`column_id` BIGINT UNIQUE AUTO_INCREMENT, " +
-                    "`island_id` INT, " +
+                    "`island_id` BIGINT, " +
                     "`name` VARCHAR(64), " +
                     "`permission_level` TINYINT DEFAULT " + MemberRank.MEMBER.getPriority()+", " +
                     "`x` DOUBLE, " +
@@ -33,7 +33,7 @@ public class MySQLIslandWarpsDataModel extends MySQLAbstractLocationDataModel{
                     "`yaw` FLOAT, " +
                     "`pitch` FLOAT, " +
                     "PRIMARY KEY(`island_id`, `name`), " +
-                    "FOREIGN KEY (`island_id`) REFERENCES "+islandTable+"(`island_id`) ON DELETE CASCADE)) " +
+                    "FOREIGN KEY (`island_id`) REFERENCES "+islandTable+"(`island_id`) ON DELETE CASCADE) " +
                     "charset=utf8mb4");
             ps.execute();
         });

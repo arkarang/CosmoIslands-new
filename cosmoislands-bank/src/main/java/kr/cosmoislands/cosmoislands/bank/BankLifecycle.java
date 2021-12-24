@@ -5,6 +5,7 @@ import kr.cosmoislands.cosmoislands.api.IslandContext;
 import kr.cosmoislands.cosmoislands.api.ModulePriority;
 import kr.cosmoislands.cosmoislands.api.bank.IslandBank;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -26,7 +27,9 @@ public class BankLifecycle implements ComponentLifecycle {
 
     @Override
     public CompletableFuture<Void> onCreate(UUID owner, IslandContext island) {
-        return module.getAsync(island.getIslandId()).thenAccept(inv->island.register(IslandBank.class, inv));
+        val future = module.getAsync(island.getIslandId()).thenAccept(inv->island.register(IslandBank.class, inv));
+        val future2 = module.create(island.getIslandId(), owner);
+        return CompletableFuture.allOf(future, future2);
     }
 
     @Override

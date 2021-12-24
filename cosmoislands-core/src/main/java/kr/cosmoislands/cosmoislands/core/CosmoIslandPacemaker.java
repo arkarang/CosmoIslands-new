@@ -23,7 +23,7 @@ public class CosmoIslandPacemaker implements IslandPacemaker {
 
     CosmoIslandPacemaker(IslandRegistry registry, IslandGarbageCollector gc, ThreadFactory factory, long period){
         this.loop = Executors.newSingleThreadExecutor(factory);
-        this.workers = Executors.newFixedThreadPool(Math.max(registry.getAllocatedMaxSize()/4, 1));
+        this.workers = Executors.newFixedThreadPool(Math.min(Math.max(registry.getAllocatedMaxSize()/4, 1), 4), factory);
         this.periodMills = period;
         this.registry = registry;
         this.tasks = new ConcurrentHashMap<>();
@@ -41,23 +41,25 @@ public class CosmoIslandPacemaker implements IslandPacemaker {
     private void start(){
         run.set(true);
         loop.submit(()->{
-            long begin = System.currentTimeMillis();
             while (run.get()){
+                long begin = System.currentTimeMillis();
+
                 loop();
-            }
-            try {
-                CompletableFuture.allOf(runningTasks.values().toArray(new CompletableFuture<?>[0])).get();
-            }catch (ExecutionException e){
-                e.printStackTrace();
-            }catch (InterruptedException ignored){
 
-            }
-            long estimatedTime = System.currentTimeMillis() - begin;
-            if(estimatedTime < periodMills){
                 try {
-                    Thread.sleep(periodMills - estimatedTime);
-                } catch (InterruptedException ignored) {
+                    CompletableFuture.allOf(runningTasks.values().toArray(new CompletableFuture<?>[0])).get();
+                }catch (ExecutionException e){
+                    e.printStackTrace();
+                }catch (InterruptedException ignored){
 
+                }
+                long estimatedTime = System.currentTimeMillis() - begin;
+                if(estimatedTime < periodMills){
+                    try {
+                        Thread.sleep(periodMills - estimatedTime);
+                    } catch (InterruptedException ignored) {
+
+                    }
                 }
             }
         });

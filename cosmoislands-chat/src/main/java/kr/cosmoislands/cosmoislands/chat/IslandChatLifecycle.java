@@ -28,8 +28,9 @@ public class IslandChatLifecycle implements ComponentLifecycle {
 
     @Override
     public CompletableFuture<Void> onCreate(UUID owner, IslandContext island) {
-        return module.getAsync(island.getIslandId()).thenAccept(component->{
+        return module.getAsync(island.getIslandId()).thenCompose(component->{
             island.register(IslandChat.class, component);
+            return module.create(island.getIslandId(), owner);
         });
     }
 

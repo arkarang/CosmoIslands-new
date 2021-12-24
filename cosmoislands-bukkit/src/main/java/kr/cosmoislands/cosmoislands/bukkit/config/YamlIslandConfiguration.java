@@ -22,6 +22,10 @@ public class YamlIslandConfiguration extends SimpleConfig implements IslandConfi
         super(plugin, "config.yml");
     }
 
+    public boolean isDebug(){
+        return config.getBoolean("Debug", false);
+    }
+
     public String getRedisName(){
         return config.getString("CosmoDataSource.redis");
     }

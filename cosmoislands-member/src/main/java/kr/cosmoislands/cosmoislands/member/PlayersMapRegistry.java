@@ -4,6 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import io.lettuce.core.api.async.RedisAsyncCommands;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import kr.cosmoislands.cosmoislands.settings.IslandSettingsModule;
 import kr.cosmoislands.cosmoislands.api.IslandComponent;
 import kr.cosmoislands.cosmoislands.api.IslandRegistry;
@@ -12,8 +13,10 @@ import kr.cosmoislands.cosmoislands.api.member.ModificationStrategyRegistry;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSettingsMap;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -33,10 +36,13 @@ public class PlayersMapRegistry {
             CompletableFuture<IslandSettingsMap> future = settingsModule.getAsync(integer);
             MySQLPlayersMap mysql = new MySQLPlayersMap(integer, registry, model);
             RedisPlayersMap redis = new RedisPlayersMap(integer, registry, async);
-            return islandRegistry.getIsland(integer).thenCompose(island-> {
-                return redis.migrate(mysql).thenCombine(future, (ignored, settingsMap)-> {
-                    return new CosmoIslandPlayersMap(island, mysql, redis, settingsMap, strategies.getStrategies());
-                });
+            DebugLogger.log("players map registry: is future null: "+(future == null));
+            DebugLogger.handle("players map registry: handle islandSettings loading at playersmap ", future);
+            val migrateFuture = redis.migrate(mysql);
+            DebugLogger.handle("migrateFuture handle1: ", migrateFuture);
+            return future.thenCombine(migrateFuture, (settingsMap, ignored)->{
+                DebugLogger.log("players map registry: load completed");
+                return new CosmoIslandPlayersMap(integer, islandRegistry, mysql, redis, settingsMap, strategies.getStrategies());
             });
         }
     });

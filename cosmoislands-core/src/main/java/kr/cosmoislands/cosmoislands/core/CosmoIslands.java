@@ -52,11 +52,12 @@ public class CosmoIslands implements IslandService {
         this.threadFactory = new IslandThreadFactory("cosmoislands");
         this.database = new Database(msMySQLDatabase, "cosmoislands_islands");
         IslandRegistrationDataModel registrationDataModel = new IslandRegistrationDataModel("cosmoislands_islands", database);
+        registrationDataModel.init();
         this.factory = new CosmoIslandFactory(Executors.newScheduledThreadPool(4, this.threadFactory), registrationDataModel);
+        this.registry = new CosmoIslandRegistry(100, this);
         this.cloud = new CosmoIslandCloud(network, this, database, async, logger);
-        this.registry = new CosmoIslandRegistry(100, this, this.cloud.getHostServer());
         this.playerRegistry = RedisIslandPlayerRegistry
-                .build("cosmoislands_players", "cosmoislands_islands", msMySQLDatabase, async, registry);
+                .build("cosmoislands_members", "cosmoislands_islands", msMySQLDatabase, async, registry);
         this.garbageCollector = new CosmoIslandGarbageCollector(this, 1000*30*60L);
         this.modules = new ConcurrentHashMap<>();
         this.pacemaker = new CosmoIslandPacemaker(this.registry, this.garbageCollector, this.threadFactory, 1000L);
@@ -114,12 +115,13 @@ public class CosmoIslands implements IslandService {
 
     @Override
     public CompletableFuture<Island> loadIsland(int id, boolean isLocal) {
+        DebugLogger.log("cosmoislands: run load island");
         return OperationPrecondition.canUpdate(id, true).thenCompose(canExecute->{
             if (canExecute) {
                 return factory.fireLoad(id, isLocal)
                         .thenApply(context-> new CosmoIsland(context, cloud))
                         .thenApply(island->{
-                            this.registry.registerIsland(island);
+                            this.cloud.getHostServer().registerIsland(island, System.currentTimeMillis());
                             return island;
                         });
             }else {
@@ -136,7 +138,7 @@ public class CosmoIslands implements IslandService {
                 if (island != null) {
                     return factory.fireUnload(island).thenApply(context -> {
                         if (context != null) {
-                            registry.unregisterIsland(id);
+                            this.cloud.getHostServer().unregisterIsland(island);
                             return true;
                         } else
                             return false;
@@ -149,12 +151,15 @@ public class CosmoIslands implements IslandService {
 
     @Override
     public CompletableFuture<Island> createIsland(UUID uuid) {
+        DebugLogger.log("cosmoislands: run create island");
         return OperationPrecondition.canCreate(uuid).thenCompose(canExecute->{
+            DebugLogger.log("cosmoIslands: create island: "+uuid+", "+canExecute);
             if(canExecute){
                 return factory.fireCreate(uuid)
                         .thenApply(context-> new CosmoIsland(context, cloud))
                         .thenApply(island -> {
                             this.registry.registerIsland(island);
+                            DebugLogger.log("cosmoislands: registered island");
                             return island;
                         });
             }else {

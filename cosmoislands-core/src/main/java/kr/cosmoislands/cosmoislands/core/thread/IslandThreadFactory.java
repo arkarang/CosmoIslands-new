@@ -1,10 +1,14 @@
 package kr.cosmoislands.cosmoislands.core.thread;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class IslandThreadFactory implements ThreadFactory {
+
+    private final AtomicInteger count = new AtomicInteger(0);
     private final ThreadGroup group;
 
     public static final class IslandThreadGroup extends ThreadGroup{
@@ -20,6 +24,8 @@ public class IslandThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(Runnable r){
+        count.addAndGet(1);
+        DebugLogger.log("ThreadFactory: count: "+count.get());
         return new Thread( group, r );
     }
 

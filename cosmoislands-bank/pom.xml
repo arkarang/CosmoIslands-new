@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>cosmoislands-bank</artifactId>
+
     <dependencies>
         <dependency>
             <groupId>kr.cosmoisland</groupId>
@@ -25,13 +26,13 @@
         </dependency>
         <dependency>
             <groupId>com.minepalm</groupId>
-            <artifactId>arkarangutils-compress</artifactId>
+            <artifactId>arkarangutils-bukkit</artifactId>
             <version>1.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.minepalm</groupId>
-            <artifactId>arkarangutils-bukkit</artifactId>
+            <artifactId>arkarangutils-v1_16</artifactId>
             <version>1.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

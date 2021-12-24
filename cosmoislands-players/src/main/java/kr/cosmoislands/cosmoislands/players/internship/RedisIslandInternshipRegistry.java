@@ -34,6 +34,7 @@ public class RedisIslandInternshipRegistry implements IslandInternshipRegistry {
                 playersTable,
                 "cosmoislands_players_max_interns",
                 islandTable);
+        model.init();
         return new RedisIslandInternshipRegistry(islandRegistry, model, async);
     }
 

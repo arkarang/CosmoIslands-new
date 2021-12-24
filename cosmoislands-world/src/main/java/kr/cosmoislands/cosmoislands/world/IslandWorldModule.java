@@ -15,10 +15,12 @@ import kr.cosmoislands.cosmoislands.api.IslandModule;
 import kr.cosmoislands.cosmoislands.api.IslandService;
 import kr.cosmoislands.cosmoislands.api.world.IslandWorld;
 import kr.cosmoislands.cosmoislands.core.Database;
+import kr.cosmoislands.cosmoislands.core.thread.IslandThreadFactory;
 import lombok.Getter;
 
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 
@@ -43,12 +45,13 @@ public class IslandWorldModule implements IslandModule<IslandWorld> {
                              Database islandDatabase,
                              Properties properties,
                              Map<String, Integer> defaultValues,
+                             ThreadFactory threadFactory,
                              Logger logger){
         this.worldService = worldService;
         this.logger = logger;
         this.defaultValues = ImmutableMap.copyOf(defaultValues);
         this.model = new MySQLIslandWorldDataModel("cosmoislands_world_data", "cosmoislands_islands", islandDatabase, this.defaultValues);
-        MySQLDatabase manyWorldDatabase = new MySQLDatabase(properties, Executors.newFixedThreadPool(4));
+        MySQLDatabase manyWorldDatabase = new MySQLDatabase(properties, Executors.newFixedThreadPool(4, threadFactory));
         this.worldService.getLoadService().registerWorldFactory(WorldToken.get("ISLAND"), new SWMWorldFactory(this.worldService.getWorldRegistry()));
         this.worldService.getWorldRegistry().registerDatabase(new MySQLWorldDatabase(WorldToken.get("ISLAND"), "cosmoislands_worlds", manyWorldDatabase, logger));
     }
@@ -92,6 +95,12 @@ public class IslandWorldModule implements IslandModule<IslandWorld> {
         proxiedCache.invalidate(islandId);
     }
 
+    @Override
+    @Deprecated
+    public CompletableFuture<Void> create(int islandId, UUID uuid) {
+        throw new UnsupportedOperationException("ChuYong will implement this");
+    }
+
     void register(int islandId, CompletableFuture<IslandWorld> future){
         local.put(islandId, future);
     }
@@ -103,7 +112,7 @@ public class IslandWorldModule implements IslandModule<IslandWorld> {
     @Override
     public void onEnable(IslandService service) {
         this.model.init();
-        service.getFactory().addFirst("players", new IslandWorldLifecycle(this, this.worldService));
+        service.getFactory().addFirst("world", new IslandWorldLifecycle(this, this.worldService));
     }
 
     @Override

@@ -24,7 +24,7 @@ public class CosmoIslandPlayer implements IslandPlayer {
 
     @Override
     public CompletableFuture<Island> getIsland() {
-        return playerRegistry.getIslandId(this.uniqueId).thenCompose(id-> id == Island.NIL_ID ? registry.getIsland(id) : CompletableFuture.completedFuture(null));
+        return playerRegistry.getIslandId(this.uniqueId).thenCompose(id -> id != Island.NIL_ID ? registry.getIsland(id) : CompletableFuture.completedFuture(null));
     }
 
     @Override

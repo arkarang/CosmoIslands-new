@@ -63,6 +63,11 @@ public class IslandPointsModule implements IslandModule<IslandPoints> {
         pointsCache.invalidate(islandId);
     }
 
+    @Override
+    public CompletableFuture<Void> create(int islandId, UUID uuid) {
+        return model.setPoints(islandId, 0);
+    }
+
     public CosmoIslandVoter getVoter(UUID uuid){
         return new CosmoIslandVoter(uuid, voteModel);
     }
@@ -71,7 +76,7 @@ public class IslandPointsModule implements IslandModule<IslandPoints> {
     public void onEnable(IslandService service) {
         this.model.init();
         this.voteModel.init();
-        service.getFactory().addLast("settings", new PointsLifecycle(this));
+        service.getFactory().addLast("points", new PointsLifecycle(this));
     }
 
     @Override

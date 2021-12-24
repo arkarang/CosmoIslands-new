@@ -29,7 +29,7 @@ public class IslandRewardDataModel {
                     "`requiredLevel` TINYINT, " +
                     "`type` VARCHAR(32), " +
                     "`data` TEXT, " +
-                    "PRIMARY KEY(`id`) " +
+                    "PRIMARY KEY(`id`)) " +
                     "charset=utf8mb4");
             ps.execute();
         });

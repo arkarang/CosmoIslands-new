@@ -34,7 +34,7 @@ public class BankChestGUI extends ArkarangGUI {
         for(int i = 0 ; i < 54 && i < view.list.size(); i++){
             inv.setItem(i, view.list.get(i));
         }
-        for(int i = (getLevel()+1)*9; i < 54; i++){
+        for(int i = (getLevel())*9; i < 54; i++){
             inv.setItem(i, barrier);
         }
         for(int i = 0; i < 54; i++){

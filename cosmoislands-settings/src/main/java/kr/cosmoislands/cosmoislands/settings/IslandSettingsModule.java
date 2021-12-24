@@ -11,9 +11,13 @@ import kr.cosmoislands.cosmoislands.api.IslandService;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoislands.cosmoislands.core.Database;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -44,7 +48,9 @@ public class IslandSettingsModule implements IslandModule<IslandSettingsMap> {
                     MySQLIslandSettingsMap mysql = new MySQLIslandSettingsMap(integer, model);
                     RedisIslandSettingsMap redis = new RedisIslandSettingsMap(integer, async);
                     CosmoIslandSettingsMap cached = new CachedIslandSettingsMap(mysql, redis, defaultValues);
-                    return cached.migrate().thenApply(ignored->cached);
+                    return cached.migrate().thenApply(ignored->{
+                        return cached;
+                    });
                 }
             });
 
@@ -66,10 +72,11 @@ public class IslandSettingsModule implements IslandModule<IslandSettingsMap> {
             CompletableFuture<IslandSettingsMap> future = localCache.getUnchecked(islandId);
             if (future == null) {
                 return CompletableFuture.completedFuture(proxiedCache.get(islandId));
-            } else
+            } else {
                 return future;
+            }
         }catch (ExecutionException e){
-            return null;
+            return CompletableFuture.completedFuture(null);
         }
     }
 
@@ -93,9 +100,18 @@ public class IslandSettingsModule implements IslandModule<IslandSettingsMap> {
     }
 
     @Override
+    public CompletableFuture<Void> create(int islandId, UUID uuid) {
+        List<CompletableFuture<?>> list = new ArrayList<>();
+        for (Map.Entry<IslandSetting, String> entry : defaultValues.entrySet()) {
+            list.add(this.model.setValue(islandId, entry.getKey(), entry.getValue()));
+        }
+        return CompletableFuture.allOf(list.toArray(new CompletableFuture[0]));
+    }
+
+    @Override
     public void onEnable(IslandService service) {
         this.model.init();
-        service.getFactory().addLast("settings", new IslandSettingsLifecycle(this));
+        service.getFactory().addFirst("settings", new IslandSettingsLifecycle(this));
     }
 
     @Override

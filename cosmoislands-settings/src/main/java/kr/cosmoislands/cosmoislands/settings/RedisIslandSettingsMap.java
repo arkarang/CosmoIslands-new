@@ -28,7 +28,10 @@ public class RedisIslandSettingsMap implements IslandSettingsMap {
         for (IslandSetting key : map.keySet()) {
             hashMap.put(key.name(), map.get(key));
         }
-        return async.hmset(redisKey, hashMap).thenRun(()->{}).toCompletableFuture();
+        if(!hashMap.isEmpty())
+            return async.hmset(redisKey, hashMap).thenRun(()->{}).toCompletableFuture();
+        else
+            return CompletableFuture.completedFuture(null);
     }
 
     @Override

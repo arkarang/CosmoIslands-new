@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -74,6 +75,11 @@ public class IslandProtectionModule implements IslandModule<IslandProtection> {
     @Override
     public void invalidate(int islandId){
         map.remove(islandId);
+    }
+
+    @Override
+    public CompletableFuture<Void> create(int islandId, UUID uuid) {
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override

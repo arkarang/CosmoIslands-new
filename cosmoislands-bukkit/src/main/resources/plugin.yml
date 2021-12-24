@@ -2,6 +2,7 @@ main: kr.cosmoislands.cosmoislands.bukkit.CosmoIslandsBukkit
 name: CosmoIslands
 version: 1.0.0-SNAPSHOT
 author: arkarang
+api-version: 1.16
 depend:
   - CosmoChat
   - HelloBukkit
@@ -9,3 +10,4 @@ depend:
   - ManyWorlds
   - CosmoTeleport
   - CosmoDataSource
+  - Vault

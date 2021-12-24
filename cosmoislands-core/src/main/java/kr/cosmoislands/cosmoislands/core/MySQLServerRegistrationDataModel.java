@@ -20,7 +20,7 @@ public class MySQLServerRegistrationDataModel {
     void init(){
         database.execute(connection -> {
             PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS "+table+" " +
-                    "(`column_id` INT AUTO_INCREMENT, " +
+                    "(`column_id` INT AUTO_INCREMENT UNIQUE, " +
                     "`serverName` VARCHAR(64), " +
                     "`serverType` VARCHAR(64), " +
                     "PRIMARY KEY(`serverName`)) " +
@@ -35,6 +35,7 @@ public class MySQLServerRegistrationDataModel {
             ps.setString(1, server);
             ps.setString(2, type.name());
             ps.setString(3, type.name());
+            ps.execute();
             return null;
         });
     }

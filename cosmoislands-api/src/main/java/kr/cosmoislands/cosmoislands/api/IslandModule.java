@@ -1,5 +1,6 @@
 package kr.cosmoislands.cosmoislands.api;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -10,6 +11,8 @@ public interface IslandModule<T> {
     T get(int islandId);
 
     void invalidate(int islandId);
+
+    CompletableFuture<Void> create(int islandId, UUID uuid);
 
     void onEnable(IslandService service);
 

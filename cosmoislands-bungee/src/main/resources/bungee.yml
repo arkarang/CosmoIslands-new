@@ -6,6 +6,6 @@ depends:
   - CosmoDataSource
   - HelloPlayers
   - HelloBungee
-  - CosmoChat
+  - CosmoChatBungee
 softdepends:
   - CosmoTeleport

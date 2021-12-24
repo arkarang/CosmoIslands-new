@@ -30,31 +30,47 @@ public class IslandWorldLifecycle implements ComponentLifecycle {
 
     @Override
     public CompletableFuture<Void> onLoad(IslandContext island) {
-        CompletableFuture<ManyWorld> worldFuture = service.loadWorld(toInform(island));
-        CompletableFuture<IslandWorld> world = worldFuture.thenApply(mw->module.create(island.getIslandId(), mw));
-        module.register(island.getIslandId(), world);
-        return world.thenAccept(islandWorld->island.register(IslandWorld.class, islandWorld));
+        if(island.isLocal()) {
+            CompletableFuture<ManyWorld> worldFuture = service.loadWorld(toInform(island));
+            CompletableFuture<IslandWorld> world = worldFuture.thenApply(mw -> module.create(island.getIslandId(), mw));
+            module.register(island.getIslandId(), world);
+            return world.thenAccept(islandWorld -> island.register(IslandWorld.class, islandWorld));
+        }else {
+            return CompletableFuture.completedFuture(null);
+        }
     }
 
     @Override
     public CompletableFuture<Void> onCreate(UUID owner, IslandContext island) {
-        CompletableFuture<ManyWorld> worldFuture = service.createNewWorld(defaultWorld, toInform(island));
-        CompletableFuture<IslandWorld> world = worldFuture.thenApply(mw->module.create(island.getIslandId(), mw));
-        module.register(island.getIslandId(), world);
-        return world.thenAccept(islandWorld->island.register(IslandWorld.class, islandWorld));
+        if(island.isLocal()) {
+            CompletableFuture<ManyWorld> worldFuture = service.createNewWorld(defaultWorld, toInform(island));
+            CompletableFuture<IslandWorld> world = worldFuture.thenApply(mw -> module.create(island.getIslandId(), mw));
+            module.register(island.getIslandId(), world);
+            return world.thenAccept(islandWorld -> island.register(IslandWorld.class, islandWorld));
+        }else{
+            return CompletableFuture.completedFuture(null);
+        }
     }
 
     @Override
     public CompletableFuture<Void> onUnload(IslandContext island) {
-        IslandManyWorld imw = (IslandManyWorld)(module.get(island.getIslandId()));
-        module.invalidate(island.getIslandId());
-        return imw.getManyWorld().unload().thenRun(()->{});
+        if(island.isLocal()) {
+            IslandManyWorld imw = (IslandManyWorld) (module.get(island.getIslandId()));
+            module.invalidate(island.getIslandId());
+            return imw.getManyWorld().unload().thenRun(() -> {});
+        }else{
+            return CompletableFuture.completedFuture(null);
+        }
     }
 
     @Override
     public CompletableFuture<Void> onDelete(IslandContext island) {
-        module.invalidate(island.getIslandId());
-        return service.unload(toInform(island)).thenRun(()->{});
+        if(island.isLocal()) {
+            module.invalidate(island.getIslandId());
+            return service.unload(toInform(island)).thenRun(() -> {});
+        }else{
+            return CompletableFuture.completedFuture(null);
+        }
     }
 
     private WorldInform toInform(IslandContext island){

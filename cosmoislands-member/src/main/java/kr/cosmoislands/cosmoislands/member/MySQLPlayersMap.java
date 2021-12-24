@@ -7,6 +7,7 @@ import kr.cosmoislands.cosmoislands.api.player.IslandPlayer;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -73,7 +74,15 @@ public class MySQLPlayersMap implements IslandPlayersMap {
 
     @Override
     public CompletableFuture<Map<UUID, MemberRank>> getMembers() {
-        return model.getMembers(islandId);
+        return model.getMembers(islandId).thenApply(map->{
+            HashMap<UUID, MemberRank> filtered = new HashMap<>();
+            map.forEach((key, value)->{
+                if(value.getPriority() >= MemberRank.INTERN.getPriority()){
+                    filtered.put(key, value);
+                }
+            });
+            return filtered;
+        });
     }
 
     @Override

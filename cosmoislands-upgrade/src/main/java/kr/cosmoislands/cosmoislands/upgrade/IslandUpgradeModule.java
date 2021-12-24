@@ -7,10 +7,14 @@ import kr.cosmoislands.cosmoislands.api.IslandModule;
 import kr.cosmoislands.cosmoislands.api.IslandRegistry;
 import kr.cosmoislands.cosmoislands.api.IslandService;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgrade;
+import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
 import kr.cosmoislands.cosmoislands.core.Database;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -59,6 +63,15 @@ public class IslandUpgradeModule implements IslandModule<IslandUpgrade> {
     @Override
     public void invalidate(int islandId) {
         cache.invalidate(islandId);
+    }
+
+    @Override
+    public CompletableFuture<Void> create(int islandId, UUID uuid) {
+        List<CompletableFuture<?>> list = new ArrayList<>();
+        for (IslandUpgradeType value : IslandUpgradeType.values()) {
+            list.add(upgradeModel.setLevel(islandId, value, 0));
+        }
+        return CompletableFuture.allOf(list.toArray(new CompletableFuture[0]));
     }
 
     @Override

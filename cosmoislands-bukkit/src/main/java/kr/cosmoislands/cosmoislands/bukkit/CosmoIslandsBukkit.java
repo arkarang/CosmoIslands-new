@@ -32,6 +32,7 @@ import kr.cosmoislands.cosmoislands.bukkit.settings.SettingsCommands;
 import kr.cosmoislands.cosmoislands.bukkit.upgrade.UpgradeCommands;
 import kr.cosmoislands.cosmoislands.bukkit.warp.IslandWarpCommands;
 import kr.cosmoislands.cosmoislands.core.CosmoIslands;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import kr.cosmoislands.cosmoislands.core.HelloBungeeInitializer;
 import kr.cosmoislands.cosmoislands.warp.IslandWarpModule;
 import kr.cosmoislands.cosmoredis.CosmoDataSource;
@@ -55,16 +56,17 @@ public class CosmoIslandsBukkit extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        YamlIslandConfiguration config = new YamlIslandConfiguration(this);
+
         HelloEveryone networkModule = HelloBukkit.getInst().getMain();
         HelloPlayers playersModule = HelloPlayers.getInst();
-        MySQLDatabase msLibMySQLDatabase = CosmoDataSource.mysql("island");
-        RedisClient redis = CosmoDataSource.redis("island");
+        MySQLDatabase msLibMySQLDatabase = CosmoDataSource.mysql(config.getMySQLName());
+        RedisClient redis = CosmoDataSource.redis(config.getRedisName());
         RedisAsyncCommands<String, String> async = redis.connect().async();
         CosmoChat cosmoChat = CosmoChatBukkit.getService();
         CosmoChatPrivateChat privateChatAddon = CosmoChatBukkit.getPrivateChatAddon();
         CosmoTeleport cosmoTeleport = CosmoTeleportBukkit.getService();
         ManyWorlds manyWorlds = ManyWorlds.getInst();
-        IslandConfiguration config = new YamlIslandConfiguration(this);
         BukkitExecutor executor = new BukkitExecutor(this, Bukkit.getScheduler());
 
         Economy economy = null;
@@ -102,6 +104,11 @@ public class CosmoIslandsBukkit extends JavaPlugin {
 
             this.initializeCommands(cosmoIslands, config, async);
             this.initializeListeners(cosmoIslands, executor);
+
+
+            DebugLogger.setLogger(this.getLogger());
+            DebugLogger.setEnableDebug(config.isDebug());
+            DebugLogger.setEnableDebug(true);
         }catch (Exception e){
             e.printStackTrace();
             Bukkit.getPluginManager().disablePlugin(this);
@@ -138,6 +145,7 @@ public class CosmoIslandsBukkit extends JavaPlugin {
         SettingsCommands.init(manager, executor);
         UpgradeCommands.init(manager, executor);
         IslandWarpCommands.init(manager, islands, (IslandWarpModule) islands.getModule(IslandWarpsMap.class), executor);
+        GenericCommands.init(manager, islands, executor);
     }
 
     private void initializeListeners(CosmoIslands islands, BukkitExecutor executor){

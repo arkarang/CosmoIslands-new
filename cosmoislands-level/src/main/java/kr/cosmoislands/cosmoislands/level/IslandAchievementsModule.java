@@ -12,6 +12,7 @@ import kr.cosmoislands.cosmoislands.level.bukkit.MinecraftItemRewardDataAdapter;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -51,6 +52,11 @@ public class IslandAchievementsModule implements IslandModule<IslandAchievements
     @Override
     public void invalidate(int islandId) {
         cache.invalidate(islandId);
+    }
+
+    @Override
+    public CompletableFuture<Void> create(int islandId, UUID uuid) {
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override

@@ -18,9 +18,7 @@ public class IslandRegistrationDataModel {
     public void init() {
         database.execute(connection -> {
             PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS "+table+" " +
-                    "(`island_id` BIGINT AUTO_INCREMENT, " +
-                    "`uuid` VARCHAR(36) UNIQUE, " +
-                    "PRIMARY KEY(`island_id`)) " +
+                    "(`island_id` BIGINT AUTO_INCREMENT PRIMARY KEY) " +
                     "charset=utf8mb4");
             ps.execute();
         });
@@ -28,9 +26,8 @@ public class IslandRegistrationDataModel {
 
     public CompletableFuture<Integer> create(UUID uuid){
         return database.executeAsync(connection -> {
-            PreparedStatement ps1 = connection.prepareStatement("INSERT INTO "+table+" (`uuid`) VALUES(?)");
-            PreparedStatement ps2 = connection.prepareStatement("SELECT LAST_INSERT_ID();");
-            ps1.setString(1, uuid.toString());
+            PreparedStatement ps1 = connection.prepareStatement("INSERT INTO "+table+" () VALUES(); ");
+            PreparedStatement ps2 = connection.prepareStatement("SELECT LAST_INSERT_ID() AS `id`;");
             ps1.execute();
             ResultSet rs = ps2.executeQuery();
             if(rs.next()){
@@ -44,15 +41,6 @@ public class IslandRegistrationDataModel {
         return database.executeAsync(connection -> {
             PreparedStatement ps = connection.prepareStatement("SELECT `island_id` FROM "+table+" WHERE `island_id`=?");
             ps.setInt(1, islandID);
-            ResultSet rs = ps.executeQuery();
-            return rs.next();
-        });
-    }
-
-    public CompletableFuture<Boolean> exists(UUID uuid){
-        return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("SELECT `island_id` FROM "+table+" WHERE `uuid`=?");
-            ps.setString(1, uuid.toString());
             ResultSet rs = ps.executeQuery();
             return rs.next();
         });

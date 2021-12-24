@@ -9,6 +9,7 @@ import kr.cosmoislands.cosmoislands.api.protection.IslandPermissionsMap;
 import lombok.Getter;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -39,6 +40,11 @@ public class IslandPermissionsMapModule implements IslandModule<IslandPermission
     @Override
     public void invalidate(int islandId) {
 
+    }
+
+    @Override
+    public CompletableFuture<Void> create(int islandId, UUID uuid) {
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override

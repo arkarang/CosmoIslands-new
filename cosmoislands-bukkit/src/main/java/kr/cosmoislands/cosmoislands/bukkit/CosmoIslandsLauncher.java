@@ -86,12 +86,11 @@ public class CosmoIslandsLauncher {
         IslandPermissionsMapModule permissionsModule = new IslandPermissionsMapModule(configuration.getDefaultPermissions(), logger);
         IslandProtectionModule protectionModule = new IslandProtectionModule(permissionsModule, playersMapModule, settingsModule, playerRegistry, cloud, logger);
         IslandUpgradeModule upgradeModule = new IslandUpgradeModule(islandRegistry, database, logger);
-        IslandWorldModule worldModule = new IslandWorldModule(manyWorlds, database, configuration.getManyWorldsProperties(), configuration.getDefaultWorldBorder(), logger);
+        IslandWorldModule worldModule = new IslandWorldModule(manyWorlds, database, configuration.getManyWorldsProperties(), configuration.getDefaultWorldBorder(), service.getThreadFactory(), logger);
 
         IslandInventoryModule bankModule = new IslandInventoryModule(database, executor, logger);
         IslandVaultModule vaultModule = new IslandVaultModule(database, logger);
         IslandWarpModule warpModule = new IslandWarpModule(database, islandRegistry, playerRegistry, cosmoTeleport, settingsModule, logger);
-
 
         if(configuration.getUpdateUpgradeSettings()){
             for (IslandUpgradeSettings setting : configuration.getDefaultUpgradeSettings().values()) {

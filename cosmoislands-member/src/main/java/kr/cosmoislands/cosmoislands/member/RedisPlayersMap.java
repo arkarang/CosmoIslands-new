@@ -6,6 +6,8 @@ import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMap;
 import kr.cosmoislands.cosmoislands.api.member.MemberRank;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayer;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
+import lombok.val;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -20,27 +22,32 @@ public class RedisPlayersMap implements IslandPlayersMap {
         this.async = async;
         this.registry = registry;
         ownerKey = "cosmoislands:island:"+islandId+":owner";
-        membersKey = "cosmoislands:island:"+islandId+":players";
+        membersKey = "cosmoislands:island:"+islandId+":members";
         internsKey = "cosmoislands:island:"+islandId+":interns";
     }
 
     CompletableFuture<Void> migrate(IslandPlayersMap players){
         CompletableFuture<Void> insertMembersFuture = migrateMembers(players.getMembers());
         CompletableFuture<Void> insertInternsFuture = migrateInterns(players.getInterns());
-        return CompletableFuture.allOf(insertInternsFuture, insertMembersFuture);
+        return insertMembersFuture;
     }
 
     CompletableFuture<Void> migrateMembers(CompletableFuture<Map<UUID, MemberRank>> membersFuture){
-        return membersFuture.thenAccept(map -> {
+        return membersFuture.thenCompose(map -> {
+            DebugLogger.log("redisPlayersMap: migrateMembers");
             HashMap<String, String> result = new HashMap<>();
             map.forEach((key, value) -> result.put(key.toString(), value.name()));
-            async.hmset(membersKey, result);
+            if(!result.isEmpty()){
+                return async.hmset(membersKey, result).thenRun(()->{}).toCompletableFuture();
+            }else{
+                return CompletableFuture.completedFuture(null);
+            }
         });
     }
 
     CompletableFuture<Void> migrateInterns(CompletableFuture<List<UUID>> internsMap){
-        return internsMap.thenAccept(list-> {
-            async.sadd(internsKey, list.stream().map(UUID::toString).toArray(String[]::new));
+        return internsMap.thenCompose(list-> {
+            return async.sadd(internsKey, list.stream().map(UUID::toString).toArray(String[]::new)).thenRun(()->{}).toCompletableFuture();
         });
     }
 

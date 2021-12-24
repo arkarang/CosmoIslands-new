@@ -27,7 +27,7 @@ public class IslandSettingsLifecycle implements ComponentLifecycle {
 
     @Override
     public CompletableFuture<Void> onCreate(UUID owner, IslandContext island) {
-        return onLoad(island);
+        return CompletableFuture.allOf(onLoad(island), module.create(island.getIslandId(), owner));
     }
 
     @Override

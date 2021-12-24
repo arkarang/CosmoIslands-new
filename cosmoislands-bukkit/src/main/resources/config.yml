@@ -1,3 +1,4 @@
+Debug: true
 CosmoDataSource:
   mysql: 'island'
   redis: 'island'

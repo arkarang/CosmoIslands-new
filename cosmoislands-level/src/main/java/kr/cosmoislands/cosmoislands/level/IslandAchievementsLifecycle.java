@@ -28,7 +28,7 @@ public class IslandAchievementsLifecycle implements ComponentLifecycle {
     @Override
     public CompletableFuture<Void> onCreate(UUID owner, IslandContext island) {
         island.register(IslandAchievements.class, module.get(island.getIslandId()));
-        return CompletableFuture.completedFuture(null);
+        return module.create(island.getIslandId(), owner);
     }
 
     @Override

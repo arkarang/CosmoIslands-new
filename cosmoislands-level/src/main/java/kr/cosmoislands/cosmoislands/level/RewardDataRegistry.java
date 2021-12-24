@@ -33,6 +33,7 @@ public class RewardDataRegistry implements IslandRewardsRegistry {
 
     RewardDataRegistry(Database database){
         this.model = new IslandRewardDataModel(database, "cosmoislands_reward_data", factory);
+        this.model.init();
     }
 
     void cacheAll(){

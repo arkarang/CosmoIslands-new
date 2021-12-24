@@ -10,6 +10,7 @@ import kr.cosmoislands.cosmoislands.api.bank.IslandBank;
 import kr.cosmoislands.cosmoislands.core.Database;
 import lombok.Getter;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -63,6 +64,11 @@ public class IslandInventoryModule implements IslandModule<IslandBank> {
     @Override
     public void invalidate(int islandId) {
         cache.invalidate(islandId);
+    }
+
+    @Override
+    public CompletableFuture<Void> create(int islandId, UUID uuid) {
+        return this.model.create(islandId, uuid);
     }
 
     @Override

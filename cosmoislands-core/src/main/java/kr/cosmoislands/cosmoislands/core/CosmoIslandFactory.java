@@ -91,11 +91,13 @@ public class CosmoIslandFactory implements IslandFactory {
         contextFuture.thenApplyAsync(context->{
             try {
                 for (ComponentLifecycle strategy : orderedList()) {
+                    DebugLogger.log("island factory: execution on create: "+strategy.getClass().getSimpleName());
                     strategy.onCreate(uuid, context).get();
                 }
             }catch (InterruptedException | ExecutionException ignored){
 
             }
+            DebugLogger.log("island factory: island creation completed");
             return context;
         }, service);
         return contextFuture;

@@ -3,6 +3,8 @@ package kr.cosmoislands.cosmoislands.warp;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import kr.cosmoislands.cosmoislands.api.member.MemberRank;
+import kr.cosmoislands.cosmoislands.api.warp.IslandWarp;
 import kr.cosmoislands.cosmoislands.settings.IslandSettingsModule;
 import kr.cosmoislands.cosmoislands.api.IslandModule;
 import kr.cosmoislands.cosmoislands.api.IslandRegistry;
@@ -14,6 +16,7 @@ import kr.cosmoislands.cosmoteleport.CosmoTeleport;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -65,6 +68,11 @@ public class IslandWarpModule implements IslandModule<IslandWarpsMap> {
     @Override
     public void invalidate(int islandId) {
         cache.invalidate(islandId);
+    }
+
+    @Override
+    public CompletableFuture<Void> create(int islandId, UUID uuid) {
+        return this.islandWarpsModel.insertWarp(islandId, new IslandWarp("spawn", MemberRank.NONE, 0, 64, 0, 0f, 0f));
     }
 
     @Override

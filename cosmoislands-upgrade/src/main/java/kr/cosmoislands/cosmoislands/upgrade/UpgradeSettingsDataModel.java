@@ -25,7 +25,7 @@ public class UpgradeSettingsDataModel {
                     "`level` INT DEFAULT 0, " +
                     "`value` INT, " +
                     "`required_cost` INT DEFAULT 0, " +
-                    "PRIMARY KEY(`type`), " +
+                    "PRIMARY KEY(`type`)) " +
                     "charset=utf8mb4");
             ps.execute();
         });

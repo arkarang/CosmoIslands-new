@@ -40,6 +40,7 @@ public class CosmoIslandCloud implements IslandCloud {
         this.async = async;
         this.logger = logger;
         MySQLServerRegistrationDataModel dataModel = new MySQLServerRegistrationDataModel("cosmoislands_island_servers", database);
+        dataModel.init();
         this.serverRegistration = new MySQLServerRegistration(dataModel);
         this.statusRegistry = new RedisIslandStatusRegistry(async);
         Map<String, IslandServer.Type> registeredServers = this.serverRegistration.getRegisteredServers().get();
@@ -49,7 +50,6 @@ public class CosmoIslandCloud implements IslandCloud {
                 service.getRegistry(),
                 this,
                 networkModule.sender(networkModule.getName()), async);
-
         for (String serverName : registeredServers.keySet()) {
             IslandServer.Type type = registeredServers.get(serverName);
             if(this.networkModule.getConnections().getClient(serverName) != null){
@@ -59,7 +59,6 @@ public class CosmoIslandCloud implements IslandCloud {
                 logger.warning("island server '"+serverName+"' is not found on HelloBungee settings.");
             }
         }
-
     }
 
     @Override
@@ -69,7 +68,11 @@ public class CosmoIslandCloud implements IslandCloud {
 
     @Override
     public IslandServer getServer(String name) {
-        return servers.get(name);
+        if(name == null) {
+            return null;
+        }else{
+            return servers.get(name);
+        }
     }
 
     @Override
@@ -135,27 +138,34 @@ public class CosmoIslandCloud implements IslandCloud {
 
     @Override
     public CompletableFuture<IslandServer> getLeastLoadedServer(int maximumLoaded){
+        DebugLogger.log("islandcloud: let found least loaded server");
         Map<String, Integer> counts = new HashMap<>();
-        List<CompletableFuture<?>> futures = new ArrayList<>();
-        for (String serverName : servers.keySet()) {
-            IslandServer server = servers.get(serverName);
-            if(server != null){
-                CompletableFuture<?> future = server.getLoadedCount().thenAccept(count -> {
-                    counts.put(serverName, count);
-                });
-                futures.add(future);
-            }
-        }
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(ignored->{
-            String serverName = null;
-            int min = maximumLoaded;
-            for (Map.Entry<String, Integer> entry : counts.entrySet()) {
-                if(entry.getValue() < min){
-                    min = entry.getValue();
-                    serverName = entry.getKey();
+        return serverRegistration.getRegisteredServers(IslandServer.Type.ISLAND).thenCompose(list->{
+            List<CompletableFuture<?>> futures = new ArrayList<>();
+            for (String serverName : list) {
+                DebugLogger.log("islandcloud: found online island server: "+list.size());
+                IslandServer server = servers.get(serverName);
+                if(server != null){
+                    CompletableFuture<?> future = server.getLoadedCount().thenAccept(count -> {
+                        DebugLogger.log("islandcloud: serverName: "+serverName+", count: "+count);
+                        counts.put(serverName, count);
+                    });
+                    futures.add(future);
                 }
             }
-            return this.getServer(serverName);
+
+            return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(ignored->{
+                String serverName = null;
+                int min = maximumLoaded;
+                for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+                    if(entry.getValue() < min){
+                        min = entry.getValue();
+                        serverName = entry.getKey();
+                    }
+                }
+                DebugLogger.log("islandcloud: least server: "+serverName);
+                return this.getServer(serverName);
+            });
         });
     }
 }

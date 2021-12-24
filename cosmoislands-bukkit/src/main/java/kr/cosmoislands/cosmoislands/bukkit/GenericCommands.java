@@ -1,12 +1,14 @@
 package kr.cosmoislands.cosmoislands.bukkit;
 
 import co.aikar.commands.BaseCommand;
+import co.aikar.commands.PaperCommandManager;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import kr.cosmoislands.cosmoislands.api.IslandService;
 import kr.cosmoislands.cosmoislands.api.member.MemberRank;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.entity.Player;
@@ -14,6 +16,10 @@ import org.bukkit.entity.Player;
 import java.util.concurrent.CompletableFuture;
 
 public class GenericCommands {
+
+    public static void init(PaperCommandManager manager, IslandService service, BukkitExecutor executor){
+        manager.registerCommand(new User(service, executor));
+    }
 
     @CommandAlias("섬")
     @RequiredArgsConstructor
@@ -72,18 +78,30 @@ public class GenericCommands {
 
         @Subcommand("생성")
         public void create(Player player){
-            PlayerPreconditions
+            val execution = PlayerPreconditions
                     .of(player.getUniqueId())
                     .hasIsland()
                     .thenAccept(hasIsland->{
                         if (hasIsland){
                             player.sendMessage("당신은 이미 섬에 소속되어 있습니다.");
                         }else {
-                            service.createIsland(player.getUniqueId()).thenAccept(island -> {
-                                player.sendMessage("섬 생성을 완료했습니다.");
+                            val innerExecution
+                                    = service.getCloud().getLeastLoadedServer(100).thenCompose(islandServer->{
+                                DebugLogger.log("create 1");
+                                return islandServer.create(player.getUniqueId()).thenAccept(island->{
+                                    if(island != null){
+                                        player.sendMessage("섬을 성공적으로 생성했습니다 !");
+                                    }else{
+                                        player.sendMessage("섬을 생성하는데 실패했습니다... 관리자에게 문의해주세요.");
+                                    }
+                                });
                             });
+                            DebugLogger.handle("inner creation: ", innerExecution);
+                            DebugLogger.timeout("inner creation: ", innerExecution, 30000L);
                         }
                     });
+            DebugLogger.handle("create command", execution);
+            DebugLogger.timeout("create command timeout", execution, 30000L);
         }
 
         @Subcommand("삭제")

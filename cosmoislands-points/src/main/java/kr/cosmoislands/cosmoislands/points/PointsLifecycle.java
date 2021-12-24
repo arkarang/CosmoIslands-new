@@ -31,11 +31,8 @@ public class PointsLifecycle implements ComponentLifecycle {
 
     @Override
     public CompletableFuture<Void> onCreate(UUID owner, IslandContext island) {
-        Supplier<Void> sup = ()->{
-            island.register(IslandPoints.class, module.get(island.getIslandId()));
-            return (Void)null;
-        };
-        return CompletableFuture.completedFuture(sup.get());
+        island.register(IslandPoints.class, module.get(island.getIslandId()));
+        return module.create(island.getIslandId(), owner);
     }
 
     @Override

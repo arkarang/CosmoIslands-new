@@ -1,6 +1,6 @@
 package kr.cosmoislands.cosmoislands.bank;
 
-import com.minepalm.arkarangutils.compress.CompressedInventorySerializer;
+import com.minepalm.arkarangutils.bukkit1_16.v1_16InventorySerializer;
 import kr.cosmoislands.cosmoislands.api.IslandDataModel;
 import kr.cosmoislands.cosmoislands.core.Database;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class IslandInventoryDataModel implements IslandDataModel {
             PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS "+table+" " +
                     "(`column_id` BIGINT UNIQUE AUTO_INCREMENT, " +
                     "`island_id` BIGINT, " +
-                    "`level` INT DEFAULT 0, " +
+                    "`level` INT DEFAULT 1, " +
                     "`contents` TEXT, " +
                     "PRIMARY KEY(`island_id`), " +
                     "FOREIGN KEY (`island_id`) REFERENCES "+islandTable+"(`island_id`) ON DELETE CASCADE) " +
@@ -49,14 +49,10 @@ public class IslandInventoryDataModel implements IslandDataModel {
     @Override
     public CompletableFuture<Void> create(int id, UUID uuid){
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("IF NOT EXISTS (SELECT 1=1 FROM "+table+" WHERE `island_id`= ?) THEN "
-                    +"BEGIN "
-                    +"INSERT INTO "+table+" (`island_id`, `level`, `contents`) VALUES(?, ?); "
-                    +"END; "
-                    +"END IF; ");
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO "+table+" (`island_id`, `level`, `contents`) VALUES(?, ?, ?); ");
             ps.setInt(1, id);
-            ps.setInt(2, id);
-            ps.setInt(3, 0);
+            ps.setInt(2, 1);
+            ps.setString(3, serialize(new ArrayList<>()));
             return null;
         });
     }
@@ -119,7 +115,7 @@ public class IslandInventoryDataModel implements IslandDataModel {
 
     public static List<ItemStack> deserialize(String base64){
         try {
-            return Arrays.asList(CompressedInventorySerializer.itemStackArrayFromBase64(base64));
+            return Arrays.asList(v1_16InventorySerializer.itemStackArrayFromBase64(base64));
         }catch (IOException ignored){
 
         }
@@ -127,7 +123,7 @@ public class IslandInventoryDataModel implements IslandDataModel {
     }
 
     public static String serialize(List<ItemStack> list){
-        return CompressedInventorySerializer.itemStackArrayToBase64(list.toArray(new ItemStack[0]));
+        return v1_16InventorySerializer.itemStackArrayToBase64(list.toArray(new ItemStack[0]));
     }
 
 }

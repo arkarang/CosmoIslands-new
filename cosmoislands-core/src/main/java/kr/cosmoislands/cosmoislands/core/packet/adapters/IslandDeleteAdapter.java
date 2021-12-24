@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import kr.cosmoislands.cosmoislands.core.packet.IslandDeletePacket;
 
 public class IslandDeleteAdapter implements HelloAdapter<IslandDeletePacket> {
+
     @Override
     public String getIdentifier() {
         return IslandDeletePacket.class.getSimpleName();
@@ -23,4 +24,5 @@ public class IslandDeleteAdapter implements HelloAdapter<IslandDeletePacket> {
         int id = buf.readInt();
         return new IslandDeletePacket(destination, id);
     }
+    
 }

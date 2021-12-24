@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.concurrent.ExecutionException;
 
 @RequiredArgsConstructor
-public class IslandUpdateCallback implements CallbackTransformer<IslandUpdatePacket, Boolean> {
+public class IslandUpdateCallback implements CallbackTransformer<IslandUpdatePacket, Integer> {
 
     private final CosmoIslands service;
 
@@ -18,15 +18,19 @@ public class IslandUpdateCallback implements CallbackTransformer<IslandUpdatePac
     }
 
     @Override
-    public Boolean transform(IslandUpdatePacket packet) {
+    public Integer transform(IslandUpdatePacket packet) {
         try {
             if(packet.isLoad()){
-                return service.loadIsland(packet.getIslandID(), true).get() != null;
+                return service.loadIsland(packet.getIslandID(), true).get().getId();
             }else{
-                return service.unloadIsland(packet.getIslandID()).get();
+                if(service.unloadIsland(packet.getIslandID()).get()){
+                    return packet.getIslandID();
+                }else {
+                    return null;
+                }
             }
         }catch (InterruptedException | ExecutionException e){
-            return false;
+            return null;
         }
     }
 }

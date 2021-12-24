@@ -7,12 +7,17 @@ import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import kr.cosmoislands.cosmochat.bungee.CosmoChatBungee;
 import kr.cosmoislands.cosmochat.core.CosmoChat;
+import kr.cosmoislands.cosmochat.core.RedisChannelFactory;
 import kr.cosmoislands.cosmochat.privatechat.CosmoChatPrivateChat;
 import kr.cosmoislands.cosmoislands.api.IslandServer;
 import kr.cosmoislands.cosmoislands.api.ServerRegistration;
 import kr.cosmoislands.cosmoislands.api.chat.IslandChat;
+import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMapModule;
 import kr.cosmoislands.cosmoislands.chat.IslandChatModule;
+import kr.cosmoislands.cosmoislands.chat.IslandChatType;
+import kr.cosmoislands.cosmoislands.chat.IslandRankChatPlaceholder;
 import kr.cosmoislands.cosmoislands.core.CosmoIslands;
+import kr.cosmoislands.cosmoislands.member.PlayersMapModule;
 import kr.cosmoislands.cosmoredis.CosmoDataSource;
 import kr.cosmoislands.cosmoteleport.CosmoTeleport;
 import kr.cosmoislands.cosmoteleport.bungee.CosmoTeleportBungee;
@@ -36,25 +41,23 @@ public class CosmoIslandsBungee extends Plugin {
         Conf conf = new Conf(this);
 
         HelloEveryone networkModule = HelloBungee.getInst().getMain();
-        HelloPlayers playersModule = HelloPlayers.getInst();
         MySQLDatabase msLibMySQLDatabase = CosmoDataSource.mysql(conf.getRedisName());
         RedisClient redis = CosmoDataSource.redis(conf.getMySQLName());
-        RedisAsyncCommands<String, String> async = redis.connect().async();
         CosmoChat cosmoChat = CosmoChatBungee.getService();
-        CosmoChatPrivateChat privateChatAddon = CosmoChatBungee.getPrivateChatAddon();
-        CosmoTeleport cosmoTeleport = CosmoTeleportBungee.getService();
-
 
         try {
             cosmoIslands = new CosmoIslands(networkModule, redis, msLibMySQLDatabase, this.getLogger());
-            IslandChatModule chatModule = new IslandChatModule(cosmoChat, privateChatAddon, cosmoIslands.getPlayerRegistry(), msLibMySQLDatabase, redis.connect().async(), this.getLogger());
-            cosmoIslands.registerModule(IslandChat.class, chatModule);
+            cosmoChat.getChannelRegistry().register(IslandChatType.TOKEN, new RedisChannelFactory());
+            IslandRankChatPlaceholder placeholder = new IslandRankChatPlaceholder(cosmoIslands.getRegistry(), cosmoIslands.getPlayerRegistry());
+            cosmoChat.getFormatRegistry().registerPlaceholder(placeholder.getIdentifier(), placeholder);
             cosmoIslands.init();
             ProxyServer.getInstance().getPluginManager().registerListener(this, new Listener(cosmoIslands, conf.getMaxIslands()));
             if(conf.updateServerRegistration()) {
                 for (Map.Entry<IslandServer.Type, List<String>> entry : conf.getServerList().entrySet()) {
                     ServerRegistration registration = cosmoIslands.getCloud().getServerRegistration();
-                    entry.getValue().forEach(name -> registration.registerServer(name, entry.getKey()));
+                    for (String name : entry.getValue()) {
+                        registration.registerServer(name, entry.getKey()).get();
+                    }
                 }
             }
         }catch (Exception e){

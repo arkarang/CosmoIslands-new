@@ -11,6 +11,7 @@ import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoislands.cosmoislands.core.Database;
 import lombok.Getter;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -41,6 +42,7 @@ public final class PlayersMapModule implements IslandPlayersMapModule {
         this.settingsModule = settingsModule;
         this.strategyRegistry = new CosmoPlayerModificationStrategyRegistry();
         this.model = new PlayersMapDataModel("cosmoislands_members", "cosmoislands_islands", database);
+        this.model.init();
         this.playersMapRegistry = new PlayersMapRegistry(islandRegistry, this.registry, model, settingsModule, this.redis, this.strategyRegistry);
     }
 
@@ -60,9 +62,13 @@ public final class PlayersMapModule implements IslandPlayersMapModule {
     }
 
     @Override
+    public CompletableFuture<Void> create(int islandId, UUID uuid) {
+        return this.model.create(islandId, uuid);
+    }
+
+    @Override
     public void onEnable(IslandService service) {
-        this.model.init();
-        service.getFactory().addFirst("players", new PlayersMapLifecycle(this.playersMapRegistry));
+        service.getFactory().addFirst("players", new PlayersMapLifecycle(this, this.registry, this.playersMapRegistry));
     }
 
     @Override

@@ -14,17 +14,23 @@ public class PlayerChatModificationStrategy implements PlayerModificationStrateg
 
     @Override
     public void onOwnerChange(Island island, UUID uuid) {
-        module.get(island.getId()).setOwner(uuid);
+        module.getAsync(island.getId()).thenAccept(chat->{
+            chat.setOwner(uuid);
+        });
     }
 
     @Override
     public void onPlayerAdd(Island island, UUID uuid) {
-        module.get(island.getId()).add(uuid);
+        module.getAsync(island.getId()).thenAccept(chat->{
+            chat.add(uuid);
+        });
     }
 
     @Override
     public void onPlayerRemove(Island island, UUID uuid) {
-        module.get(island.getId()).remove(uuid);
+        module.getAsync(island.getId()).thenAccept(chat->{
+            chat.remove(uuid);
+        });
     }
 
     @Override

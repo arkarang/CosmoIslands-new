@@ -19,6 +19,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+//todo:
+// 1. create remoted IslandWorld
+// - remoted island doesnt access IslandWorld data that causing NPE & broken synchronization
 public class IslandManyWorld implements IslandWorld {
 
     private static final String MAX_X = "maxX", MIN_X = "minX", MAX_Z = "maxZ", MIN_Z = "minZ", LENGTH = "LENGTH", WEIGHT = "WEIGHT";
@@ -41,18 +44,18 @@ public class IslandManyWorld implements IslandWorld {
             }
     });
 
-    IslandManyWorld(int islandId, ManyWorld world, MySQLIslandWorldDataModel model, Map<String, Integer> intialValues){
+    IslandManyWorld(int islandId, ManyWorld world, MySQLIslandWorldDataModel model, Map<String, Integer> initialValues){
         this.islandId = islandId;
         this.manyWorld = world;
-        this.initialValues = intialValues;
+        this.initialValues = initialValues;
         this.model = model;
         this.supplierMap = initSuppliers();
-        this.maxX = new Cached<>(intialValues.get(MAX_X), supply(MAX_X));
-        this.minX = new Cached<>(intialValues.get(MIN_X), supply(MIN_X));
-        this.maxZ = new Cached<>(intialValues.get(MAX_Z), supply(MAX_Z));
-        this.minZ = new Cached<>(intialValues.get(MIN_Z), supply(MIN_Z));
-        this.length = new Cached<>(intialValues.get(MAX_X)-intialValues.get(MIN_X), supply(LENGTH));
-        this.weight = new Cached<>(intialValues.get(MAX_Z)-intialValues.get(MIN_Z), supply(WEIGHT));
+        this.maxX = new Cached<>(initialValues.get(MAX_X), supply(MAX_X));
+        this.minX = new Cached<>(initialValues.get(MIN_X), supply(MIN_X));
+        this.maxZ = new Cached<>(initialValues.get(MAX_Z), supply(MAX_Z));
+        this.minZ = new Cached<>(initialValues.get(MIN_Z), supply(MIN_Z));
+        this.length = new Cached<>(initialValues.get(MAX_X)-initialValues.get(MIN_X), supply(LENGTH));
+        this.weight = new Cached<>(initialValues.get(MAX_Z)-initialValues.get(MIN_Z), supply(WEIGHT));
     }
 
     private Map<String, Supplier<CompletableFuture<Integer>>> initSuppliers(){

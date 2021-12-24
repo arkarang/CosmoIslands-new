@@ -31,9 +31,9 @@ public class MySQLIslandInternshipDataModel {
             ps.execute();
             PreparedStatement ps2 = connection.prepareStatement("CREATE TABLE IF NOT EXISTS "+maxInternTable+ " "+
                     "(`column_id` BIGINT UNIQUE AUTO_INCREMENT, " +
-                    "`uuid` VARCHAR(36), " +
+                    "`island_id` BIGINT, " +
                     "`max_internship` TINYINT DEFAULT 5, " +
-                    "PRIMARY KEY(`uuid`, `island_id`), " +
+                    "PRIMARY KEY(`island_id`), " +
                     "FOREIGN KEY (`island_id`) REFERENCES "+islandTable+"(`island_id`) ON DELETE CASCADE) " +
                     "charset=utf8mb4");
             ps2.execute();

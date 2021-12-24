@@ -13,15 +13,13 @@ public class CosmoIslandRegistry implements IslandRegistry {
     @Getter
     private final int allocatedMaxSize;
     private final IslandService service;
-    private final IslandHostServer localServer;
 
     private final HashBiMap<Class<? extends IslandComponent>, Byte> componentIds;
     private final ConcurrentHashMap<Integer, Island> localIslands;
     private final ConcurrentHashMap<Integer, Island> remotedIslands;
 
-    CosmoIslandRegistry(int maxSize, IslandService service, IslandHostServer hostServer){
+    CosmoIslandRegistry(int maxSize, IslandService service){
         this.allocatedMaxSize = maxSize;
-        this.localServer = hostServer;
         this.service = service;
         this.localIslands = new ConcurrentHashMap<>();
         this.remotedIslands = new ConcurrentHashMap<>();
@@ -31,6 +29,7 @@ public class CosmoIslandRegistry implements IslandRegistry {
 
     @Override
     public CompletableFuture<Island> getIsland(int islandId) {
+        DebugLogger.log("island registry: get island: "+islandId);
         if(localIslands.containsKey(islandId)){
             return CompletableFuture.completedFuture(localIslands.get(islandId));
         }else if(remotedIslands.containsKey(islandId)) {
@@ -54,7 +53,6 @@ public class CosmoIslandRegistry implements IslandRegistry {
     public void registerIsland(Island island) {
         if(island.isLocal()) {
             localIslands.put(island.getId(), island);
-            localServer.registerIsland(island, System.currentTimeMillis());
         }else {
             remotedIslands.put(island.getId(), island);
         }
@@ -62,9 +60,7 @@ public class CosmoIslandRegistry implements IslandRegistry {
 
     @Override
     public Island unregisterIsland(int islandId) {
-        Island island = localIslands.remove(islandId);
-        localServer.unregisterIsland(island);
-        return island;
+        return localIslands.remove(islandId);
     }
 
     @Override

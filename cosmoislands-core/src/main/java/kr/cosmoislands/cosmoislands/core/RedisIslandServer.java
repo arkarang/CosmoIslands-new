@@ -11,6 +11,7 @@ import lombok.Getter;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -53,7 +54,7 @@ public class RedisIslandServer implements IslandServer {
     @Override
     public CompletableFuture<Boolean> registerIsland(Island island, long uptime) {
         return async.hexists(islandKey, island.getId()+"").thenCompose(exist->{
-            if(exist) {
+            if(!exist) {
                 CompletableFuture<Long> future = async.sadd(redisKey, island.getId()+"").toCompletableFuture();
                 return async.hset(islandKey, island.getId() + "", name).thenCombine(future, (l, str) -> true);
             }else
@@ -74,20 +75,26 @@ public class RedisIslandServer implements IslandServer {
 
     @Override
     public CompletableFuture<List<Integer>> getIslands() {
-        return async.hkeys(redisKey).thenApply(list->list.stream().map(Integer::parseInt).collect(Collectors.toList()))
+        return async.smembers(redisKey).thenApply(list->list.stream().map(Integer::parseInt).collect(Collectors.toList()))
                 .toCompletableFuture();
     }
 
     @Override
     public CompletableFuture<Integer> getLoadedCount() {
-        return async.hkeys(redisKey).thenApply(List::size).toCompletableFuture();
+        return async.smembers(redisKey).thenApply(Set::size).toCompletableFuture();
     }
 
     @Override
     public CompletableFuture<Island> create(UUID uuid) {
         return OperationPrecondition.canCreate(uuid).thenCompose(canCreate->{
             if(canCreate){
-                return sender.callback(new IslandCreatePacket(this.name, uuid), Island.class).async();
+                return sender.callback(new IslandCreatePacket(this.name, uuid), Integer.class).timeout(30000L).async().thenCompose(islandId->{
+                    if(islandId != null){
+                        return registry.getIsland(islandId);
+                    }else{
+                        return CompletableFuture.completedFuture(null);
+                    }
+                });
             }else{
                 return CompletableFuture.completedFuture(null);
             }
@@ -98,7 +105,12 @@ public class RedisIslandServer implements IslandServer {
     public CompletableFuture<Island> load(int islandId) {
         return OperationPrecondition.canUpdate(islandId, true).thenCompose(canUpdate->{
             if(canUpdate){
-                return sender.callback(new IslandUpdatePacket(this.name, islandId, true), Island.class).async();
+                return sender.callback(new IslandUpdatePacket(this.name, islandId, true), Integer.class).async().thenCompose(id->{
+                    if(id != null){
+                        return registry.getIsland(id);
+                    }else
+                        return CompletableFuture.completedFuture(null);
+                });
             }else{
                 return CompletableFuture.completedFuture(null);
             }
@@ -109,7 +121,7 @@ public class RedisIslandServer implements IslandServer {
     public CompletableFuture<Boolean> unload(int islandId) {
         return OperationPrecondition.canUpdate(islandId, false).thenCompose(canUpdate->{
             if(canUpdate){
-                return sender.callback(new IslandUpdatePacket(this.name, islandId, false), Island.class)
+                return sender.callback(new IslandUpdatePacket(this.name, islandId, false), Integer.class)
                         .async()
                         .thenApply(Objects::nonNull);
 

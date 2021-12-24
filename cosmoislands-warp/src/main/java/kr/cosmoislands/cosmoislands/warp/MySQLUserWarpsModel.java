@@ -25,13 +25,13 @@ public class MySQLUserWarpsModel extends MySQLAbstractLocationDataModel{
                     "(`column_id` BIGINT UNIQUE AUTO_INCREMENT, " +
                     "`uuid` VARCHAR(36), " +
                     "`name` VARCHAR(32), " +
-                    "`island_id` INT, " +
+                    "`island_id` BIGINT, " +
                     "`x` DOUBLE, " +
                     "`y` DOUBLE, " +
                     "`z` DOUBLE, " +
                     "`yaw` FLOAT, " +
                     "`pitch` FLOAT, " +
-                    "FOREIGN KEY (`island_id`) REFERENCES "+islandTable+"(`island_id`) ON DELETE CASCADE), " +
+                    "FOREIGN KEY (`island_id`) REFERENCES "+islandTable+"(`island_id`) ON DELETE CASCADE, " +
                     "PRIMARY KEY(`uuid`, `name`)) " +
                     "charset=utf8mb4");
             ps.execute();

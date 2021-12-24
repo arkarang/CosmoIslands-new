@@ -11,6 +11,7 @@ import kr.cosmoislands.cosmoislands.core.Database;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -48,6 +49,11 @@ public class IslandLevelModule implements IslandModule<IslandLevel> {
     @Override
     public void invalidate(int islandId) {
         cache.invalidate(islandId);
+    }
+
+    @Override
+    public CompletableFuture<Void> create(int islandId, UUID uuid) {
+        return this.model.create(islandId, uuid);
     }
 
     @Override
