@@ -1,8 +1,10 @@
 package kr.cosmoislands.cosmoislands.api;
 
-
 import lombok.Getter;
+import lombok.ToString;
+
 @Getter
+@ToString
 public class AbstractLocation {
 
     double x, y, z;

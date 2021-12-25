@@ -16,7 +16,6 @@ public class MySQLAbstractLocationDataModel {
 
     @Nullable
     protected AbstractLocation getLocation(ResultSet rs) throws SQLException {
-        if(rs.next()){
             double x, y, z;
             float yaw, pitch;
             x = rs.getDouble(1);
@@ -25,8 +24,6 @@ public class MySQLAbstractLocationDataModel {
             yaw = rs.getFloat(4);
             pitch = rs.getFloat(5);
             return new AbstractLocation(x, y, z, yaw, pitch);
-        }else
-            return null;
     }
 
 }

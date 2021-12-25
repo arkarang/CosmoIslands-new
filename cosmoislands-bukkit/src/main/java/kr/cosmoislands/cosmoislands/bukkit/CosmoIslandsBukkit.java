@@ -56,6 +56,7 @@ public class CosmoIslandsBukkit extends JavaPlugin {
 
     @Override
     public void onEnable() {
+
         YamlIslandConfiguration config = new YamlIslandConfiguration(this);
 
         HelloEveryone networkModule = HelloBukkit.getInst().getMain();
@@ -81,7 +82,7 @@ public class CosmoIslandsBukkit extends JavaPlugin {
 
         try {
             cosmoIslands = new CosmoIslands(networkModule, redis, msLibMySQLDatabase, this.getLogger());
-            HelloBungeeInitializer.initBukkit(networkModule, cosmoIslands);
+            HelloBungeeInitializer.init(networkModule, cosmoIslands);
             CosmoIslandsLauncher launcher = new CosmoIslandsLauncher(cosmoIslands, redis, msLibMySQLDatabase, this.getLogger());
 
             launcher.registerExternalDependency(HelloEveryone.class, networkModule);
@@ -104,7 +105,6 @@ public class CosmoIslandsBukkit extends JavaPlugin {
 
             this.initializeCommands(cosmoIslands, config, async);
             this.initializeListeners(cosmoIslands, executor);
-
 
             DebugLogger.setLogger(this.getLogger());
             DebugLogger.setEnableDebug(config.isDebug());
@@ -146,6 +146,8 @@ public class CosmoIslandsBukkit extends JavaPlugin {
         UpgradeCommands.init(manager, executor);
         IslandWarpCommands.init(manager, islands, (IslandWarpModule) islands.getModule(IslandWarpsMap.class), executor);
         GenericCommands.init(manager, islands, executor);
+
+        manager.registerCommand(new TestCommands(islands, executor));
     }
 
     private void initializeListeners(CosmoIslands islands, BukkitExecutor executor){

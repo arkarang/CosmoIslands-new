@@ -2,6 +2,7 @@ package kr.cosmoislands.cosmoislands.chat;
 
 import kr.cosmoislands.cosmochat.privatechat.PrivateChatDatabase;
 import kr.cosmoislands.cosmoislands.api.IslandDataModel;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import kr.msleague.mslibrary.database.impl.internal.MySQLDatabase;
 import lombok.val;
 
@@ -35,9 +36,11 @@ public class IslandChatDataModel extends PrivateChatDatabase implements IslandDa
 
     @Override
     public CompletableFuture<Void> create(int id, UUID uuid) {
-        val future1 = super.addMember(id, uuid);
-        val future2 = super.create(uuid, id);
-        return CompletableFuture.allOf(future1, future2);
+        DebugLogger.log("islandchatdataModel: create");
+        return super.create(uuid, id).thenCompose(ignored->{
+            DebugLogger.log("islandchatdataModel: create2");
+            return super.addMember(id, uuid);
+        });
     }
 
     @Override

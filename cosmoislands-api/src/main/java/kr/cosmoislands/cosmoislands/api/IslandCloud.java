@@ -15,8 +15,10 @@ public interface IslandCloud {
 
     IslandHostServer getHostServer();
 
+    //todo: IslandRegistry로 옮기기
     CompletableFuture<IslandStatus> getStatus(int islandId);
 
+    //todo: IslandRegistry로 옮기기
     CompletableFuture<Void> setStatus(int islandId, IslandStatus status);
 
     CompletableFuture<IslandServer> getLocated(int islandId);

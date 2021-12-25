@@ -4,6 +4,7 @@ import kr.cosmoislands.cosmoislands.api.ComponentLifecycle;
 import kr.cosmoislands.cosmoislands.api.IslandContext;
 import kr.cosmoislands.cosmoislands.api.ModulePriority;
 import kr.cosmoislands.cosmoislands.api.chat.IslandChat;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
@@ -29,6 +30,7 @@ public class IslandChatLifecycle implements ComponentLifecycle {
     @Override
     public CompletableFuture<Void> onCreate(UUID owner, IslandContext island) {
         return module.getAsync(island.getIslandId()).thenCompose(component->{
+            DebugLogger.log("chat on create");
             island.register(IslandChat.class, component);
             return module.create(island.getIslandId(), owner);
         });

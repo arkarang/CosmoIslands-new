@@ -43,7 +43,6 @@ public class CachedIslandProtection implements IslandProtection {
         this.defaultValues = defaultValues;
         this.playersMap = playersMap;
         this.playerRegistry = playerRegistry;
-        sync();
     }
 
     @Override

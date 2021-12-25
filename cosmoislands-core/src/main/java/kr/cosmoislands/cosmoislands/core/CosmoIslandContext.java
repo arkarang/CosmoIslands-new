@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Getter
 @RequiredArgsConstructor
@@ -36,16 +37,7 @@ public class CosmoIslandContext implements IslandContext {
     @Override
     public <T extends IslandComponent> void register(Class<T> clazz, IslandComponent component) {
         components.putIfAbsent(clazz, component);
-    }
-
-    @Override
-    public void register(String tag, PlayerModificationStrategy strategy) {
-        strategies.put(tag, strategy);
-    }
-
-    @Override
-    public Map<String, PlayerModificationStrategy> getStrategies() {
-        return ImmutableMap.copyOf(strategies);
+        DebugLogger.log("applied: "+getApplied().stream().map(Class::getSimpleName).collect(Collectors.toList()));
     }
 
     @Override

@@ -22,7 +22,7 @@ public class RedisIslandServer implements IslandServer {
     final String name;
     @Getter
     final IslandServer.Type type;
-    final String islandKey;
+    final String islandLocationKey;
     final HelloSender sender;
     final IslandRegistry registry;
     final IslandCloud cloud;
@@ -38,7 +38,7 @@ public class RedisIslandServer implements IslandServer {
                       RedisAsyncCommands<String, String> async){
         this.name = name;
         this.type = type;
-        this.islandKey = islandKey;
+        this.islandLocationKey = islandKey;
         this.registry = registry;
         this.sender = sender;
         this.async = async;
@@ -53,10 +53,12 @@ public class RedisIslandServer implements IslandServer {
 
     @Override
     public CompletableFuture<Boolean> registerIsland(Island island, long uptime) {
-        return async.hexists(islandKey, island.getId()+"").thenCompose(exist->{
+        return async.hexists(islandLocationKey, island.getId()+"").thenCompose(exist->{
             if(!exist) {
                 CompletableFuture<Long> future = async.sadd(redisKey, island.getId()+"").toCompletableFuture();
-                return async.hset(islandKey, island.getId() + "", name).thenCombine(future, (l, str) -> true);
+                this.registry.registerIsland(island);
+                this.cloud.setStatus(island.getId(), IslandStatus.ONLINE);
+                return async.hset(islandLocationKey, island.getId() + "", name).thenCombine(future, (l, str) -> true);
             }else
                 return CompletableFuture.completedFuture(false);
         }).toCompletableFuture();
@@ -64,10 +66,12 @@ public class RedisIslandServer implements IslandServer {
 
     @Override
     public CompletableFuture<Boolean> unregisterIsland(Island island) {
-        return async.hexists(islandKey, island.getId()+"").thenCompose(exist->{
+        return async.hexists(islandLocationKey, island.getId()+"").thenCompose(exist->{
             if(exist) {
                 CompletableFuture<Long> future = async.sadd(redisKey, island.getId()+"").toCompletableFuture();
-                return async.hdel(islandKey, island.getId() + "").thenCombine(future, (l, str) -> true);
+                this.registry.unregisterIsland(island.getId());
+                this.cloud.setStatus(island.getId(), IslandStatus.OFFLINE);
+                return async.hdel(islandLocationKey, island.getId() + "").thenCombine(future, (l, str) -> true);
             }else
                 return CompletableFuture.completedFuture(false);
         }).toCompletableFuture();

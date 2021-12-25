@@ -16,7 +16,7 @@ import kr.cosmoislands.cosmoislands.core.packet.executors.IslandSyncPacketExecut
 
 public class HelloBungeeInitializer {
 
-    public static void initBukkit(HelloEveryone networkModule, CosmoIslands service){
+    public static void init(HelloEveryone networkModule, CosmoIslands service){
         HelloHandler handler = networkModule.getHandler();
         HelloGateway gateway = networkModule.getGateway();
         CallbackService callbackService = networkModule.getCallbackService();
@@ -33,13 +33,5 @@ public class HelloBungeeInitializer {
         callbackService.registerTransformer(new IslandCreateCallback(service));
         callbackService.registerTransformer(new IslandUpdateCallback(service));
         callbackService.registerTransformer(new IslandUpdateCallback(service));
-    }
-
-    public static void initBungee(HelloEveryone networkModule){
-        HelloGateway gateway = networkModule.getGateway();
-
-        gateway.registerAdapter(new IslandCreateAdapter());
-        gateway.registerAdapter(new IslandDeleteAdapter());
-        gateway.registerAdapter(new IslandUpdateAdapter());
     }
 }

@@ -7,6 +7,7 @@ import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMap;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -31,8 +32,10 @@ public class PlayersMapLifecycle implements ComponentLifecycle {
 
     @Override
     public CompletableFuture<Void> onCreate(UUID owner, IslandContext island) {
-        island.register(IslandPlayersMap.class, module.get(island.getIslandId()));
-        return module.create(island.getIslandId(), owner);
+        CosmoIslandPlayersMap playersMap = (CosmoIslandPlayersMap)module.get(island.getIslandId());
+        island.register(IslandPlayersMap.class, playersMap);
+        return module.create(island.getIslandId(), owner)
+                .thenCompose(ignored-> playersMap.getRedis().migrate(playersMap.getMysql()));
     }
 
     @Override
@@ -43,7 +46,13 @@ public class PlayersMapLifecycle implements ComponentLifecycle {
 
     @Override
     public CompletableFuture<Void> onDelete(IslandContext island) {
-        registry.invalidate(island.getIslandId());
-        return CompletableFuture.completedFuture(null);
+        return module.getPlayersMapRegistry().getModel()
+                .delete(island.getIslandId())
+                .thenCompose(ignored -> {
+                    registry.invalidate(island.getIslandId());
+                    return island.getComponent(IslandPlayersMap.class).getMembers().thenAccept(map -> {
+                        map.keySet().forEach(playerRegistry::unload);
+                    });
+                });
     }
 }

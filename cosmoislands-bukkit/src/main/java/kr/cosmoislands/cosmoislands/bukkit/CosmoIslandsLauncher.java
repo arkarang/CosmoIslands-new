@@ -47,6 +47,7 @@ import kr.cosmoislands.cosmoteleport.CosmoTeleport;
 import kr.msleague.mslibrary.database.impl.internal.MySQLDatabase;
 import lombok.RequiredArgsConstructor;
 
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 @RequiredArgsConstructor
@@ -60,6 +61,7 @@ public class CosmoIslandsLauncher {
     public <T> void registerExternalDependency(Class<T> clazz, T instance){
         service.getExternalRepository().registerService(clazz, instance);
     }
+
     public void initializeModules(IslandConfiguration configuration){
         RedisAsyncCommands<String, String> async = client.connect().async();
         ExternalRepository repo = service.getExternalRepository();
@@ -131,7 +133,7 @@ public class CosmoIslandsLauncher {
         service.getRegistry().registerComponentId(IslandWarpsMap.class, IslandWarpsMap.COMPONENT_ID);
     }
 
-    public void launch(){
+    public void launch() throws ExecutionException, InterruptedException {
         service.init();
     }
 }

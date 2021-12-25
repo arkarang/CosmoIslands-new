@@ -4,6 +4,7 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import kr.cosmoislands.cosmoislands.api.*;
 import lombok.Getter;
+import lombok.val;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,12 +31,22 @@ public class CosmoIslandRegistry implements IslandRegistry {
     @Override
     public CompletableFuture<Island> getIsland(int islandId) {
         DebugLogger.log("island registry: get island: "+islandId);
+        if(islandId == Island.NIL_ID){
+            return CompletableFuture.completedFuture(null);
+        }
+
         if(localIslands.containsKey(islandId)){
             return CompletableFuture.completedFuture(localIslands.get(islandId));
         }else if(remotedIslands.containsKey(islandId)) {
             return CompletableFuture.completedFuture(remotedIslands.get(islandId));
         }else{
-            return service.loadIsland(islandId, false);
+            val future = service.loadIsland(islandId, false);
+            future.thenAccept(island->{
+                if(island != null){
+                    remotedIslands.put(island.getId(), island);
+                }
+            });
+            return future;
         }
     }
 

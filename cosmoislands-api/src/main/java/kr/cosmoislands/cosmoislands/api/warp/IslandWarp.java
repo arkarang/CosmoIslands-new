@@ -3,7 +3,9 @@ package kr.cosmoislands.cosmoislands.api.warp;
 import kr.cosmoislands.cosmoislands.api.AbstractLocation;
 import kr.cosmoislands.cosmoislands.api.member.MemberRank;
 import lombok.Getter;
+import lombok.ToString;
 
+@ToString
 public class IslandWarp extends AbstractLocation {
 
     @Getter

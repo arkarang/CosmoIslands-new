@@ -39,7 +39,13 @@ public class MySQLPlayersMap implements IslandPlayersMap {
 
     @Override
     public CompletableFuture<IslandPlayer> getOwner() {
-        return model.getOwner(islandId).thenApply(registry::get);
+        return model.getOwner(islandId).thenApply(uuid->{
+            if(uuid == null){
+                return null;
+            }else{
+                return registry.get(uuid);
+            }
+        });
     }
 
     @Override

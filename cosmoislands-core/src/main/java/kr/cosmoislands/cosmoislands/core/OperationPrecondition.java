@@ -20,9 +20,7 @@ public class OperationPrecondition {
     }
 
     public static CompletableFuture<Boolean> canCreate(UUID uuid){
-        return playerRegistry.getIslandId(uuid).thenApply(id->{
-            return id == Island.NIL_ID;
-        });
+        return playerRegistry.getIslandId(uuid).thenApply(id-> id == Island.NIL_ID);
     }
 
     public static CompletableFuture<Boolean> canUpdate(int islandId, boolean load){

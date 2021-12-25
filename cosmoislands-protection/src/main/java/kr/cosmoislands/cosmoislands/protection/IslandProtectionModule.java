@@ -44,6 +44,7 @@ public class IslandProtectionModule implements IslandModule<IslandProtection> {
         ImmutableMap<IslandPermissions, MemberRank> defaultValues = permissionsMapModule.getDefaultValues();
         IslandSettingsMap settingsMap = settingsModule.get(islandId);
         protection = new CachedIslandProtection(islandId, permissionsMap, playersMap, settingsMap, playerRegistry, defaultValues);
+        protection.sync();
         return protection;
     }
 
@@ -54,6 +55,7 @@ public class IslandProtectionModule implements IslandModule<IslandProtection> {
         ImmutableMap<IslandPermissions, MemberRank> defaultValues = permissionsMapModule.getDefaultValues();
         IslandSettingsMap settingsMap = settingsModule.get(islandId);
         protection = new IslandProtectionRemote(islandId, permissionsMap, playersMap, settingsMap, playerRegistry, defaultValues, cloud);
+        protection.sync();
         return protection;
     }
 

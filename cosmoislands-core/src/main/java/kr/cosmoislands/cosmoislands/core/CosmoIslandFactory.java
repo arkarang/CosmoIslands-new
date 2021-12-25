@@ -1,11 +1,9 @@
 package kr.cosmoislands.cosmoislands.core;
 
 import com.google.common.collect.ImmutableList;
-import kr.cosmoislands.cosmoislands.api.ComponentLifecycle;
-import kr.cosmoislands.cosmoislands.api.Island;
-import kr.cosmoislands.cosmoislands.api.IslandContext;
-import kr.cosmoislands.cosmoislands.api.IslandFactory;
+import kr.cosmoislands.cosmoislands.api.*;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -21,6 +19,7 @@ public class CosmoIslandFactory implements IslandFactory {
 
     private final ExecutorService service;
     private final IslandRegistrationDataModel model;
+    private final IslandCloud cloud;
     private final boolean isLocal = true;
 
     private final LinkedList<String> orders = new LinkedList<>();
@@ -87,8 +86,13 @@ public class CosmoIslandFactory implements IslandFactory {
     }
 
     public CompletableFuture<IslandContext> fireCreate(UUID uuid){
-        CompletableFuture<IslandContext> contextFuture = model.create(uuid).thenApply(id-> new CosmoIslandContext(id, true));
-        contextFuture.thenApplyAsync(context->{
+        CompletableFuture<IslandContext> contextFuture = model.create(uuid).thenComposeAsync(id-> {
+            val updateStatusFuture = this.cloud.setStatus(id, IslandStatus.LOADING);
+            return updateStatusFuture.thenApply(ignored-> new CosmoIslandContext(id, true));
+        }, service);
+
+        return contextFuture.thenApplyAsync(context->{
+            DebugLogger.log("create current thread: "+Thread.currentThread().getName());
             try {
                 for (ComponentLifecycle strategy : orderedList()) {
                     DebugLogger.log("island factory: execution on create: "+strategy.getClass().getSimpleName());
@@ -100,51 +104,61 @@ public class CosmoIslandFactory implements IslandFactory {
             DebugLogger.log("island factory: island creation completed");
             return context;
         }, service);
-        return contextFuture;
     }
 
     @Override
     public CompletableFuture<IslandContext> fireLoad(int islandId, boolean isLocal) {
-        return CompletableFuture.supplyAsync(()->new CosmoIslandContext(islandId, isLocal), service).thenApply(context->{
-            try {
-                for (ComponentLifecycle strategy : orderedList()) {
-                    strategy.onLoad(context).get();
-                }
-            }catch (InterruptedException | ExecutionException ignored){
+        val updateStatusFuture = this.cloud.setStatus(islandId, IslandStatus.LOADING);
+        return CompletableFuture.supplyAsync(()->new CosmoIslandContext(islandId, isLocal), service)
+                .thenCombine(updateStatusFuture, (context, ignored) -> context)
+                .thenApplyAsync(context->{
+                    DebugLogger.log("load current thread: "+Thread.currentThread().getName());
+                    try {
+                        for (ComponentLifecycle strategy : orderedList()) {
+                            strategy.onLoad(context).get();
+                        }
+                    }catch (InterruptedException | ExecutionException ignored){
 
-            }
-            return context;
-        });
+                    }
+                    return context;
+                }, service);
     }
 
     @Override
     public CompletableFuture<IslandContext> fireUnload(Island island) {
-        return CompletableFuture.supplyAsync(()->new CosmoIslandContext(island, isLocal), service).thenApply(context->{
-            try{
-                for (ComponentLifecycle strategy : orderedList()) {
-                    strategy.onUnload(context).get();
-                }
-            }catch (InterruptedException | ExecutionException ignored){
+        val updateStatusFuture = this.cloud.setStatus(island.getId(), IslandStatus.UNLOADING);
+        return CompletableFuture.supplyAsync(() -> new CosmoIslandContext(island, isLocal), service)
+                .thenCombine(updateStatusFuture, (context, ignored) -> context)
+                .thenApplyAsync(context->{
+                    try{
+                        for (ComponentLifecycle strategy : orderedList()) {
+                            strategy.onUnload(context).get();
+                        }
+                    }catch (InterruptedException | ExecutionException ignored){
 
-            }
-            return context;
-        });
+                    }
+                    return context;
+                }, service);
     }
 
     @Override
     public CompletableFuture<IslandContext> fireDelete(Island island) {
-        return CompletableFuture.supplyAsync(()->new CosmoIslandContext(island, isLocal), service).thenApply(context->{
-            try{
-                for (ComponentLifecycle strategy : orderedList()) {
-                    strategy.onDelete(context).get();
-                }
-            }catch (InterruptedException | ExecutionException ignored){
+        val updateStatusFuture = this.cloud.setStatus(island.getId(), IslandStatus.UNLOADING);
+        return CompletableFuture.supplyAsync(()->new CosmoIslandContext(island, isLocal), service)
+                .thenCombine(updateStatusFuture, (context, ignored) -> context)
+                .thenComposeAsync(context->{
+                    DebugLogger.log("delete current thread: "+Thread.currentThread().getName());
+                    try{
+                        for (ComponentLifecycle strategy : orderedList()) {
+                            DebugLogger.log("island factory: execution on delete: "+strategy.getClass().getSimpleName());
+                            strategy.onDelete(context).get();
+                        }
+                    }catch (InterruptedException | ExecutionException ignored){
 
-            }
-            return context;
-        });
+                    }
+                    return model.delete(island.getId()).thenApply(ignored->context);
+                }, service);
     }
-
 
     private List<ComponentLifecycle> orderedList(){
         List<ComponentLifecycle> list = new ArrayList<>();

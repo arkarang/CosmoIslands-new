@@ -14,6 +14,7 @@ import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoislands.cosmoislands.api.warp.*;
 import kr.cosmoislands.cosmoislands.bukkit.PlayerPreconditions;
 import kr.cosmoislands.cosmoislands.bukkit.utils.IslandUtils;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import kr.cosmoislands.cosmoislands.warp.IslandWarpModule;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
@@ -48,6 +49,7 @@ public class IslandWarpCommands {
                 }
             }).thenCombine(preconditions.isPlayer(player.getUniqueId()), (warp, isMember) -> {
                 if(warp != null){
+                    DebugLogger.log("island go warp: "+warp);
                     player.sendMessage("섬 이동을 시도합니다.");
                     return teleportExecutor.teleportPlayer(player.getUniqueId(), warp);
                 }else{
@@ -57,8 +59,11 @@ public class IslandWarpCommands {
                 if(warpResult != null){
                     if(!warpResult.isSuccess()){
                         player.sendMessage("오류: 섬이 로드되어 있지 않습니다.");
+                    }else{
+                        DebugLogger.log("island go failed - 1");
                     }
                 }
+                DebugLogger.log("island go failed - 2");
             });
         }
 

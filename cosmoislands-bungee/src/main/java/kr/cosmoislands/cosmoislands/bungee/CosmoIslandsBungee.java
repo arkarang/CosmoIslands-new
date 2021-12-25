@@ -17,6 +17,8 @@ import kr.cosmoislands.cosmoislands.chat.IslandChatModule;
 import kr.cosmoislands.cosmoislands.chat.IslandChatType;
 import kr.cosmoislands.cosmoislands.chat.IslandRankChatPlaceholder;
 import kr.cosmoislands.cosmoislands.core.CosmoIslands;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
+import kr.cosmoislands.cosmoislands.core.HelloBungeeInitializer;
 import kr.cosmoislands.cosmoislands.member.PlayersMapModule;
 import kr.cosmoislands.cosmoredis.CosmoDataSource;
 import kr.cosmoislands.cosmoteleport.CosmoTeleport;
@@ -60,6 +62,11 @@ public class CosmoIslandsBungee extends Plugin {
                     }
                 }
             }
+
+            HelloBungeeInitializer.init(networkModule, cosmoIslands);
+
+            DebugLogger.setLogger(this.getLogger());
+            DebugLogger.setEnableDebug(true);
         }catch (Exception e){
             e.printStackTrace();
         }

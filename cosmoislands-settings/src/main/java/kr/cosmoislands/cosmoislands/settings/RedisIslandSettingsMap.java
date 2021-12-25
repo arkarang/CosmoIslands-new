@@ -20,7 +20,7 @@ public class RedisIslandSettingsMap implements IslandSettingsMap {
     RedisIslandSettingsMap(int islandId, RedisAsyncCommands<String, String> async){
         this.islandId = islandId;
         this.async = async;
-        this.redisKey = "cosmoislands:island:settings:"+islandId;
+        this.redisKey = "cosmoislands:island:"+islandId+":settings";
     }
 
     CompletableFuture<Void> migrate(Map<IslandSetting, String> map){

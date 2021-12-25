@@ -28,7 +28,7 @@ public class IslandWarpLifecycle implements ComponentLifecycle {
     @Override
     public CompletableFuture<Void> onCreate(UUID owner, IslandContext island) {
         island.register(IslandWarpsMap.class, module.get(island.getIslandId()));
-        return CompletableFuture.completedFuture(null);
+        return module.create(island.getIslandId(), owner);
     }
 
     @Override

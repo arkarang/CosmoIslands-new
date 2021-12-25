@@ -24,7 +24,7 @@ public interface IslandService {
 
     <T extends IslandComponent> void registerModule(Class<T> clazz, IslandModule<T> module);
 
-    void init();
+    void init() throws ExecutionException, InterruptedException;
 
     void shutdown() throws ExecutionException, InterruptedException;
 

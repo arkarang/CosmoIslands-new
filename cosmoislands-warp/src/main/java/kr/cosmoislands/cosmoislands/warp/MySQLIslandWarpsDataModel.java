@@ -41,7 +41,7 @@ public class MySQLIslandWarpsDataModel extends MySQLAbstractLocationDataModel{
 
     CompletableFuture<IslandWarp> getWarp(int islandId, String name){
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("SELECT `x`, `y`, `z`, `yaw`, `pitch`, `permission_level` WHERE `name`=? AND `island_id`=?");
+            PreparedStatement ps = connection.prepareStatement("SELECT `x`, `y`, `z`, `yaw`, `pitch`, `permission_level` FROM "+table+" WHERE `name`=? AND `island_id`=?");
             ps.setString(1, name);
             ps.setInt(2, islandId);
             ResultSet rs = ps.executeQuery();
@@ -49,7 +49,7 @@ public class MySQLIslandWarpsDataModel extends MySQLAbstractLocationDataModel{
                 AbstractLocation location = getLocation(rs);
                 int permissionLevel = rs.getInt(6);
                 return new IslandWarp(name, MemberRank.get(permissionLevel), location);
-            }else {
+            }else{
                 return null;
             }
         });
@@ -57,7 +57,7 @@ public class MySQLIslandWarpsDataModel extends MySQLAbstractLocationDataModel{
 
     CompletableFuture<List<IslandWarp>> getWarps(int islandId, MemberRank required){
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("SELECT `name`, `x`, `y`, `z`, `yaw`, `pitch`, `permission_level` WHERE `island_id`=? AND `permission_level` <= ?");
+            PreparedStatement ps = connection.prepareStatement("SELECT `name`, `x`, `y`, `z`, `yaw`, `pitch`, `permission_level` FROM "+table+" WHERE `island_id`=? AND `permission_level` <= ?");
             ps.setInt(1, islandId);
             ps.setInt(2, required.getPriority());
             ResultSet rs = ps.executeQuery();

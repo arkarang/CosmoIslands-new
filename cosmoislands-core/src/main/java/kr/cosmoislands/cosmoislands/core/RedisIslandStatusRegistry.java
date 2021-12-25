@@ -28,7 +28,15 @@ public class RedisIslandStatusRegistry implements IslandStatusRegistry {
 
     @Override
     public CompletableFuture<Void> setStatus(int islandId, IslandStatus status){
-        return async.hset(statusKey, islandId+"", status.code()+"").thenRun(()->{}).toCompletableFuture();
+        if(status == IslandStatus.OFFLINE){
+            return async.hdel(statusKey, islandId+"")
+                    .thenRun(() -> {})
+                    .toCompletableFuture();
+        }else {
+            return async.hset(statusKey, islandId + "", status.code() + "")
+                    .thenRun(() -> {})
+                    .toCompletableFuture();
+        }
     }
 
     @Override

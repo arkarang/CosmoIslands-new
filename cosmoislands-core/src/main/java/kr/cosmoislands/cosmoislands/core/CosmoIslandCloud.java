@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class CosmoIslandCloud implements IslandCloud {
 
-    private static final String islandKey = "cosmoislands:island_locations";
+    private static final String islandLocationsKey = "cosmoislands:island_locations";
     private static final String onlineKey = "cosmoislands:online_servers";
 
     @Getter
@@ -46,14 +46,14 @@ public class CosmoIslandCloud implements IslandCloud {
         Map<String, IslandServer.Type> registeredServers = this.serverRegistration.getRegisteredServers().get();
         this.localServer = new RedisIslandHostServer(networkModule.getName(),
                 registeredServers.get(networkModule.getName()),
-                islandKey,
+                islandLocationsKey,
                 service.getRegistry(),
                 this,
                 networkModule.sender(networkModule.getName()), async);
         for (String serverName : registeredServers.keySet()) {
             IslandServer.Type type = registeredServers.get(serverName);
             if(this.networkModule.getConnections().getClient(serverName) != null){
-                IslandServer islandServer = new RedisIslandServer(serverName, type, islandKey, service.getRegistry(), this, networkModule.sender(serverName), async);
+                IslandServer islandServer = new RedisIslandServer(serverName, type, islandLocationsKey, service.getRegistry(), this, networkModule.sender(serverName), async);
                 this.servers.put(serverName, islandServer);
             }else{
                 logger.warning("island server '"+serverName+"' is not found on HelloBungee settings.");
@@ -92,7 +92,8 @@ public class CosmoIslandCloud implements IslandCloud {
 
     @Override
     public CompletableFuture<IslandServer> getLocated(int islandId) {
-        return async.hget(islandKey, islandId+"").thenApply(server-> server == null ? null : getServer(server)).toCompletableFuture();
+        return async.hget(islandLocationsKey, islandId+"")
+                .thenApply(server-> server == null ? null : getServer(server)).toCompletableFuture();
     }
 
     @Override

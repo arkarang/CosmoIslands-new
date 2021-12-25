@@ -43,7 +43,7 @@ public final class PlayersMapModule implements IslandPlayersMapModule {
         this.strategyRegistry = new CosmoPlayerModificationStrategyRegistry();
         this.model = new PlayersMapDataModel("cosmoislands_members", "cosmoislands_islands", database);
         this.model.init();
-        this.playersMapRegistry = new PlayersMapRegistry(islandRegistry, this.registry, model, settingsModule, this.redis, this.strategyRegistry);
+        this.playersMapRegistry = new PlayersMapRegistry(islandRegistry, this.registry, settingsModule, this.redis, model, this.strategyRegistry);
     }
 
     @Override

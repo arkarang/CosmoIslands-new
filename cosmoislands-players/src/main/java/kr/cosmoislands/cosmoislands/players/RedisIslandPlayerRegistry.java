@@ -44,12 +44,17 @@ public class RedisIslandPlayerRegistry implements IslandPlayerRegistry {
         @Override
         public IslandPlayer load(UUID uuid) throws Exception {
             IslandInternship internship = internshipRegistry.get(uuid);
+            update(uuid);
             return new CosmoIslandPlayer(uuid, registry, internship, RedisIslandPlayerRegistry.this);
         }
     });
 
     @Override
     public IslandPlayer get(UUID uuid) {
+        if(uuid == null){
+            return null;
+        }
+
         try {
             return cache.get(uuid);
         }catch (ExecutionException e){
@@ -78,13 +83,25 @@ public class RedisIslandPlayerRegistry implements IslandPlayerRegistry {
     }
 
     @Override
-    public void load(UUID uuid) {
+    public CompletableFuture<Void> load(UUID uuid) {
         cache.refresh(uuid);
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override
-    public void unload(UUID uuid) {
-        async.del(redisKey(uuid));
+    public CompletableFuture<Void> unload(UUID uuid) {
+        return async.del(redisKey(uuid)).thenRun(()->{}).toCompletableFuture();
+    }
+
+    @Override
+    public CompletableFuture<Void> update(UUID uuid) {
+        return database.get(uuid).thenCompose(id->{
+            if(id == Island.NIL_ID){
+                return async.del(redisKey(uuid)).thenRun(()->{});
+            }else{
+                return async.set(redisKey(uuid), id+"").thenRun(()->{});
+            }
+        });
     }
 
     private String redisKey(UUID uuid){

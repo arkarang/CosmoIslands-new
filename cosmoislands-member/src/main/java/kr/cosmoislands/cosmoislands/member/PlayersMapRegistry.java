@@ -12,6 +12,8 @@ import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMap;
 import kr.cosmoislands.cosmoislands.api.member.ModificationStrategyRegistry;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSettingsMap;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -25,9 +27,13 @@ public class PlayersMapRegistry {
 
     final IslandRegistry islandRegistry;
     final IslandPlayerRegistry registry;
-    final PlayersMapDataModel model;
     final IslandSettingsModule settingsModule;
     final RedisAsyncCommands<String, String> async;
+
+    @Getter(AccessLevel.PACKAGE)
+    final PlayersMapDataModel model;
+
+    @Getter(AccessLevel.PACKAGE)
     final ModificationStrategyRegistry strategies;
 
     LoadingCache<Integer, CompletableFuture<IslandPlayersMap>> cache = CacheBuilder.newBuilder().build(new CacheLoader<Integer, CompletableFuture<IslandPlayersMap>>() {

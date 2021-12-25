@@ -9,6 +9,7 @@ import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.val;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -27,9 +28,20 @@ public class RedisPlayersMap implements IslandPlayersMap {
     }
 
     CompletableFuture<Void> migrate(IslandPlayersMap players){
+        CompletableFuture<Void> insertOwnerFuture = migrateOwner(players.getOwner());
         CompletableFuture<Void> insertMembersFuture = migrateMembers(players.getMembers());
         CompletableFuture<Void> insertInternsFuture = migrateInterns(players.getInterns());
-        return insertMembersFuture;
+        return CompletableFuture.allOf(insertOwnerFuture, insertMembersFuture);
+    }
+
+    CompletableFuture<Void> migrateOwner(CompletableFuture<IslandPlayer> ownerFuture){
+        return ownerFuture.thenCompose(ip->{
+            if(ip == null){
+                return CompletableFuture.completedFuture(null);
+            }else{
+                return setOwner(ip);
+            }
+        });
     }
 
     CompletableFuture<Void> migrateMembers(CompletableFuture<Map<UUID, MemberRank>> membersFuture){
@@ -76,21 +88,21 @@ public class RedisPlayersMap implements IslandPlayersMap {
     }
 
     @Override
-    public CompletableFuture<Void> setOwner(IslandPlayer player) {
+    public CompletableFuture<Void> setOwner(@Nonnull IslandPlayer player) {
         return async.set(ownerKey, player.getUniqueId().toString())
                 .thenRun(()->{})
                 .toCompletableFuture();
     }
 
     @Override
-    public CompletableFuture<Void> setRank(IslandPlayer player, MemberRank rank) {
+    public CompletableFuture<Void> setRank(@Nonnull IslandPlayer player, MemberRank rank) {
         return async.hset(membersKey, player.getUniqueId()+"", rank.getPriority()+"")
                 .thenRun(()->{})
                 .toCompletableFuture();
     }
 
     @Override
-    public CompletableFuture<MemberRank> getRank(IslandPlayer player) {
+    public CompletableFuture<MemberRank> getRank(@Nonnull IslandPlayer player) {
         return async.hget(membersKey, player.getUniqueId()+"")
                 .thenApply(value-> value == null ? MemberRank.NONE : MemberRank.valueOf(value))
                 .handle((rank, e)-> e != null ? MemberRank.NONE : rank)
@@ -98,14 +110,14 @@ public class RedisPlayersMap implements IslandPlayersMap {
     }
 
     @Override
-    public CompletableFuture<Void> removeMember(IslandPlayer player) {
+    public CompletableFuture<Void> removeMember(@Nonnull IslandPlayer player) {
         return async.hdel(membersKey, player.getUniqueId()+"")
                 .thenRun(()->{})
                 .toCompletableFuture();
     }
 
     @Override
-    public CompletableFuture<Void> addMember(IslandPlayer player) {
+    public CompletableFuture<Void> addMember(@Nonnull IslandPlayer player) {
         return async.hset(membersKey, player.getUniqueId()+"", MemberRank.MEMBER.name())
                 .thenRun(()->{})
                 .toCompletableFuture();

@@ -15,10 +15,6 @@ public interface IslandContext {
 
     <T extends IslandComponent> void register(Class<T> clazz, IslandComponent component);
 
-    void register(String tag, PlayerModificationStrategy strategy);
-
-    Map<String, PlayerModificationStrategy> getStrategies();
-
     <T extends IslandComponent> T getComponent(Class<T> clazz);
 
 }

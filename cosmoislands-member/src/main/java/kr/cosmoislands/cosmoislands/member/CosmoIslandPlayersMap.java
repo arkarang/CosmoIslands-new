@@ -10,6 +10,8 @@ import kr.cosmoislands.cosmoislands.api.member.PlayerModificationStrategy;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayer;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSettingsMap;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -22,7 +24,9 @@ public class CosmoIslandPlayersMap implements IslandPlayersMap {
 
     final int islandId;
     final IslandRegistry islandRegistry;
+    @Getter(AccessLevel.PROTECTED)
     final MySQLPlayersMap mysql;
+    @Getter(AccessLevel.PROTECTED)
     final RedisPlayersMap redis;
     final IslandSettingsMap settings;
     final ImmutableMap<String, PlayerModificationStrategy> strategies;
@@ -35,7 +39,7 @@ public class CosmoIslandPlayersMap implements IslandPlayersMap {
 
     @Override
     public CompletableFuture<Void> invalidate() {
-        return CompletableFuture.completedFuture(null);
+        return CompletableFuture.allOf(mysql.invalidate(), redis.invalidate());
     }
 
     @Override

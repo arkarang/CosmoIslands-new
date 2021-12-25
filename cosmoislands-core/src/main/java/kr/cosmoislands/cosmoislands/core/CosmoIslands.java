@@ -11,6 +11,7 @@ import kr.cosmoislands.cosmoislands.core.thread.IslandThreadFactory;
 import kr.cosmoislands.cosmoislands.players.RedisIslandPlayerRegistry;
 import kr.msleague.mslibrary.database.impl.internal.MySQLDatabase;
 import lombok.Getter;
+import lombok.val;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -53,9 +54,9 @@ public class CosmoIslands implements IslandService {
         this.database = new Database(msMySQLDatabase, "cosmoislands_islands");
         IslandRegistrationDataModel registrationDataModel = new IslandRegistrationDataModel("cosmoislands_islands", database);
         registrationDataModel.init();
-        this.factory = new CosmoIslandFactory(Executors.newScheduledThreadPool(4, this.threadFactory), registrationDataModel);
         this.registry = new CosmoIslandRegistry(100, this);
         this.cloud = new CosmoIslandCloud(network, this, database, async, logger);
+        this.factory = new CosmoIslandFactory(Executors.newScheduledThreadPool(4, this.threadFactory), registrationDataModel, this.cloud);
         this.playerRegistry = RedisIslandPlayerRegistry
                 .build("cosmoislands_members", "cosmoislands_islands", msMySQLDatabase, async, registry);
         this.garbageCollector = new CosmoIslandGarbageCollector(this, 1000*30*60L);
@@ -80,7 +81,7 @@ public class CosmoIslands implements IslandService {
     }
 
     @Override
-    public synchronized void init() {
+    public synchronized void init() throws ExecutionException, InterruptedException {
         if(!isInitialized.get()){
             //todo: ModulePriority 구현
             Map<ModulePriority, List<IslandModule<?>>> map = new HashMap<>();
@@ -95,7 +96,7 @@ public class CosmoIslands implements IslandService {
                     e.printStackTrace();
                 }
             }
-            this.getCloud().getHostServer().registerServer();
+            this.getCloud().getHostServer().registerServer().get();
             isInitialized.set(true);
         }
     }
@@ -158,7 +159,7 @@ public class CosmoIslands implements IslandService {
                 return factory.fireCreate(uuid)
                         .thenApply(context-> new CosmoIsland(context, cloud))
                         .thenApply(island -> {
-                            this.registry.registerIsland(island);
+                            this.cloud.getHostServer().registerIsland(island, System.currentTimeMillis());
                             DebugLogger.log("cosmoislands: registered island");
                             return island;
                         });
@@ -174,7 +175,11 @@ public class CosmoIslands implements IslandService {
             if(canExecute){
                 Island island = this.registry.getLocalIsland(id);
                 if(island != null){
-                    return factory.fireDelete(island).thenApply(ignored->true);
+                    return factory.fireDelete(island).thenCompose(ignored2-> {
+                        return this.cloud.getHostServer().unregisterIsland(island);
+                    }).thenApply(ignored->{
+                        return true;
+                    });
                 }
             }
             return CompletableFuture.completedFuture(false);

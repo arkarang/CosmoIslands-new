@@ -9,7 +9,9 @@ public interface IslandPlayerRegistry {
 
     CompletableFuture<Integer> getIslandId(UUID uuid);
 
-    void load(UUID uuid);
+    CompletableFuture<Void> load(UUID uuid);
 
-    void unload(UUID uuid);
+    CompletableFuture<Void> unload(UUID uuid);
+
+    CompletableFuture<Void> update(UUID uuid);
 }
