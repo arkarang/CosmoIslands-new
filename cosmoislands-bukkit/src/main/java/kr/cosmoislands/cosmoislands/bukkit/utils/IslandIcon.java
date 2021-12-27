@@ -7,6 +7,7 @@ import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMap;
 import kr.cosmoislands.cosmoislands.api.member.MemberRank;
 import kr.cosmoislands.cosmoislands.api.points.IslandPoints;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSettingsMap;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -74,7 +75,8 @@ public class IslandIcon {
                         }
 
                         return results;
-                    }catch (ExecutionException | InterruptedException ignored){
+                    }catch (ExecutionException | InterruptedException e){
+                        DebugLogger.error(e);
                         return null;
                     }
                 });
@@ -93,12 +95,16 @@ public class IslandIcon {
                     usernames = new ArrayList<>(Collections.singletonList("알수 없음"));
                 }
                 displayname = displaynameFuture.get();
+                if(displayname == null || displayname.equals("")){
+                    displayname = "이름없는 섬";
+                }
                 levelValue = levelValueFuture.get();
                 pointValue = pointValueFuture.get();
                 maxPlayers = maxPlayersFuture.get();
                 IconData data = new IconData(displayname, usernames, levelValue, pointValue, maxPlayers);
                 return getInfoIcon(data);
             }catch (ExecutionException | InterruptedException e){
+                DebugLogger.error(e);
                 return null;
             }
         }, executors);
@@ -124,7 +130,7 @@ public class IslandIcon {
         meta.setDisplayName("§a§l섬 정보");
         List<String> lore = new ArrayList<>(4);
         lore.add("§a§l섬 §f§l이름 §f: " + Optional.ofNullable(data.displayname).orElse("이름없는 섬"));
-        lore.add("§a§l"+ String.join(", ", data.usernames.toArray(new String[0])));
+        lore.add("§a§l섬원: "+ String.join(", ", data.usernames.toArray(new String[0])));
         lore.add("§a§l섬 §e§l섬 최대 인원 수 §f: " + data.maxPlayers);
         lore.add("§a§l섬 §b§l레벨 §f§l: " + data.level);
         lore.add("§a§l섬 §c§l인기도 §f§l:§f§l "+data.points);

@@ -83,7 +83,7 @@ public class IslandPointDataModel implements IslandDataModel {
 
     CompletableFuture<List<IslandRanking.RankingData>> getTopOf(int count){
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( SELECT `island_id`, `points`, dense_rank() over (order by `points`) as ranking FROM "+table+") ranks WHERE ranks.ranking <= ?");
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( SELECT `island_id`, `points`, dense_rank() over (order by `points` DESC) as ranking FROM "+table+") ranks WHERE ranks.ranking <= ?");
             ps.setInt(1, count);
             ResultSet rs = ps.executeQuery();
             List<IslandRanking.RankingData> list = new ArrayList<>();
@@ -99,7 +99,7 @@ public class IslandPointDataModel implements IslandDataModel {
 
     CompletableFuture<Integer> getRank(int islandId){
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( SELECT `island_id`, `points`, dense_rank() over (order by `points`) as ranking FROM "+table+") ranks WHERE ranks.island_id = ?");
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( SELECT `island_id`, `points`, dense_rank() over (order by `points` DESC) as ranking FROM "+table+") ranks WHERE ranks.island_id = ?");
             ps.setInt(1, islandId);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){

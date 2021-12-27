@@ -98,27 +98,31 @@ public class CosmoIslandFactory implements IslandFactory {
                     DebugLogger.log("island factory: execution on create: "+strategy.getClass().getSimpleName());
                     strategy.onCreate(uuid, context).get();
                 }
-            }catch (InterruptedException | ExecutionException ignored){
-
+            }catch (InterruptedException | ExecutionException ex){
+                DebugLogger.error(ex);
             }
-            DebugLogger.log("island factory: island creation completed");
+            DebugLogger.log("island factory: island creation completed: time: "+System.currentTimeMillis());
             return context;
         }, service);
     }
 
     @Override
     public CompletableFuture<IslandContext> fireLoad(int islandId, boolean isLocal) {
-        val updateStatusFuture = this.cloud.setStatus(islandId, IslandStatus.LOADING);
+        CompletableFuture<Void> updateStatusFuture = CompletableFuture.completedFuture(null);
+        if(isLocal) {
+            updateStatusFuture = this.cloud.setStatus(islandId, IslandStatus.LOADING);
+        }
         return CompletableFuture.supplyAsync(()->new CosmoIslandContext(islandId, isLocal), service)
                 .thenCombine(updateStatusFuture, (context, ignored) -> context)
                 .thenApplyAsync(context->{
                     DebugLogger.log("load current thread: "+Thread.currentThread().getName());
                     try {
                         for (ComponentLifecycle strategy : orderedList()) {
+                            DebugLogger.log("island factory: execution on load: "+strategy.getClass().getSimpleName());
                             strategy.onLoad(context).get();
                         }
-                    }catch (InterruptedException | ExecutionException ignored){
-
+                    }catch (InterruptedException | ExecutionException ex){
+                        DebugLogger.error(ex);
                     }
                     return context;
                 }, service);
@@ -126,7 +130,10 @@ public class CosmoIslandFactory implements IslandFactory {
 
     @Override
     public CompletableFuture<IslandContext> fireUnload(Island island) {
-        val updateStatusFuture = this.cloud.setStatus(island.getId(), IslandStatus.UNLOADING);
+        CompletableFuture<Void> updateStatusFuture = CompletableFuture.completedFuture(null);
+        if(island.isLocal()) {
+            updateStatusFuture = this.cloud.setStatus(island.getId(), IslandStatus.UNLOADING);
+        }
         return CompletableFuture.supplyAsync(() -> new CosmoIslandContext(island, isLocal), service)
                 .thenCombine(updateStatusFuture, (context, ignored) -> context)
                 .thenApplyAsync(context->{

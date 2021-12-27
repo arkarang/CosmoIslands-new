@@ -1,6 +1,7 @@
 package kr.cosmoislands.cosmoislands.bukkit;
 
 import co.aikar.commands.PaperCommandManager;
+import com.minepalm.arkarangutils.bukkit.ArkarangGUIListener;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import com.minepalm.arkarangutils.invitation.ArkarangInvitation;
 import com.minepalm.arkarangutils.invitation.InvitationService;
@@ -9,6 +10,7 @@ import com.minepalm.hellobungee.bukkit.HelloBukkit;
 import com.minepalm.helloplayer.core.HelloPlayers;
 import com.minepalm.manyworlds.bukkit.ManyWorlds;
 import io.lettuce.core.RedisClient;
+import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import kr.cosmoislands.cosmochat.bukkit.CosmoChatBukkit;
 import kr.cosmoislands.cosmochat.core.CosmoChat;
@@ -19,7 +21,8 @@ import kr.cosmoislands.cosmoislands.api.IslandConfiguration;
 import kr.cosmoislands.cosmoislands.api.warp.IslandWarpsMap;
 import kr.cosmoislands.cosmoislands.bukkit.bank.BankCommands;
 import kr.cosmoislands.cosmoislands.bukkit.chat.ChatCommands;
-import kr.cosmoislands.cosmoislands.bukkit.config.YamlIslandConfiguration;
+import kr.cosmoislands.cosmoislands.bukkit.config.BukkitConfiguration;
+import kr.cosmoislands.cosmoislands.bukkit.config.MySQLBukkitIslandConfiguration;
 import kr.cosmoislands.cosmoislands.bukkit.level.LevelCommands;
 import kr.cosmoislands.cosmoislands.bukkit.member.IslandInternInvitationStrategy;
 import kr.cosmoislands.cosmoislands.bukkit.member.IslandInvitationStrategy;
@@ -30,10 +33,13 @@ import kr.cosmoislands.cosmoislands.bukkit.protection.ProtectionCommands;
 import kr.cosmoislands.cosmoislands.bukkit.protection.ProtectionListener;
 import kr.cosmoislands.cosmoislands.bukkit.settings.SettingsCommands;
 import kr.cosmoislands.cosmoislands.bukkit.upgrade.UpgradeCommands;
+import kr.cosmoislands.cosmoislands.bukkit.utils.IslandIcon;
 import kr.cosmoislands.cosmoislands.bukkit.warp.IslandWarpCommands;
 import kr.cosmoislands.cosmoislands.core.CosmoIslands;
 import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import kr.cosmoislands.cosmoislands.core.HelloBungeeInitializer;
+import kr.cosmoislands.cosmoislands.core.config.AbstractMySQLIslandConfiguration;
+import kr.cosmoislands.cosmoislands.core.config.MySQLPropertyDataModel;
 import kr.cosmoislands.cosmoislands.warp.IslandWarpModule;
 import kr.cosmoislands.cosmoredis.CosmoDataSource;
 import kr.cosmoislands.cosmoteleport.CosmoTeleport;
@@ -46,6 +52,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -56,19 +63,24 @@ public class CosmoIslandsBukkit extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        DebugLogger.setLogger(this.getLogger());
+        DebugLogger.setEnableDebug(true);
 
-        YamlIslandConfiguration config = new YamlIslandConfiguration(this);
+        BukkitConfiguration config = new BukkitConfiguration(this);
 
         HelloEveryone networkModule = HelloBukkit.getInst().getMain();
         HelloPlayers playersModule = HelloPlayers.getInst();
         MySQLDatabase msLibMySQLDatabase = CosmoDataSource.mysql(config.getMySQLName());
         RedisClient redis = CosmoDataSource.redis(config.getRedisName());
-        RedisAsyncCommands<String, String> async = redis.connect().async();
         CosmoChat cosmoChat = CosmoChatBukkit.getService();
         CosmoChatPrivateChat privateChatAddon = CosmoChatBukkit.getPrivateChatAddon();
         CosmoTeleport cosmoTeleport = CosmoTeleportBukkit.getService();
         ManyWorlds manyWorlds = ManyWorlds.getInst();
         BukkitExecutor executor = new BukkitExecutor(this, Bukkit.getScheduler());
+
+        MySQLPropertyDataModel propertyDataModel = new MySQLPropertyDataModel("cosmoislands_properties", msLibMySQLDatabase);
+        propertyDataModel.init();
+        AbstractMySQLIslandConfiguration islandConfig = new MySQLBukkitIslandConfiguration(propertyDataModel);
 
         Economy economy = null;
         RegisteredServiceProvider<Economy> provider = Bukkit.getServicesManager().getRegistration(Economy.class);
@@ -94,7 +106,7 @@ public class CosmoIslandsBukkit extends JavaPlugin {
             launcher.registerExternalDependency(BukkitExecutor.class, executor);
             launcher.registerExternalDependency(Economy.class, economy);
 
-            launcher.initializeModules(config);
+            launcher.initializeModules(islandConfig);
             launcher.launch();
 
             PlayerPreconditions.getFactory().setPlayerRegistry(cosmoIslands.getPlayerRegistry());
@@ -103,21 +115,28 @@ public class CosmoIslandsBukkit extends JavaPlugin {
             IslandPreconditions.getFactory().setIslandRegistry(cosmoIslands.getRegistry());
             IslandPreconditions.getFactory().setPlayerRegistry(cosmoIslands.getPlayerRegistry());
 
-            this.initializeCommands(cosmoIslands, config, async);
+            IslandIcon.setPlayerModule(playersModule);
+
+            this.initializeCommands(cosmoIslands, islandConfig, redis);
             this.initializeListeners(cosmoIslands, executor);
 
-            DebugLogger.setLogger(this.getLogger());
             DebugLogger.setEnableDebug(config.isDebug());
+            //todo: remove this after testing.
             DebugLogger.setEnableDebug(true);
+
         }catch (Exception e){
             e.printStackTrace();
             Bukkit.getPluginManager().disablePlugin(this);
         }
     }
 
-    private void initializeCommands(CosmoIslands islands, IslandConfiguration configuration, RedisAsyncCommands<String, String> async){
+    private void initializeCommands(CosmoIslands islands, IslandConfiguration configuration, RedisClient client){
         PaperCommandManager manager = new PaperCommandManager(this);
         ExternalRepository repo = islands.getExternalRepository();
+
+        StatefulRedisConnection<String, String> connection = client.connect();
+        connection.setTimeout(Duration.ofMillis(30000L));
+        RedisAsyncCommands<String, String> timeoutAsync = connection.async();
 
         HelloEveryone networkModule = repo.getRegisteredService(HelloEveryone.class);
         HelloPlayers playersModule = repo.getRegisteredService(HelloPlayers.class);
@@ -130,13 +149,13 @@ public class CosmoIslandsBukkit extends JavaPlugin {
 
         BankCommands.init(islands, manager);
         ChatCommands.init(islands, manager);
-        LevelCommands.init(islands, manager, playersModule, executor, configuration.getLevelLorePattern());
+        LevelCommands.init(islands, manager, playersModule, executor, configuration.getLevelLorePattern(), configuration.getLevelLore());
 
         ExecutorService service = Executors.newScheduledThreadPool(4, islands.getThreadFactory());
         InvitationService memberInvitation, internInvitation;
-        memberInvitation = ArkarangInvitation.redis("island_member", 5000, async,
+        memberInvitation = ArkarangInvitation.redis("island_member", 30000, timeoutAsync,
                 new IslandInvitationStrategy(islands.getRegistry(), islands.getPlayerRegistry(), playersModule, service, helper));
-        internInvitation = ArkarangInvitation.redis("island_member", 5000, async,
+        internInvitation = ArkarangInvitation.redis("island_intern", 30000, timeoutAsync,
                 new IslandInternInvitationStrategy(islands.getRegistry(), islands.getPlayerRegistry(), playersModule, service, helper));
         MemberCommands.init(manager, islands, playersModule, memberInvitation, internInvitation, helper, executor);
 
@@ -147,13 +166,13 @@ public class CosmoIslandsBukkit extends JavaPlugin {
         IslandWarpCommands.init(manager, islands, (IslandWarpModule) islands.getModule(IslandWarpsMap.class), executor);
         GenericCommands.init(manager, islands, executor);
 
-        manager.registerCommand(new TestCommands(islands, executor));
+        manager.registerCommand(new TestCommands(islands, helper, executor));
     }
 
     private void initializeListeners(CosmoIslands islands, BukkitExecutor executor){
         Bukkit.getPluginManager().registerEvents(new CacheUpdateListener(), this);
         Bukkit.getPluginManager().registerEvents(new ProtectionListener(executor), this);
-
+        ArkarangGUIListener.init();
     }
 
     @SneakyThrows

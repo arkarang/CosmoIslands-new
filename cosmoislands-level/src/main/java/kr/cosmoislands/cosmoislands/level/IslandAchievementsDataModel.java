@@ -53,7 +53,7 @@ public class IslandAchievementsDataModel extends AbstractDataModel {
 
     public CompletableFuture<Void> setAchieved(int islandId, int achievementId, boolean achieved){
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO "+table+" (`island_id`, `achievement_id`, `status`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `status`=?");
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO "+table+" (`island_id`, `achievement_id`, `status`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `status`=VALUES(`status`)");
             ps.setInt(1, islandId);
             ps.setInt(2, achievementId);
             ps.setBoolean(3, achieved);

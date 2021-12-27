@@ -68,7 +68,7 @@ public class RedisIslandServer implements IslandServer {
     public CompletableFuture<Boolean> unregisterIsland(Island island) {
         return async.hexists(islandLocationKey, island.getId()+"").thenCompose(exist->{
             if(exist) {
-                CompletableFuture<Long> future = async.sadd(redisKey, island.getId()+"").toCompletableFuture();
+                CompletableFuture<Long> future = async.srem(redisKey, island.getId()+"").toCompletableFuture();
                 this.registry.unregisterIsland(island.getId());
                 this.cloud.setStatus(island.getId(), IslandStatus.OFFLINE);
                 return async.hdel(islandLocationKey, island.getId() + "").thenCombine(future, (l, str) -> true);

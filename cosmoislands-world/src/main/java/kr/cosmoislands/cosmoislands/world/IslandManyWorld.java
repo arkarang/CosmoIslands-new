@@ -8,6 +8,7 @@ import com.minepalm.manyworlds.api.ManyWorld;
 import kr.cosmoislands.cosmoislands.api.AbstractLocation;
 import kr.cosmoislands.cosmoislands.api.IslandComponent;
 import kr.cosmoislands.cosmoislands.api.world.IslandWorld;
+import kr.cosmoislands.cosmoislands.api.world.IslandWorldHandler;
 import kr.cosmoislands.cosmoislands.core.utils.Cached;
 import lombok.Getter;
 import lombok.val;
@@ -22,6 +23,7 @@ import java.util.function.Supplier;
 //todo:
 // 1. create remoted IslandWorld
 // - remoted island doesnt access IslandWorld data that causing NPE & broken synchronization
+// 2. make enum world coordination properties like maxX, minZ
 public class IslandManyWorld implements IslandWorld {
 
     private static final String MAX_X = "maxX", MIN_X = "minX", MAX_Z = "maxZ", MIN_Z = "minZ", LENGTH = "LENGTH", WEIGHT = "WEIGHT";
@@ -77,6 +79,11 @@ public class IslandManyWorld implements IslandWorld {
                 return CompletableFuture.completedFuture(initialValues.get(key));
             }
         };
+    }
+
+    @Override
+    public IslandWorldHandler getWorldHandler() {
+        return null;
     }
 
     @Override

@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,13 +39,15 @@ public class SettingGUI extends ArkarangGUI {
         biome = new ItemStackBuilder(new ItemStack(Material.GRASS)).setName("§f§l[§2§l 섬 바이옴 §f§l]").getHandle();
     }
 
-    public SettingGUI(World world, IslandSettingsMap settings, Map<IslandSetting, String> view, BukkitExecutor executor) {
+    public SettingGUI(World world, IslandSettingsMap settings, Map<IslandSetting, String> map, BukkitExecutor executor) {
         super(3, "§f§l[§7§l 섬 관리 §f§l]");
         for(int i = 0; i < 3; i++){
             for(int j = 0 ; j < 9 ; j ++){
                 inv.setItem(i*9+j, glass[i]);
             }
         }
+
+        Map<IslandSetting, String> view = new HashMap<>(map);
 
         inv.setItem(10, setting);
         inv.setItem(12, weather);
@@ -95,7 +98,7 @@ public class SettingGUI extends ArkarangGUI {
                      IslandSettingsMap settings, 
                      Map<IslandSetting, String> view, 
                      BukkitExecutor executor ) {
-            super(3, "§f§l[§7§l섬 설정 §f§l]");
+            super(3, "§f§l[§7§l 섬 설정 §f§l]");
             for(int i = 0 ; i < 27 ; i ++){
                 inv.setItem(i, glass);
             }
@@ -149,7 +152,7 @@ public class SettingGUI extends ArkarangGUI {
                         IslandSettingsMap settings,
                         Map<IslandSetting, String> view,
                         BukkitExecutor executor ) {
-            super(3, "§f§l[§3§l섬 날씨 §f§l]");
+            super(3, "§f§l[§3§l 섬 날씨 §f§l]");
 
             this.world = world;
             this.settings = settings;
@@ -169,6 +172,7 @@ public class SettingGUI extends ArkarangGUI {
                 if(!b) {
                     b = true;
                     settings.setSetting(IslandSetting.SUNNY, Boolean.toString(b));
+                    view.put(IslandSetting.SUNNY, Boolean.toString(b));
                     updateIcon(true);
                     world.setStorm(false);
                     player.updateInventory();
@@ -180,6 +184,7 @@ public class SettingGUI extends ArkarangGUI {
                 if(b) {
                     b = false;
                     settings.setSetting(IslandSetting.SUNNY, Boolean.toString(b));
+                    view.put(IslandSetting.SUNNY, Boolean.toString(b));
                     updateIcon(false);
                     world.setStorm(true);
                     player.updateInventory();
@@ -227,7 +232,7 @@ public class SettingGUI extends ArkarangGUI {
                      IslandSettingsMap settings,
                      Map<IslandSetting, String> view,
                      BukkitExecutor executor ) {
-            super(3, "§f§l[§7§l섬 설정 §f§l]");
+            super(3, "§f§l[§7§l 섬 설정 §f§l]");
 
             this.world = world;
             this.settings = settings;
@@ -292,7 +297,7 @@ public class SettingGUI extends ArkarangGUI {
     public static class Biome extends ArkarangGUI{
 
         public Biome(IslandSettingsMap settings) {
-            super(3, "§f§l[§7§l섬 설정 §f§l]");
+            super(3, "§f§l[§7§l 섬 설정 §f§l]");
         }
         
     }

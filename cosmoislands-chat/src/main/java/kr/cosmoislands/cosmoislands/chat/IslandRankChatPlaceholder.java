@@ -9,6 +9,7 @@ import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMap;
 import kr.cosmoislands.cosmoislands.api.member.MemberRank;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayer;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.SneakyThrows;
 
 public class IslandRankChatPlaceholder extends ChatFormatPlaceholder {
@@ -29,23 +30,27 @@ public class IslandRankChatPlaceholder extends ChatFormatPlaceholder {
             String rankPrefix = "";
             IslandPlayer player = playerRegistry.get(component.getSender());
             if (player != null) {
-                Island island = registry.getIsland(player.getIslandId().get()).get();
-                if(island != null) {
-                    IslandPlayersMap map = island.getComponent(IslandPlayersMap.class);
-                    MemberRank rank = map.getRank(player).get();
-                    switch (rank) {
-                        case OWNER:
-                            rankPrefix = "[섬장]";
-                            break;
-                        case MEMBER:
-                            rankPrefix = "[섬원]";
-                            break;
-                        case INTERN:
-                            rankPrefix = "[알바]";
-                            break;
+                try {
+                    Island island = registry.getIsland(player.getIslandId().get()).get();
+                    if (island != null) {
+                        IslandPlayersMap map = island.getComponent(IslandPlayersMap.class);
+                        MemberRank rank = map.getRank(player).get();
+                        switch (rank) {
+                            case OWNER:
+                                rankPrefix = "[섬장]";
+                                break;
+                            case MEMBER:
+                                rankPrefix = "[섬원]";
+                                break;
+                            case INTERN:
+                                rankPrefix = "[알바]";
+                                break;
+                        }
                     }
-                    return message.replace(identifier, rankPrefix);
+                }catch (Throwable e){
+                    DebugLogger.error(e);
                 }
+                return message.replace(identifier, rankPrefix);
             }
         }
         return message;

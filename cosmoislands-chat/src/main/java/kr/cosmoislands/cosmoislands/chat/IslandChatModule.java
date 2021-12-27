@@ -7,6 +7,7 @@ import io.lettuce.core.api.async.RedisAsyncCommands;
 import kr.cosmoislands.cosmochat.core.CosmoChat;
 import kr.cosmoislands.cosmochat.privatechat.CosmoChatPrivateChat;
 import kr.cosmoislands.cosmochat.privatechat.PrivateChat;
+import kr.cosmoislands.cosmochat.privatechat.PrivateChatRegistry;
 import kr.cosmoislands.cosmoislands.api.IslandModule;
 import kr.cosmoislands.cosmoislands.api.IslandService;
 import kr.cosmoislands.cosmoislands.api.chat.IslandChat;
@@ -29,6 +30,8 @@ public class IslandChatModule implements IslandModule<IslandChat> {
     private final CosmoChatPrivateChat privateChatService;
     @Getter
     private final IslandChatDataModel model;
+    @Getter
+    private final PrivateChatRegistry privateChatRegistry;
     @Getter
     private final Logger logger;
 
@@ -53,7 +56,7 @@ public class IslandChatModule implements IslandModule<IslandChat> {
         this.playerRegistry = playerRegistry;
         this.model = new IslandChatDataModel(database, "cosmoislands_chat_users", "cosmoislands_chat_list", "cosmoislands_islands");
         this.model.init();
-        this.privateChatService.createCustomChatRegistry(IslandChatType.TOKEN, this.model, async);
+        this.privateChatRegistry = this.privateChatService.createCustomChatRegistry(IslandChatType.TOKEN, this.model, async);
         this.logger = logger;
     }
 
@@ -85,7 +88,7 @@ public class IslandChatModule implements IslandModule<IslandChat> {
         this.chatService.getFormatRegistry().registerPlaceholder(placeholder.getIdentifier(), placeholder);
         IslandPlayersMapModule playersMapModule = (IslandPlayersMapModule) service.getModule(IslandPlayersMap.class);
         playersMapModule.getStrategyRegistry().addStrategy("chat", new PlayerChatModificationStrategy(this));
-        service.getFactory().addLast("chat", new IslandChatLifecycle(this));
+        service.getFactory().addLast("chat", new IslandChatLifecycle(chatService, this));
     }
 
     @Override

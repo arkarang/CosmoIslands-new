@@ -22,6 +22,9 @@ public class AchievementEditGUI extends ArkarangGUI {
         for(int i = 0; i < data.getItems().length && i < 9 ; i++){
             inv.setItem(i, data.getItems()[i]);
         }
+        for(int i = 0; i < 9; i++){
+            cancelled.put(i, false);
+        }
     }
 
     @Override

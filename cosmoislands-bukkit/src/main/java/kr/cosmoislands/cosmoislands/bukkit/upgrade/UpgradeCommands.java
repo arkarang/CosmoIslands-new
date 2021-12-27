@@ -7,7 +7,9 @@ import co.aikar.commands.annotation.Subcommand;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
 import kr.cosmoislands.cosmoislands.bukkit.PlayerPreconditions;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -66,7 +68,7 @@ public class UpgradeCommands {
                     }).thenCompose(inIsland -> {
                         if(inIsland != null){
                             if(inIsland){
-                                preconditions.getIsland().thenAccept(island->{
+                                val executionFuture = preconditions.getIsland().thenAccept(island->{
                                     UpgradeMainGUI gui = new UpgradeMainGUI(iconMaps, island, executor);
                                     executor.sync(()->gui.openGUI(player));
                                 });

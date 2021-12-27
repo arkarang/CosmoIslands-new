@@ -28,37 +28,46 @@ public class LevelUpGUI extends ArkarangGUI {
 
     @Override
     protected void onClose(InventoryCloseEvent event) {
-        List<ItemStack> toReturn = new ArrayList<>();
-        int totalToLevelUp = 0;
-        for(int i = 0; i < 54; i++){
-            ItemStack item = inv.getItem(i);
-            if(item != null && item.getType() != Material.AIR){
-                ItemMeta meta = item.getItemMeta();
-                boolean isValidItem = false;
-                for (String lore : meta.getLore()) {
-                    Matcher matcher = pattern.matcher(lore);
-                    isValidItem = regexCheck(matcher);
-                    if(isValidItem){
-                        int level = getProvidingLevel(matcher);
-                        totalToLevelUp += level * item.getAmount();
-                        item.setAmount(0);
-                        item.setType(Material.AIR);
-                        break;
+        try {
+            List<ItemStack> toReturn = new ArrayList<>();
+            int totalToLevelUp = 0;
+            for (int i = 0; i < 54; i++) {
+                ItemStack item = inv.getItem(i);
+                if (item != null && item.getType() != Material.AIR) {
+                    ItemMeta meta = item.getItemMeta();
+                    boolean isValidItem = false;
+                    if (meta != null) {
+                        List<String> list = meta.getLore();
+                        if(list != null) {
+                            for (String lore : list) {
+                                Matcher matcher = pattern.matcher(lore);
+                                isValidItem = regexCheck(matcher);
+                                if (isValidItem) {
+                                    int level = getProvidingLevel(matcher);
+                                    totalToLevelUp += level * item.getAmount();
+                                    item.setAmount(0);
+                                    item.setType(Material.AIR);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (!isValidItem) {
+                        toReturn.add(item);
                     }
                 }
-                if(!isValidItem){
-                    toReturn.add(item);
-                }
             }
-        }
-        if(totalToLevelUp > 0){
-            final int total = totalToLevelUp;
-            level.addLevel(total).thenRun(()->{
-                event.getPlayer().sendMessage("섬 레벨이 "+total+"만큼 올랐습니다!");
-            });
-        }
-        if(!toReturn.isEmpty()){
-            event.getPlayer().getInventory().addItem(toReturn.toArray(new ItemStack[0]));
+            if (totalToLevelUp > 0) {
+                final int total = totalToLevelUp;
+                level.addLevel(total).thenRun(() -> {
+                    event.getPlayer().sendMessage("섬 레벨이 " + total + "만큼 올랐습니다!");
+                });
+            }
+            if (!toReturn.isEmpty()) {
+                event.getPlayer().getInventory().addItem(toReturn.toArray(new ItemStack[0]));
+            }
+        }catch (Throwable moojisungTryCatch){
+            moojisungTryCatch.printStackTrace();
         }
     }
 

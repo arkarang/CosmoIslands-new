@@ -46,13 +46,10 @@ public class PlayersMapLifecycle implements ComponentLifecycle {
 
     @Override
     public CompletableFuture<Void> onDelete(IslandContext island) {
-        return module.getPlayersMapRegistry().getModel()
-                .delete(island.getIslandId())
-                .thenCompose(ignored -> {
-                    registry.invalidate(island.getIslandId());
-                    return island.getComponent(IslandPlayersMap.class).getMembers().thenAccept(map -> {
-                        map.keySet().forEach(playerRegistry::unload);
-                    });
-                });
+        IslandPlayersMap playersMap = island.getComponent(IslandPlayersMap.class);
+        return island.getComponent(IslandPlayersMap.class).getMembers().thenCompose(map -> {
+            map.keySet().forEach(playerRegistry::unload);
+            return playersMap.invalidate();
+        });
     }
 }

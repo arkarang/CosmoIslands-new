@@ -13,17 +13,19 @@ public class CosmoIslandRegistry implements IslandRegistry {
 
     @Getter
     private final int allocatedMaxSize;
+    private final IslandRegistrationDataModel model;
     private final IslandService service;
 
     private final HashBiMap<Class<? extends IslandComponent>, Byte> componentIds;
     private final ConcurrentHashMap<Integer, Island> localIslands;
     private final ConcurrentHashMap<Integer, Island> remotedIslands;
 
-    CosmoIslandRegistry(int maxSize, IslandService service){
+    CosmoIslandRegistry(int maxSize, IslandService service, IslandRegistrationDataModel dataModel){
         this.allocatedMaxSize = maxSize;
         this.service = service;
         this.localIslands = new ConcurrentHashMap<>();
         this.remotedIslands = new ConcurrentHashMap<>();
+        this.model = dataModel;
         this.componentIds = HashBiMap.create();
         this.componentIds.put(Island.class, Island.COMPONENT_ID);
     }
@@ -40,13 +42,19 @@ public class CosmoIslandRegistry implements IslandRegistry {
         }else if(remotedIslands.containsKey(islandId)) {
             return CompletableFuture.completedFuture(remotedIslands.get(islandId));
         }else{
-            val future = service.loadIsland(islandId, false);
-            future.thenAccept(island->{
-                if(island != null){
-                    remotedIslands.put(island.getId(), island);
+            return model.exists(islandId).thenCompose(isExist->{
+                if(isExist){
+                    val future = service.loadIsland(islandId, false);
+                    future.thenAccept(island->{
+                        if(island != null){
+                            remotedIslands.put(island.getId(), island);
+                        }
+                    });
+                    return future;
+                }else{
+                    return CompletableFuture.completedFuture(null);
                 }
             });
-            return future;
         }
     }
 

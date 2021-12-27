@@ -5,6 +5,7 @@ import co.aikar.commands.PaperCommandManager;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
+import kr.cosmoislands.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoislands.cosmoislands.bukkit.IslandPreconditions;
 import kr.cosmoislands.cosmoislands.bukkit.PlayerPreconditions;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class SettingsCommands {

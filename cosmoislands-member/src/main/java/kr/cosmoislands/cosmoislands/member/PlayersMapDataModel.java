@@ -74,9 +74,10 @@ public class PlayersMapDataModel extends AbstractDataModel implements IslandData
     
     public CompletableFuture<Void> setOwner(int islandId, UUID uuid) {
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "+table+" SET `island_id`=?, `uuid`=?");
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO "+table+" (`island_id`, `uuid`, `member_rank`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `uuid`=VALUES(`uuid`)");
             ps.setInt(1, islandId);
             ps.setString(2, uuid.toString());
+            ps.setInt(3, MemberRank.OWNER.getPriority());
             ps.execute();
             return null;
         });

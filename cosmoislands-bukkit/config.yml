@@ -1,0 +1,4 @@
+Debug: true
+CosmoDataSource:
+  mysql: 'default'
+  redis: 'default'

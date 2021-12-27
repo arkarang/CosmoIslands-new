@@ -6,6 +6,7 @@ import com.minepalm.helloplayer.core.HelloPlayers;
 import com.minepalm.manyworlds.bukkit.ManyWorlds;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.async.RedisAsyncCommands;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import kr.cosmoislands.cosmoislands.settings.IslandSettingsModule;
 import kr.cosmoislands.cosmochat.core.CosmoChat;
 import kr.cosmoislands.cosmochat.privatechat.CosmoChatPrivateChat;
@@ -46,7 +47,11 @@ import kr.cosmoislands.cosmoislands.world.IslandWorldModule;
 import kr.cosmoislands.cosmoteleport.CosmoTeleport;
 import kr.msleague.mslibrary.database.impl.internal.MySQLDatabase;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
@@ -93,12 +98,6 @@ public class CosmoIslandsLauncher {
         IslandInventoryModule bankModule = new IslandInventoryModule(database, executor, logger);
         IslandVaultModule vaultModule = new IslandVaultModule(database, logger);
         IslandWarpModule warpModule = new IslandWarpModule(database, islandRegistry, playerRegistry, cosmoTeleport, settingsModule, logger);
-
-        if(configuration.getUpdateUpgradeSettings()){
-            for (IslandUpgradeSettings setting : configuration.getDefaultUpgradeSettings().values()) {
-                upgradeModule.getSettingsRegistry().setSetting(setting);
-            }
-        }
 
         service.registerModule(IslandWorld.class, worldModule);
         service.registerModule(IslandSettingsMap.class, settingsModule);

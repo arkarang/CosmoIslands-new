@@ -5,10 +5,12 @@ import kr.cosmoislands.cosmoislands.api.level.IslandLevel;
 import kr.cosmoislands.cosmoislands.api.level.IslandRewardData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+@ToString
 @RequiredArgsConstructor
 public abstract class AbstractRewardData implements IslandRewardData {
 

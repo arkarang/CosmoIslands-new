@@ -59,7 +59,7 @@ public class ProtectionCommands {
                                     List<UUID> list = new ArrayList<>();
                                     world.getPlayers().forEach(p->list.add(p.getUniqueId()));
                                     for (UUID uuid : list) {
-                                        if (!protection.hasPermission(uuid, IslandPermissions.ENTER)) {
+                                        if (!protection.hasPermission(uuid, IslandPermissions.IGNORE_LOCK)) {
                                             teleportService.getWarpService().getSpawnLocation().thenAccept(spawn->{
                                                 teleportService.warpPlayer(uuid, spawn);
                                             });

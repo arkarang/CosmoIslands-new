@@ -64,7 +64,7 @@ public class PlayerPreconditions {
     }
 
     public CompletableFuture<Boolean> isMember(UUID uuid){
-        return hasRank(uuid, MemberRank.INTERN);
+        return hasRank(uuid, MemberRank.MEMBER);
     }
 
     public CompletableFuture<Boolean> isIntern(UUID uuid){
@@ -80,16 +80,7 @@ public class PlayerPreconditions {
     }
 
     public CompletableFuture<Boolean> hasRank(UUID uuid, MemberRank requiredRank){
-        return getIsland().thenCompose(island->{
-            if(island == null){
-                return CompletableFuture.completedFuture(false);
-            }
-            IslandPlayersMap map = island.getComponent(IslandPlayersMap.class);
-            IslandPlayer islandPlayer = playerRegistry.get(uuid);
-            return map.getRank(islandPlayer).thenApply(playerRank -> {
-                return playerRank.getPriority() >= requiredRank.getPriority();
-            });
-        });
+        return rankAs(uuid, requiredRank);
     }
 
     public CompletableFuture<Boolean> rankAs(UUID uuid, MemberRank requiredRank){

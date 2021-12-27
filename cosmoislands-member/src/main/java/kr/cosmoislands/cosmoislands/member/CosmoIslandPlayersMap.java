@@ -8,11 +8,13 @@ import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMap;
 import kr.cosmoislands.cosmoislands.api.member.MemberRank;
 import kr.cosmoislands.cosmoislands.api.member.PlayerModificationStrategy;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayer;
+import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSettingsMap;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,7 @@ import java.util.concurrent.CompletableFuture;
 public class CosmoIslandPlayersMap implements IslandPlayersMap {
 
     final int islandId;
+    final IslandPlayerRegistry playerRegistry;
     final IslandRegistry islandRegistry;
     @Getter(AccessLevel.PROTECTED)
     final MySQLPlayersMap mysql;
@@ -62,9 +65,22 @@ public class CosmoIslandPlayersMap implements IslandPlayersMap {
 
     @Override
     public CompletableFuture<Void> setOwner(IslandPlayer player) {
+        val ownerFuture = mysql.getOwner();
+
+        val setMySQLMemberFuture = ownerFuture.thenAccept(islandOwner -> {
+            mysql.setRank(islandOwner, MemberRank.MEMBER);
+        });
+        val setRedisMemberFuture = ownerFuture.thenAccept(islandOwner -> {
+            redis.setRank(islandOwner, MemberRank.MEMBER);
+        });
+        val setMemberRankFuture = CompletableFuture.allOf(setMySQLMemberFuture, setRedisMemberFuture);
+
         CompletableFuture<Void> redisFuture = redis.setOwner(player);
         CompletableFuture<Void> mysqlFuture = mysql.setOwner(player);
-        return CompletableFuture.allOf(redisFuture, mysqlFuture).thenCompose(ignored->islandRegistry.getIsland(islandId))
+        val setOwnerFuture = CompletableFuture.allOf(redisFuture, mysqlFuture);
+
+        return CompletableFuture.allOf(setMemberRankFuture, setOwnerFuture)
+                .thenCompose(ignored->islandRegistry.getIsland(islandId))
                 .thenAccept(island->{
                     strategies.values().forEach(strategy -> strategy.onOwnerChange(island, player.getUniqueId()));
                 });
@@ -97,8 +113,10 @@ public class CosmoIslandPlayersMap implements IslandPlayersMap {
     public CompletableFuture<Void> removeMember(IslandPlayer player) {
         CompletableFuture<Void> redisFuture = redis.removeMember(player);
         CompletableFuture<Void> mysqlFuture = mysql.removeMember(player);
+
         return CompletableFuture.allOf(redisFuture, mysqlFuture)
-                .thenCompose(ignored->islandRegistry.getIsland(islandId))
+                .thenCompose(ignored-> playerRegistry.update(player.getUniqueId()))
+                .thenCompose(ignored-> islandRegistry.getIsland(islandId))
                 .thenAccept(island->{
                     strategies.values().forEach(strategy -> strategy.onPlayerRemove(island, player.getUniqueId()));
                 });
@@ -109,7 +127,8 @@ public class CosmoIslandPlayersMap implements IslandPlayersMap {
         CompletableFuture<Void> redisFuture = redis.addMember(player);
         CompletableFuture<Void> mysqlFuture = mysql.addMember(player);
         return CompletableFuture.allOf(redisFuture, mysqlFuture)
-                .thenCompose(ignored->islandRegistry.getIsland(islandId))
+                .thenCompose(ignored-> playerRegistry.update(player.getUniqueId()))
+                .thenCompose(ignored-> islandRegistry.getIsland(islandId))
                 .thenAccept(island->{
                     strategies.values().forEach(strategy -> strategy.onPlayerAdd(island, player.getUniqueId()));
                 });

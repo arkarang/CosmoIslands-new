@@ -2,6 +2,7 @@ package kr.cosmoislands.cosmoislands.bungee;
 
 import com.minepalm.arkarangutils.bungee.BungeeConfig;
 import kr.cosmoislands.cosmoislands.api.IslandServer;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import net.md_5.bungee.config.Configuration;
 
 import java.util.ArrayList;
@@ -33,7 +34,10 @@ public class Conf extends BungeeConfig {
         for (String key : section.getKeys()){
             IslandServer.Type type = IslandServer.Type.valueOf(key);
             map.put(type, new ArrayList<>());
-            section.getStringList(key).forEach(name->map.get(type).add(name));
+            section.getStringList(key).forEach(name->{
+                map.get(type).add(name);
+                DebugLogger.log("registered server type: "+key+", name: "+name);
+            });
         }
         return map;
     }
@@ -41,4 +45,5 @@ public class Conf extends BungeeConfig {
     int getMaxIslands(){
         return config.getInt("MaxIslands", 100);
     }
+
 }

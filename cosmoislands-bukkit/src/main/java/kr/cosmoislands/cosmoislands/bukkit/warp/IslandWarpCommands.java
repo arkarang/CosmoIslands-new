@@ -59,11 +59,8 @@ public class IslandWarpCommands {
                 if(warpResult != null){
                     if(!warpResult.isSuccess()){
                         player.sendMessage("오류: 섬이 로드되어 있지 않습니다.");
-                    }else{
-                        DebugLogger.log("island go failed - 1");
                     }
                 }
-                DebugLogger.log("island go failed - 2");
             });
         }
 

@@ -3,6 +3,7 @@ package kr.cosmoislands.cosmoislands.bukkit.member;
 import com.minepalm.arkarangutils.bukkit.ArkarangGUI;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import com.minepalm.helloplayer.core.HelloPlayers;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -16,6 +17,8 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class PlayerListGUI extends ArkarangGUI {
+
+    protected static final UUID SYSTEM = new UUID(0, 0);
 
     private static final ItemStack glass = new ItemStack(Material.WHITE_STAINED_GLASS_PANE, 1);
     static final HashMap<Integer, Integer> slots = new HashMap<>();
@@ -33,8 +36,11 @@ public class PlayerListGUI extends ArkarangGUI {
         slots.put(9, 42);
     }
 
-    public PlayerListGUI(String title, List<UUID> players, BiConsumer<OfflinePlayer, ItemStack> con) {
+    protected final BukkitExecutor executor;
+
+    public PlayerListGUI(String title, List<UUID> players, BukkitExecutor executor) {
         super(6, title);
+        this.executor = executor;
         for(int i = 0; i < 6; i++){
             inv.setItem(i*9, glass);
             inv.setItem(i*9+8, glass);
@@ -45,36 +51,46 @@ public class PlayerListGUI extends ArkarangGUI {
         }
         for(int i = 0; i < players.size(); i++){
             if(slots.containsKey(i)){
-                inv.setItem(slots.get(i), getHead(players.get(i), con));
+                UUID uuid = players.get(i);
+                setLazy(uuid, get(uuid), slots.get(i));
             }
         }
     }
 
-    public ItemStack getHead(UUID uuid, BiConsumer<OfflinePlayer, ItemStack> con){
+    public ItemStack get(UUID uuid){
         ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
-        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-        ItemMeta meta = item.getItemMeta();
-        SkullMeta sm = (SkullMeta) meta;
-        sm.setOwningPlayer(player);
-        item.setItemMeta(sm);
-        con.accept(player, item);
+        if(!uuid.equals(SYSTEM)) {
+            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+            ItemMeta meta = item.getItemMeta();
+            SkullMeta sm = (SkullMeta) meta;
+            sm.setOwningPlayer(player);
+            item.setItemMeta(sm);
+        }
         return item;
     }
 
 
-    static BiConsumer<OfflinePlayer, ItemStack> provide(BukkitExecutor executor) {
-        return (off, item) ->{
-            final ItemMeta metaBefore  = item.getItemMeta();
-            metaBefore.setDisplayName("§7§l조회중...");
-            item.setItemMeta(metaBefore);
-            HelloPlayers.inst().getProxied(off.getUniqueId()).isOnline().thenAccept(online->{
-                final ItemMeta meta  = item.getItemMeta();
-                if(online)
-                    meta.setDisplayName("§a§l온라인: "+off.getName());
-                else
-                    meta.setDisplayName("§a§l오프라인: "+off.getName());
-                executor.sync(()-> item.setItemMeta(meta));
+    void setLazy(UUID uuid, ItemStack item, int slot) {
+        final ItemMeta metaBefore  = item.getItemMeta();
+        metaBefore.setDisplayName("§7§l조회중...");
+        item.setItemMeta(metaBefore);
+        if(!uuid.equals(SYSTEM)) {
+            val usernameFuture = HelloPlayers.getInst().getUsername(uuid);
+            HelloPlayers.inst().getProxied(uuid).isOnline().thenCombine(usernameFuture, (online, username) -> {
+                executor.sync(() -> {
+                    final ItemMeta meta = item.getItemMeta();
+                    if (online)
+                        meta.setDisplayName("§a§l온라인: " + username);
+                    else
+                        meta.setDisplayName("§a§l오프라인: " + username);
+                    item.setItemMeta(meta);
+                    inv.setItem(slot, item);
+                });
+                return null;
             });
-        };
+        }else{
+            metaBefore.setDisplayName("§a§l알수 없음");
+            item.setItemMeta(metaBefore);
+        }
     }
 }

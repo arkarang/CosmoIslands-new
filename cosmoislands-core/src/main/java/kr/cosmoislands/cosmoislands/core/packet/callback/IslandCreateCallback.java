@@ -23,8 +23,11 @@ public class IslandCreateCallback implements CallbackTransformer<IslandCreatePac
     public Integer transform(IslandCreatePacket packet) {
         try {
             DebugLogger.log("create packet callback: "+packet.getUuid()+", "+packet.getDestination());
-            return service.createIsland(packet.getUuid()).get().getId();
+            int id = service.createIsland(packet.getUuid()).get().getId();
+            DebugLogger.log("create packet callback completed: "+packet.getUuid()+", id: "+id);
+            return id;
         }catch (InterruptedException | ExecutionException e){
+            DebugLogger.error(e);
             return null;
         }
     }

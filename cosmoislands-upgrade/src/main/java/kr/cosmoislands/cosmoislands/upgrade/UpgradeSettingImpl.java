@@ -3,6 +3,7 @@ package kr.cosmoislands.cosmoislands.upgrade;
 import com.google.common.collect.ImmutableMap;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeSettings;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -26,6 +27,15 @@ public class UpgradeSettingImpl implements IslandUpgradeSettings {
             max = Math.max(key, max);
         }
         this.maxLevel = max;
+
+        DebugLogger.log("type: "+type.name());
+        for (Map.Entry<Integer, Integer> entry : valueMap.entrySet()) {
+            DebugLogger.log("valueMap: "+entry.getKey()+", "+entry.getValue());
+        }
+
+        for (Map.Entry<Integer, Integer> entry : requiredCostMap.entrySet()) {
+            DebugLogger.log("valueMap: "+entry.getKey()+", "+entry.getValue());
+        }
     }
 
     public UpgradeSettingImpl(IslandUpgradeType type, Map<Integer, PairData> map){

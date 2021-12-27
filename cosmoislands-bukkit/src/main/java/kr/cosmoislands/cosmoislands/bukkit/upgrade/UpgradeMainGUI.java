@@ -9,6 +9,7 @@ import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgrade;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeCondition;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeSettings;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.Material;
@@ -77,27 +78,27 @@ public class UpgradeMainGUI extends ArkarangGUI {
         this.executor = executor;
 
         itemSize = (level, pairData) ->{
-            return new ItemStackBuilder(icons.get(IslandUpgradeType.BORDER_SIZE).getIcon(level))
+            return new ItemStackBuilder(icons.get(IslandUpgradeType.BORDER_SIZE).getIcon(level).clone())
                     .setName("섬 최대 사이즈 : " + pairData.getValue() + "블럭")
                     .addLine("§a§l 가격 §f: §e" + pairData.getCost() + "G")
                     .getHandle();
 
         };
         itemMember = (level, pairData) ->{
-            return new ItemStackBuilder(icons.get(IslandUpgradeType.MAX_PLAYERS).getIcon(level))
+            return new ItemStackBuilder(icons.get(IslandUpgradeType.MAX_PLAYERS).getIcon(level).clone())
                     .setName("섬 최대 인원 : " + pairData.getValue() + "명")
                     .addLine("§a§l 가격 §f: §e" + pairData.getCost() + "G")
                     .getHandle();
 
         };
         itemChest = (level, pairData) ->{
-            return new ItemStackBuilder(icons.get(IslandUpgradeType.INVENTORY_SIZE).getIcon(level))
+            return new ItemStackBuilder(icons.get(IslandUpgradeType.INVENTORY_SIZE).getIcon(level).clone())
                     .setName("섬 창고 " + getKoreanOrdering(pairData.getValue()) + "줄")
                     .addLine("§a§l 가격 §f: §e" + pairData.getCost() + "G")
                     .getHandle();
         };
         itemIntern = (level, pairData) ->{
-            return new ItemStackBuilder(icons.get(IslandUpgradeType.MAX_INTERNS).getIcon(level))
+            return new ItemStackBuilder(icons.get(IslandUpgradeType.MAX_INTERNS).getIcon(level).clone())
                     .setName("섬 최대 알바 : " + pairData.getValue() + "명")
                     .addLine("§a§l 가격 §f: §e" + pairData.getCost() + "G")
                     .getHandle();
@@ -117,8 +118,9 @@ public class UpgradeMainGUI extends ArkarangGUI {
         funcs.put(10, event->{
             Player player = (Player)event.getWhoClicked();
             player.closeInventory();
-            builder(IslandUpgradeType.BORDER_SIZE, island, "섬 강화: 섬 최대 사이즈")
+            val future = builder(IslandUpgradeType.BORDER_SIZE, island, "섬 강화: 섬 최대 사이즈")
                     .thenAccept(gui-> executor.sync(()->gui.openGUI(player)));
+            DebugLogger.handle("size upgrade", future);
         });
         funcs.put(12, event->{
             Player player = (Player)event.getWhoClicked();
@@ -153,7 +155,6 @@ public class UpgradeMainGUI extends ArkarangGUI {
                 .thenApply(IslandUpgradeSettings::asMap);
         BiFunction<Integer, IslandUpgradeSettings.PairData, ItemStack> func = null;
 
-
         switch (type){
             case BORDER_SIZE:
                 func = itemSize;
@@ -179,6 +180,7 @@ public class UpgradeMainGUI extends ArkarangGUI {
                         Map<Integer, IslandUpgradeSettings.PairData> view = viewFuture.get();
                         return new UpgradeGUI(title, type, maxLevel, view, currentLevel, currentMoney, upgrade, finalFunc, executor);
                     }catch (Exception e){
+                        DebugLogger.error(e);
                         return null;
                     }
                 });

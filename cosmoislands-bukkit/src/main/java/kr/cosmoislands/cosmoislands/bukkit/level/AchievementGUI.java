@@ -7,6 +7,7 @@ import com.minepalm.arkarangutils.bukkit.ItemStackBuilder;
 import kr.cosmoislands.cosmoislands.api.level.IslandAchievements;
 import kr.cosmoislands.cosmoislands.api.level.IslandLevel;
 import kr.cosmoislands.cosmoislands.api.level.IslandRewardData;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -22,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class AchievementGUI extends ArkarangGUI {
 
     private static final ItemStack yellow, white, bottle;
-    private static HashMap<Integer, Integer> map = new HashMap<>();
     private static final HashBiMap<Integer, Integer> ID_TO_SLOT = HashBiMap.create();
 
     static{
@@ -70,12 +70,14 @@ public class AchievementGUI extends ArkarangGUI {
         }
 
         inv.setItem(4, getLevelIcon(currentLevel));
-        for(int i = 0; i < ID_TO_SLOT.size(); i++){
+        for(int i = 0; i < 7; i++){
             int slot = ID_TO_SLOT.getOrDefault(i, -1);
             if(slot != -1) {
                 locks.put(slot, new AtomicBoolean(false));
-                inv.setItem(slot, getRewardIcon(i, map.get(i), currentLevel, achievementView.get(i)));
-                setFunction(slot, rewardDataView.get(i).getRequiredLevel());
+                int requiredLevel = this.rewardDataView.get(i).getRequiredLevel();
+                boolean isAchieved = this.achievementView.getOrDefault(i, false);
+                inv.setItem(slot, getRewardIcon(i, requiredLevel, currentLevel, isAchieved));
+                setFunction(slot, this.rewardDataView.get(i).getRequiredLevel());
             }
         }
     }
@@ -101,7 +103,7 @@ public class AchievementGUI extends ArkarangGUI {
                 if(!locks.get(slot).get()) {
                     locks.get(slot).set(true);
                     int rewardId = ID_TO_SLOT.inverse().get(slot);
-                    if (!achievementView.get(rewardId) && currentLevel >= reqLevel) {
+                    if (!achievementView.getOrDefault(rewardId, false) && currentLevel >= reqLevel) {
                         IslandRewardData data = rewardDataView.get(rewardId);
                         try{
                             CompletableFuture<Integer> levelFuture = level.getLevel();

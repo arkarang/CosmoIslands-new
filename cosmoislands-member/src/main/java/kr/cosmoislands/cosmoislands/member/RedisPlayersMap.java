@@ -90,13 +90,13 @@ public class RedisPlayersMap implements IslandPlayersMap {
     @Override
     public CompletableFuture<Void> setOwner(@Nonnull IslandPlayer player) {
         return async.set(ownerKey, player.getUniqueId().toString())
-                .thenRun(()->{})
+                .thenCompose(ignored-> setRank(player, MemberRank.OWNER))
                 .toCompletableFuture();
     }
 
     @Override
     public CompletableFuture<Void> setRank(@Nonnull IslandPlayer player, MemberRank rank) {
-        return async.hset(membersKey, player.getUniqueId()+"", rank.getPriority()+"")
+        return async.hset(membersKey, player.getUniqueId()+"", rank.name())
                 .thenRun(()->{})
                 .toCompletableFuture();
     }

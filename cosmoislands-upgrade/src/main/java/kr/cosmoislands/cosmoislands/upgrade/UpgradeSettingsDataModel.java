@@ -22,10 +22,10 @@ public class UpgradeSettingsDataModel {
             PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS "+table+" " +
                     "(`column_id` BIGINT UNIQUE AUTO_INCREMENT, " +
                     "`type` VARCHAR(16), " +
-                    "`level` INT DEFAULT 0, " +
+                    "`level` INT, " +
                     "`value` INT, " +
                     "`required_cost` INT DEFAULT 0, " +
-                    "PRIMARY KEY(`type`)) " +
+                    "PRIMARY KEY(`type`, `level`)) " +
                     "charset=utf8mb4");
             ps.execute();
         });
@@ -37,7 +37,7 @@ public class UpgradeSettingsDataModel {
             for(int i = 1; i <= maxLevel; i++){
                 PreparedStatement ps = connection.prepareStatement("INSERT INTO " + table + " (`type`, `level`, `value`, `required_cost`) " +
                         "VALUES(?, ?, ?, ?) " +
-                        "ON DUPLICATE KEY UPDATE `required_cost`=?");
+                        "ON DUPLICATE KEY UPDATE `required_cost`=VALUES(`required_cost`)");
                 ps.setString(1, setting.getType().name());
                 ps.setInt(2, i);
                 ps.setInt(3, setting.getValue(i));
@@ -61,7 +61,7 @@ public class UpgradeSettingsDataModel {
                 int value = rs.getInt(2);
                 int requiredCost = rs.getInt(3);
                 values.put(level, value);
-                values.put(level, requiredCost);
+                costs.put(level, requiredCost);
             }
             return new UpgradeSettingImpl(type, values, costs);
         });

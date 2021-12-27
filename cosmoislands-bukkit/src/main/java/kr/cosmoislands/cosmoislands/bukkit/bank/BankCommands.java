@@ -10,7 +10,9 @@ import kr.cosmoislands.cosmoislands.api.IslandService;
 import kr.cosmoislands.cosmoislands.api.bank.IslandBank;
 import kr.cosmoislands.cosmoislands.api.bank.IslandVault;
 import kr.cosmoislands.cosmoislands.bukkit.PlayerPreconditions;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.entity.Player;
 
@@ -79,7 +81,11 @@ public class BankCommands {
                         }
                         if( economy.getBalance(player) >= amount){
                             IslandVault vault = island.getComponent(IslandVault.class);
-                            vault.addMoney(amount).thenRun(()->player.sendMessage("섬에 돈 "+amount+"G 를 입금했습니다."));
+                            val execution = vault.addMoney(amount).thenRun(()->{
+                                player.sendMessage("섬에 돈 "+amount+"G 를 입금했습니다.");
+                                economy.withdrawPlayer(player, amount);
+                            });
+                            DebugLogger.handle("addMoney", execution);
                         }else{
                             player.sendMessage("잔액이 부족합니다!");
                         }

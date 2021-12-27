@@ -39,7 +39,7 @@ public class GenericCommands {
                     player.sendMessage("/섬 알바 초대 <닉네임> - 섬 알바를 초대합니다.");
                     player.sendMessage("/섬 알바 추방 <닉네임> - 섬 알바를 추방합니다.");
                     player.sendMessage("/섬 창고 - 섬 창고를 엽니다.");
-                    player.sendMessage("/섬 랭킹 - 섬 레벨 랭킹을 봅니다.");
+                    player.sendMessage("/섬 레벨 랭킹 - 섬 레벨 랭킹을 봅니다.");
                     break;
                 case 2:
                     player.sendMessage("/섬 강화 - 섬 강화 GUI를 엽니다.");
@@ -60,16 +60,15 @@ public class GenericCommands {
                 case 4:
                     player.sendMessage("/섬 금고 넣기 <액수> - 자신의 돈을 섬에 입금합니다.");
                     player.sendMessage("/섬 금고 빼기 <액수> - 섬에서 돈을 출금합니다.");
-                    player.sendMessage("/섬 인기도 - 설명을 어캐적어야하지....");
                     player.sendMessage("/섬 인기도 랭킹 - 섬 인기도 랭킹을 확인합니다.");
                     player.sendMessage("/섬 인기도 올리기 - 자신이 서 있는 섬의 인기도를 올립니다.");
                     player.sendMessage("/섬 인기도 내리기 - 자신이 서 있는 섬의 인기도를 내립니다.");
+                    player.sendMessage("/섬 채팅 - 채팅 모드를 전환합니다.");
                     break;
                 case 5:
-                    player.sendMessage("/섬 채팅 - 채팅 모드를 전환합니다.");
                     player.sendMessage("/섬 스폰설정 - 자신이 서 있는 자리를 섬의 스폰으로 설정합니다.");
-                    player.sendMessage("/섬 워프 <닉네임> - 해당 플레이어의 워프 지점으로 텔레포트 합니다.");
-                    player.sendMessage("/섬 워프설정 - 지금 서 있는 자리를 워프 지점으로 등록합니다.");
+                    player.sendMessage("/섬 워프 <닉네임> - 해당 워프 지점으로 텔레포트 합니다.");
+                    player.sendMessage("/섬 워프설정 <이름> - 지금 서 있는 자리를 워프 지점으로 등록합니다.");
                     player.sendMessage("/섬 설정 - 섬 설정 GUI를 엽니다.");
                     player.sendMessage("/섬 삭제 - 자신의 섬을 삭제합니다.");
                     break;
@@ -94,6 +93,7 @@ public class GenericCommands {
                                     }else{
                                         player.sendMessage("섬을 생성하는데 실패했습니다... 관리자에게 문의해주세요.");
                                     }
+                                    DebugLogger.log("command create completed: "+System.currentTimeMillis());
                                 });
                             });
                             DebugLogger.handle("inner creation: ", innerExecution);

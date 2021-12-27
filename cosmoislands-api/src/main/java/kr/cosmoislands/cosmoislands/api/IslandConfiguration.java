@@ -25,4 +25,6 @@ public interface IslandConfiguration {
     Properties getManyWorldsProperties();
 
     Pattern getLevelLorePattern();
+
+    String getLevelLore();
 }

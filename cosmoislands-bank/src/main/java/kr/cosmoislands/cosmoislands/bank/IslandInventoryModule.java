@@ -29,7 +29,6 @@ public class IslandInventoryModule implements IslandModule<IslandBank> {
         }
     });
     LoadingCache<Integer, CompletableFuture<Integer>> levelCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(5, TimeUnit.MINUTES)
             .build(new CacheLoader<Integer, CompletableFuture<Integer>>() {
                 @Override
                 public CompletableFuture<Integer> load(Integer islandId) throws Exception {

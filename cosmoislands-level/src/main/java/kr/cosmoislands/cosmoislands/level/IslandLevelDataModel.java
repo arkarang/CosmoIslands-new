@@ -88,7 +88,7 @@ public class IslandLevelDataModel extends AbstractDataModel {
 
     CompletableFuture<List<IslandRanking.RankingData>> getTopOf(int count){
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( SELECT `island_id`, `level`, dense_rank() over (order by `level`) as ranking FROM "+table+") ranks WHERE ranks.ranking <= ?");
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( SELECT `island_id`, `level`, dense_rank() over (order by `level` DESC) as ranking FROM "+table+") ranks WHERE ranks.ranking <= ?");
             ps.setInt(1, count);
             ResultSet rs = ps.executeQuery();
             List<IslandRanking.RankingData> list = new ArrayList<>();
@@ -104,7 +104,7 @@ public class IslandLevelDataModel extends AbstractDataModel {
 
     CompletableFuture<Integer> getRank(int islandId){
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( SELECT `island_id`, `level`, dense_rank() over (order by `level`) as ranking FROM "+table+") ranks WHERE ranks.island_id = ?");
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( SELECT `island_id`, `level`, dense_rank() over (order by `level` DESC) as ranking FROM "+table+") ranks WHERE ranks.island_id = ?");
             ps.setInt(1, islandId);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){

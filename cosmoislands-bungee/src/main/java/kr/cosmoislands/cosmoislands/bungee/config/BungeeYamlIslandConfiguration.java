@@ -1,25 +1,29 @@
-package kr.cosmoislands.cosmoislands.bukkit.config;
+package kr.cosmoislands.cosmoislands.bungee.config;
 
-import com.minepalm.arkarangutils.bukkit.SimpleConfig;
+import com.minepalm.arkarangutils.bungee.BungeeConfig;
 import kr.cosmoislands.cosmoislands.api.IslandConfiguration;
 import kr.cosmoislands.cosmoislands.api.member.MemberRank;
 import kr.cosmoislands.cosmoislands.api.protection.IslandPermissions;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeSettings;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
-import kr.cosmoislands.cosmoislands.bukkit.CosmoIslandsBukkit;
+import kr.cosmoislands.cosmoislands.bungee.CosmoIslandsBungee;
 import kr.cosmoislands.cosmoislands.upgrade.UpgradeSettingImpl;
-import org.bukkit.configuration.ConfigurationSection;
+import net.md_5.bungee.config.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-public class YamlIslandConfiguration extends SimpleConfig implements IslandConfiguration {
+public class BungeeYamlIslandConfiguration extends BungeeConfig implements IslandConfiguration {
 
-    public YamlIslandConfiguration(CosmoIslandsBukkit plugin) {
-        super(plugin, "config.yml");
+    public BungeeYamlIslandConfiguration(CosmoIslandsBungee plugin) {
+        super(plugin, "islandSettings.yml", true);
+    }
+
+    public boolean doMySQLSync(){
+        return config.getBoolean("MySQLSynchronization", false);
     }
 
     public boolean isDebug(){
@@ -36,9 +40,9 @@ public class YamlIslandConfiguration extends SimpleConfig implements IslandConfi
 
     @Override
     public Map<IslandSetting, String> getDefaultSettings() throws IllegalArgumentException{
-        ConfigurationSection section = config.getConfigurationSection("DefaultIslandSettings");
+        Configuration section = config.getSection("DefaultIslandSettings");
         Map<IslandSetting, String> map = new HashMap<>();
-        for (String key : section.getKeys(false)) {
+        for (String key : section.getKeys()) {
             try{
                 map.put(IslandSetting.valueOf(key), section.getString(key));
             }catch (IllegalArgumentException ignored){
@@ -59,9 +63,9 @@ public class YamlIslandConfiguration extends SimpleConfig implements IslandConfi
 
     @Override
     public Map<IslandPermissions, MemberRank> getDefaultPermissions() {
-        ConfigurationSection section = config.getConfigurationSection("DefaultIslandPermissions");
+        Configuration section = config.getSection("DefaultIslandPermissions");
         Map<IslandPermissions, MemberRank> map = new HashMap<>();
-        for (String key : section.getKeys(false)) {
+        for (String key : section.getKeys()) {
             IslandPermissions permission = null;
             MemberRank rank = null;
 
@@ -96,8 +100,8 @@ public class YamlIslandConfiguration extends SimpleConfig implements IslandConfi
     @Override
     public Map<String, Integer> getDefaultWorldBorder() {
         int weight, length;
-        weight = config.getInt("DefaultWorldBorder.weight");
-        length = config.getInt("DefaultWorldBorder.length");
+        weight = config.getInt("DefaultWorldBorder.WEIGHT");
+        length = config.getInt("DefaultWorldBorder.LENGTH");
         int maxX, maxZ;
         int minX, minZ;
         maxX = weight/2;
@@ -109,8 +113,8 @@ public class YamlIslandConfiguration extends SimpleConfig implements IslandConfi
         map.put("maxZ", maxZ);
         map.put("minX", minX);
         map.put("minZ", minZ);
-        map.put("weight", weight);
-        map.put("length", length);
+        map.put("WEIGHT", weight);
+        map.put("LENGTH", length);
         return map;
     }
 
@@ -131,14 +135,14 @@ public class YamlIslandConfiguration extends SimpleConfig implements IslandConfi
     }
 
     Map<Integer, IslandUpgradeSettings.PairData> getDefaultUpgradeSettings(IslandUpgradeType type) {
-        ConfigurationSection section = config.getConfigurationSection("DefaultUpgradeSettings."+type.name());
+        Configuration section = config.getSection("DefaultUpgradeSettings."+type.name());
         if(section == null){
             throw new NullPointerException("Configuration of IslandUpgradeSettings "+type+" is null");
         }
 
         Map<Integer, IslandUpgradeSettings.PairData> map = new HashMap<>();
-        for (String key : section.getKeys(false)) {
-            ConfigurationSection subSection = section.getConfigurationSection(key);
+        for (String key : section.getKeys()) {
+            Configuration subSection = section.getSection(key);
             int value = subSection.getInt("value");
             int cost = subSection.getInt("cost");
             IslandUpgradeSettings.PairData pairData = new IslandUpgradeSettings.PairData(value, cost);
@@ -161,5 +165,10 @@ public class YamlIslandConfiguration extends SimpleConfig implements IslandConfi
     @Override
     public Pattern getLevelLorePattern() {
         return Pattern.compile(config.getString("LevelLorePattern"));
+    }
+
+    @Override
+    public String getLevelLore() {
+        return config.getString("LevelLore");
     }
 }

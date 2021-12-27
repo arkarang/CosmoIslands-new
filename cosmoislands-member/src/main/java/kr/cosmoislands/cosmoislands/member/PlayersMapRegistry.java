@@ -48,7 +48,7 @@ public class PlayersMapRegistry {
             DebugLogger.handle("migrateFuture handle1: ", migrateFuture);
             return future.thenCombine(migrateFuture, (settingsMap, ignored)->{
                 DebugLogger.log("players map registry: load completed");
-                return new CosmoIslandPlayersMap(integer, islandRegistry, mysql, redis, settingsMap, strategies.getStrategies());
+                return new CosmoIslandPlayersMap(integer, registry, islandRegistry, mysql, redis, settingsMap, strategies.getStrategies());
             });
         }
     });

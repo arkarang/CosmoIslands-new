@@ -54,7 +54,7 @@ public class CosmoIslands implements IslandService {
         this.database = new Database(msMySQLDatabase, "cosmoislands_islands");
         IslandRegistrationDataModel registrationDataModel = new IslandRegistrationDataModel("cosmoislands_islands", database);
         registrationDataModel.init();
-        this.registry = new CosmoIslandRegistry(100, this);
+        this.registry = new CosmoIslandRegistry(100, this, registrationDataModel);
         this.cloud = new CosmoIslandCloud(network, this, database, async, logger);
         this.factory = new CosmoIslandFactory(Executors.newScheduledThreadPool(4, this.threadFactory), registrationDataModel, this.cloud);
         this.playerRegistry = RedisIslandPlayerRegistry
@@ -104,7 +104,7 @@ public class CosmoIslands implements IslandService {
     @Override
     public void shutdown() throws ExecutionException, InterruptedException {
         pacemaker.shutdown();
-        this.cloud.getHostServer().shutdown();
+        this.cloud.getHostServer().shutdown().get();
         ImmutableMap<Integer, Island> islands = registry.getLocals();
         List<CompletableFuture<?>> futures = new ArrayList<>(islands.size());
         for (int id : islands.keySet()) {
@@ -118,16 +118,16 @@ public class CosmoIslands implements IslandService {
     public CompletableFuture<Island> loadIsland(int id, boolean isLocal) {
         DebugLogger.log("cosmoislands: run load island");
         return OperationPrecondition.canUpdate(id, true).thenCompose(canExecute->{
-            if (canExecute) {
+            DebugLogger.log("cosmoislands: load island condition: canExecute: "+canExecute+", isLocal: "+isLocal+", final: "+(canExecute || !isLocal));
+            if(canExecute || !isLocal){
                 return factory.fireLoad(id, isLocal)
                         .thenApply(context-> new CosmoIsland(context, cloud))
                         .thenApply(island->{
                             this.cloud.getHostServer().registerIsland(island, System.currentTimeMillis());
                             return island;
                         });
-            }else {
-                return CompletableFuture.completedFuture(null);
             }
+            return CompletableFuture.completedFuture(null);
         });
     }
 
@@ -158,10 +158,9 @@ public class CosmoIslands implements IslandService {
             if(canExecute){
                 return factory.fireCreate(uuid)
                         .thenApply(context-> new CosmoIsland(context, cloud))
-                        .thenApply(island -> {
-                            this.cloud.getHostServer().registerIsland(island, System.currentTimeMillis());
-                            DebugLogger.log("cosmoislands: registered island");
-                            return island;
+                        .thenCompose(island -> {
+                            return this.cloud.getHostServer().registerIsland(island, System.currentTimeMillis())
+                                    .thenApply(ignored->island);
                         });
             }else {
                 return CompletableFuture.completedFuture(null);

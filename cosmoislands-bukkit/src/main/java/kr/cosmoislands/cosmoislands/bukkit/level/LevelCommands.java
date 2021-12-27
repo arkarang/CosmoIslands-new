@@ -13,16 +13,23 @@ import kr.cosmoislands.cosmoislands.api.level.IslandRewardData;
 import kr.cosmoislands.cosmoislands.api.level.IslandRewardsRegistry;
 import kr.cosmoislands.cosmoislands.bukkit.PlayerPreconditions;
 import kr.cosmoislands.cosmoislands.bukkit.utils.AbstractRankingGUI;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import kr.cosmoislands.cosmoislands.level.IslandAchievementsModule;
 import kr.cosmoislands.cosmoislands.level.IslandLevelModule;
 import kr.cosmoislands.cosmoislands.level.bukkit.MinecraftItemRewardData;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -32,7 +39,8 @@ public class LevelCommands {
                             PaperCommandManager manager,
                             HelloPlayers players,
                             BukkitExecutor executor,
-                            Pattern pattern){
+                            Pattern pattern,
+                            String lore){
         IslandAchievementsModule achievementsModule = (IslandAchievementsModule)service.getModule(IslandAchievements.class);
         IslandLevelModule levelModule = (IslandLevelModule) service.getModule(IslandLevel.class);
         IslandRewardsRegistry registry = achievementsModule.getRewardDataRegistry();
@@ -51,7 +59,7 @@ public class LevelCommands {
             return level.getLevel();
         });
         manager.registerCommand(new User(factory, executor, levelModule, registry, pattern));
-        manager.registerCommand(new Admin(registry));
+        manager.registerCommand(new Admin(registry, pattern, lore));
     }
 
     @RequiredArgsConstructor
@@ -114,15 +122,27 @@ public class LevelCommands {
                         IslandAchievements achievements = island.getComponent(IslandAchievements.class);
                         val mapFuture = achievements.asMap();
 
-                        mapFuture.thenCombine(listFuture, (map, list)->{
+                        val executionFuture = mapFuture.thenCombine(listFuture, (map, list)->{
                             Map<Integer, IslandRewardData> rewardDataView = new HashMap<>();
-                            list.forEach(data-> rewardDataView.put(data.getId(), data));
-                            levelFuture.thenAccept(level ->{
+                            list.forEach(data-> {
+                                rewardDataView.put(data.getId(), data);
+                            });
+
+                            for(int i = 0 ; i < 7; i++){
+                                if(!rewardDataView.containsKey(i)){
+                                    player.sendMessage("아직 레벨 보상이 설정되어 있지 않았어요.");
+                                    return null;
+                                }
+                            }
+
+                            val guiFuture = levelFuture.thenAccept(level ->{
                                 AchievementGUI gui = new AchievementGUI(rewardDataView, map, level, achievements, islandLevel, executor);
                                 executor.sync(()-> gui.openGUI(player));
                             });
+                            DebugLogger.handle("achievementGUI construct", guiFuture);
                             return null;
                         });
+                        DebugLogger.handle("achievementGUI", executionFuture);
                     });
         }
 
@@ -140,6 +160,8 @@ public class LevelCommands {
     protected static class Admin extends BaseCommand{
 
         private final IslandRewardsRegistry registry;
+        private final Pattern pattern;
+        private final String lore;
 
         @Subcommand("보상설정")
         public void modifyAchievementItem(Player player, int id){
@@ -160,6 +182,64 @@ public class LevelCommands {
         public void modifyAchievementLevel(Player player, int id, int level){
             registry.setRequiredLevel(id, level);
             player.sendMessage("보상 id: "+id+"번의 요구 레벨을 "+level+"로 설정했습니다.");
+        }
+
+        @Subcommand("로어")
+        public void addLore(Player player, int level){
+            String loreText = lore.replace("%level%", level+"");
+            ItemStack item = player.getInventory().getItemInMainHand();
+            if(item.getType() != Material.AIR) {
+                ItemMeta meta = item.getItemMeta();
+                List<Component> list = new ArrayList<>();
+                if (meta.hasLore()) {
+                    list = meta.lore();
+                }
+                list.add(Component.text(loreText));
+                meta.lore(list);
+                item.setItemMeta(meta);
+                player.sendMessage("로어 설정 완료!");
+            }else{
+                player.sendMessage("로어 ㄴㄴ 불가");
+            }
+        }
+
+        @Subcommand("레벨검증")
+        public void checkLevel(Player player){
+            ItemStack item = player.getInventory().getItemInMainHand();
+            if(item.getType() != Material.AIR) {
+                ItemMeta meta = item.getItemMeta();
+                boolean isValidItem = false;
+                if (meta != null) {
+                    List<String> list = meta.getLore();
+                    if(list != null) {
+                        for (String lore : list) {
+                            Matcher matcher = pattern.matcher(lore);
+                            isValidItem = regexCheck(matcher);
+                            if (isValidItem) {
+                                player.sendMessage("레벨아이템 ㅇㅇ 값: "+getProvidingLevel(matcher));
+                            }else{
+                                player.sendMessage("ㄴㄴ 레벨아이템");
+                            }
+                        }
+                    }
+                }
+                player.sendMessage("로어 설정 완료!");
+            }else{
+                player.sendMessage("로어 ㄴㄴ 불가 없음");
+            }
+        }
+
+        private boolean regexCheck(Matcher matcher){
+            return matcher.find();
+        }
+
+        private int getProvidingLevel(Matcher matcher){
+            String value = matcher.group(0);
+            try {
+                return Integer.parseInt(value);
+            }catch (IllegalArgumentException e){
+                return 0;
+            }
         }
     }
 }

@@ -55,9 +55,10 @@ public class IslandInternInvitationStrategy extends InvitationExecuteStrategy {
             playersMap.getOwner().thenAccept(owner->{
                 if(owner.getUniqueId().equals(invitation.getIssuer())){
                     //todo: 알바 최대 가입 횟수 체크하기
-                    playersMap.addIntern(invitation.getReceived());
-                    usernameFuture.thenAccept(username->{
-                        chat.sendSystem(username + "님이 새로운 섬 알바원이 되었습니다.");
+                    playersMap.addIntern(invitation.getReceived()).thenRun(()->{
+                        usernameFuture.thenAccept(username->{
+                            chat.sendSystem(username + "님이 새로운 섬 알바원이 되었습니다.");
+                        });
                     });
                 }
             });

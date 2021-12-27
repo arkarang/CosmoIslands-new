@@ -5,16 +5,21 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Subcommand;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
+import com.minepalm.helloplayer.core.HelloPlayers;
+import kr.cosmoislands.cosmochat.core.CosmoChat;
+import kr.cosmoislands.cosmochat.core.helper.CosmoChatHelper;
 import kr.cosmoislands.cosmoislands.api.*;
 import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMap;
 import kr.cosmoislands.cosmoislands.api.member.MemberRank;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayer;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -24,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 public class TestCommands extends BaseCommand {
 
     private final IslandService service;
+    private final CosmoChatHelper helper;
     private final BukkitExecutor executor;
 
     @Subcommand("pl")
@@ -80,8 +86,31 @@ public class TestCommands extends BaseCommand {
         });
     }
 
-    @Subcommand("delis")
-    public void deleteIsland(CommandSender sender, int islandId){
-        service.deleteIsland(islandId);
+    @Subcommand("sv")
+    public void islandServer(CommandSender sender){
+        executor.async(()->{
+            try {
+                List<IslandServer> servers = service.getCloud().getIslandServers().get();
+                int i = 1;
+                for (IslandServer server : servers) {
+                    sender.sendMessage(i+". 서버 이름: "+server.getName()+", 타입: "+server.getType()+", 온라인: "+server.isOnline().get()+", 로드 수: "+server.getLoadedCount().get());
+                    i++;
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @Subcommand("sys")
+    public void system(CommandSender sender, String username){
+        val future1 = HelloPlayers.getInst().getUniqueID(username);
+        val future2 = future1.thenCompose(uuid->{
+            return HelloPlayers.getInst().getUsername(uuid);
+        });
+        future2.thenCombine(future1, (user, uuid)->{
+            helper.system(uuid).send("당신의 닉네임은 "+user+" 입니다.");
+            return null;
+        });
     }
 }

@@ -38,9 +38,9 @@ public class IslandInvitationStrategy extends InvitationExecuteStrategy {
     public void onInvited(Invitation invitation) {
         players.getUsername(invitation.getIssuer()).thenAcceptAsync(username->{
             helper.system(invitation.getReceived()).send(
-                    username + " 님으로부터 섬 알바 초대가 도착했습니다.\n"
-                            + "/섬 알바 수락 "+username+" 시 섬 초대를 받을 수 있습니다.\n"
-                            + "/섬 알바 거절 "+username+" 시 섬 초대를 거절할수 있습니다.\n");
+                    username + " 님으로부터 섬 초대가 도착했습니다.\n"
+                            + "/섬 초대 수락 "+username+" 시 섬 초대를 받을 수 있습니다.\n"
+                            + "/섬 초대 거절 "+username+" 시 섬 초대를 거절할수 있습니다.\n");
         });
     }
 
@@ -57,9 +57,10 @@ public class IslandInvitationStrategy extends InvitationExecuteStrategy {
             playersMap.getOwner().thenCombine(preconditions.hasIsland(), (owner, hasIsland)->{
                 if(!hasIsland) {
                     if (owner.getUniqueId().equals(invitation.getIssuer())) {
-                        playersMap.addMember(playerRegistry.get(invitation.getReceived()));
-                        usernameFuture.thenAccept(username -> {
-                            chat.sendSystem(username + "님이 새로운 섬원이 되었습니다.");
+                        playersMap.addMember(playerRegistry.get(invitation.getReceived())).thenRun(()->{
+                            usernameFuture.thenAccept(username -> {
+                                chat.sendSystem(username + "님이 새로운 섬원이 되었습니다.");
+                            });
                         });
                     }
                 }else{

@@ -9,7 +9,7 @@ import java.util.UUID;
 public class InternListGUI extends PlayerListGUI{
 
     public InternListGUI(UUID owner, List<UUID> list, BukkitExecutor executor) {
-        super("알바 목록", get(owner, list), provide(executor));
+        super("알바 목록", get(owner, list), executor);
 
     }
 

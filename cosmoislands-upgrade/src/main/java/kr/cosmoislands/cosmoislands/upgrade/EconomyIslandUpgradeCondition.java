@@ -78,7 +78,7 @@ public abstract class EconomyIslandUpgradeCondition extends AbstractIslandUpgrad
         val hasCostFuture = hasCostInternally(currentLevelFuture, currentMoneyFuture);
 
         return reachedMaxLevelFuture.thenCombine(hasCostFuture, (reachedMaxLevel, hasCost)->{
-            if(reachedMaxLevel){
+            if(!reachedMaxLevel){
                 if(hasCost){
                     return executeUpgrade(island, currentLevelFuture).thenApply(ignored->Result.SUCCESSFUL);
                 }else{
