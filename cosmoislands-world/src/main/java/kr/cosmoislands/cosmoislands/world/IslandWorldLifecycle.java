@@ -10,6 +10,7 @@ import kr.cosmoislands.cosmoislands.api.ComponentLifecycle;
 import kr.cosmoislands.cosmoislands.api.IslandContext;
 import kr.cosmoislands.cosmoislands.api.ModulePriority;
 import kr.cosmoislands.cosmoislands.api.world.IslandWorld;
+import kr.cosmoislands.cosmoislands.world.minecraft.MinecraftWorldHandler;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
@@ -34,7 +35,10 @@ public class IslandWorldLifecycle implements ComponentLifecycle {
             CompletableFuture<ManyWorld> worldFuture = service.loadWorld(toInform(island));
             CompletableFuture<IslandWorld> world = worldFuture.thenApply(mw -> module.create(island.getIslandId(), mw));
             module.register(island.getIslandId(), world);
-            return world.thenAccept(islandWorld -> island.register(IslandWorld.class, islandWorld));
+            return world.thenCompose(islandWorld -> {
+                island.register(IslandWorld.class, islandWorld);
+                return islandWorld.getWorldHandler().init();
+            });
         }else {
             return CompletableFuture.completedFuture(null);
         }
@@ -46,7 +50,10 @@ public class IslandWorldLifecycle implements ComponentLifecycle {
             CompletableFuture<ManyWorld> worldFuture = service.createNewWorld(defaultWorld, toInform(island));
             CompletableFuture<IslandWorld> world = worldFuture.thenApply(mw -> module.create(island.getIslandId(), mw));
             module.register(island.getIslandId(), world);
-            return world.thenAccept(islandWorld -> island.register(IslandWorld.class, islandWorld));
+            return world.thenCompose(islandWorld -> {
+                island.register(IslandWorld.class, islandWorld);
+                return islandWorld.getWorldHandler().init();
+            });
         }else{
             return CompletableFuture.completedFuture(null);
         }

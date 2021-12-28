@@ -33,6 +33,7 @@ public class IslandManyWorld implements IslandWorld {
     @Getter
     private final ManyWorld manyWorld;
     private final MySQLIslandWorldDataModel model;
+    private final IslandWorldHandler handler;
     private final Cached<Integer> maxX, minX;
     private final Cached<Integer> maxZ, minZ;
     private final Cached<Integer> length, weight;
@@ -46,11 +47,16 @@ public class IslandManyWorld implements IslandWorld {
             }
     });
 
-    IslandManyWorld(int islandId, ManyWorld world, MySQLIslandWorldDataModel model, Map<String, Integer> initialValues){
+    IslandManyWorld(int islandId,
+                    ManyWorld world,
+                    IslandWorldHandler handler,
+                    MySQLIslandWorldDataModel model,
+                    Map<String, Integer> initialValues){
         this.islandId = islandId;
         this.manyWorld = world;
         this.initialValues = initialValues;
         this.model = model;
+        this.handler = handler;
         this.supplierMap = initSuppliers();
         this.maxX = new Cached<>(initialValues.get(MAX_X), supply(MAX_X));
         this.minX = new Cached<>(initialValues.get(MIN_X), supply(MIN_X));
@@ -66,8 +72,8 @@ public class IslandManyWorld implements IslandWorld {
         map.put(MIN_X, ()->model.getMinX(islandId));
         map.put(MAX_Z, ()->model.getMaxZ(islandId));
         map.put(MIN_Z, ()->model.getMinZ(islandId));
-        map.put(LENGTH, ()->model.getLength(islandId));
-        map.put(WEIGHT, ()->model.getWeight(islandId));
+        map.put(LENGTH, ()->model.getLength(islandId, this.getMaxX() - this.getMinX()));
+        map.put(WEIGHT, ()->model.getWeight(islandId, this.getMaxZ() - this.getMinZ()));
         return ImmutableMap.copyOf(map);
     }
 
@@ -83,7 +89,7 @@ public class IslandManyWorld implements IslandWorld {
 
     @Override
     public IslandWorldHandler getWorldHandler() {
-        return null;
+        return handler;
     }
 
     @Override
@@ -118,6 +124,12 @@ public class IslandManyWorld implements IslandWorld {
         val future2= model.setMaxZ(islandId, maxZ);
         val future3= model.setMinX(islandId, minX);
         val future4= model.setMinZ(islandId, minZ);
+        this.maxX.set(maxX);
+        this.maxZ.set(maxZ);
+        this.minX.set(minX);
+        this.minZ.set(minZ);
+        this.length.set(maxX - minX);
+        this.weight.set(maxZ - minZ);
         val combined = CompletableFuture.allOf(future1, future2, future3, future4);
         combined.thenAccept(ignored->this.refresh());
         return combined;
@@ -125,6 +137,12 @@ public class IslandManyWorld implements IslandWorld {
 
     private void refresh(){
         cache.invalidateAll();
+        this.maxX.get();
+        this.maxZ.get();
+        this.minX.get();
+        this.minZ.get();
+        this.length.get();
+        this.weight.get();
     }
 
     @Override

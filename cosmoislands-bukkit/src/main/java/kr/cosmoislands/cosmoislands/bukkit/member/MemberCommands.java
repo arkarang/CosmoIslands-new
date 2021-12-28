@@ -340,6 +340,7 @@ public class MemberCommands {
                             memberInvitation.receiver(player.getUniqueId()).accept(sender);
                         } else {
                             memberInvitation.receiver(player.getUniqueId()).deny(sender);
+                            player.sendMessage("섬 초대를 거절했습니다.");
                         }
                     }
                 });
@@ -540,15 +541,11 @@ public class MemberCommands {
 
                 if (toTransferPreconditions != null) {
                     result = toTransferPreconditions.hasIsland().thenCompose(hasIsland -> {
-                        if (hasIsland) {
-                            player.sendMessage("해당 플레이어는 섬이 존재합니다.");
-                        } else {
-                            if (isOnline != null) {
-                                if (isOnline) {
-                                    return preconditions.getIsland();
-                                } else {
-                                    player.sendMessage("해당 플레이어는 오프라인입니다.");
-                                }
+                        if (isOnline != null) {
+                            if (isOnline) {
+                                return preconditions.getIsland();
+                            } else {
+                                player.sendMessage("해당 플레이어는 오프라인입니다.");
                             }
                         }
                         return CompletableFuture.completedFuture((Island) null);
@@ -571,7 +568,7 @@ public class MemberCommands {
 
                 isMemberFuture.thenCombine(isInternFuture, (isMember, isIntern) -> {
                     if (isMember) {
-                        player.sendMessage("해당 플레이어는 섬원입니다.");
+                        player.sendMessage("해당 플레이어는 이미 섬의 섬원입니다.");
                         return false;
                     } else if (isIntern) {
                         player.sendMessage("해당 플레이어는 이미 섬 알바입니다.");
@@ -752,6 +749,7 @@ public class MemberCommands {
                                 memberInvitation.receiver(player.getUniqueId()).accept(sender);
                             } else {
                                 memberInvitation.receiver(player.getUniqueId()).deny(sender);
+                                player.sendMessage("섬 알바 초대를 거절했습니다.");
                             }
                         }
                     }

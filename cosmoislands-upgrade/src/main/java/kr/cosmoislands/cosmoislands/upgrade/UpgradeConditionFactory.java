@@ -2,7 +2,7 @@ package kr.cosmoislands.cosmoislands.upgrade;
 
 import kr.cosmoislands.cosmoislands.api.AbstractLocation;
 import kr.cosmoislands.cosmoislands.api.Island;
-import kr.cosmoislands.cosmoislands.api.bank.IslandBank;
+import kr.cosmoislands.cosmoislands.api.bank.IslandInventory;
 import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMap;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeCondition;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeSettings;
@@ -42,7 +42,7 @@ public class UpgradeConditionFactory {
                 condition = new EconomyIslandUpgradeCondition(type, setting, island) {
                     @Override
                     protected CompletableFuture<Void> executeUpgrade(Island island, int value) {
-                        IslandBank bank = island.getComponent(IslandBank.class);
+                        IslandInventory bank = island.getComponent(IslandInventory.class);
                         return bank.setLevel(value);
                     }
                 };

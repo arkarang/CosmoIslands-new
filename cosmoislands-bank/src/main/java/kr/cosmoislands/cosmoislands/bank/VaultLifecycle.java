@@ -3,7 +3,7 @@ package kr.cosmoislands.cosmoislands.bank;
 import kr.cosmoislands.cosmoislands.api.ComponentLifecycle;
 import kr.cosmoislands.cosmoislands.api.IslandContext;
 import kr.cosmoislands.cosmoislands.api.ModulePriority;
-import kr.cosmoislands.cosmoislands.api.bank.IslandBank;
+import kr.cosmoislands.cosmoislands.api.bank.IslandInventory;
 import kr.cosmoislands.cosmoislands.api.bank.IslandVault;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -36,12 +36,12 @@ public class VaultLifecycle implements ComponentLifecycle {
     @Override
     public CompletableFuture<Void> onUnload(IslandContext island) {
         module.invalidate(island.getIslandId());
-        return island.getComponent(IslandBank.class).invalidate();
+        return island.getComponent(IslandInventory.class).invalidate();
     }
 
     @Override
     public CompletableFuture<Void> onDelete(IslandContext island) {
         module.invalidate(island.getIslandId());
-        return island.getComponent(IslandBank.class).invalidate();
+        return island.getComponent(IslandInventory.class).invalidate();
     }
 }

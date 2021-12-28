@@ -6,26 +6,30 @@ import com.google.common.cache.LoadingCache;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import kr.cosmoislands.cosmoislands.api.IslandModule;
 import kr.cosmoislands.cosmoislands.api.IslandService;
-import kr.cosmoislands.cosmoislands.api.bank.IslandBank;
+import kr.cosmoislands.cosmoislands.api.bank.IslandInventory;
 import kr.cosmoislands.cosmoislands.core.Database;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.Getter;
+import lombok.val;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class IslandInventoryModule implements IslandModule<IslandBank> {
+public class IslandInventoryModule implements IslandModule<IslandInventory> {
 
     private final BukkitExecutor executor;
     private final IslandInventoryDataModel model;
     @Getter
     private final Logger logger;
-    LoadingCache<Integer, CompletableFuture<IslandBank>> cache = CacheBuilder.newBuilder().build(new CacheLoader<Integer, CompletableFuture<IslandBank>>() {
+    LoadingCache<Integer, CompletableFuture<IslandInventory>> cache = CacheBuilder.newBuilder().build(new CacheLoader<Integer, CompletableFuture<IslandInventory>>() {
         @Override
-        public CompletableFuture<IslandBank> load(Integer islandId) throws Exception {
-            return model.getView(islandId).thenApply(view-> new BukkitIslandInventory(islandId, view, model, levelCache, executor));
+        public CompletableFuture<IslandInventory> load(Integer islandId) throws Exception {
+            val future = model.getView(islandId)
+                    .thenApply(view-> new BukkitIslandInventory(islandId, view, model, levelCache, executor))
+                    .thenApply(inventory -> (IslandInventory)inventory);
+            return future;
         }
     });
     LoadingCache<Integer, CompletableFuture<Integer>> levelCache = CacheBuilder.newBuilder()
@@ -43,19 +47,21 @@ public class IslandInventoryModule implements IslandModule<IslandBank> {
     }
 
     @Override
-    public CompletableFuture<IslandBank> getAsync(int islandId) {
+    public CompletableFuture<IslandInventory> getAsync(int islandId) {
         try {
             return cache.get(islandId);
         }catch (ExecutionException e){
+            DebugLogger.error(e);
             return CompletableFuture.completedFuture(null);
         }
     }
 
     @Override
-    public IslandBank get(int islandId) {
+    public IslandInventory get(int islandId) {
         try {
             return cache.get(islandId).get();
         }catch (InterruptedException | ExecutionException e){
+            DebugLogger.error(e);
             return null;
         }
     }

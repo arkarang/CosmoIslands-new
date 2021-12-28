@@ -5,6 +5,7 @@ import kr.cosmoislands.cosmoislands.api.bank.IslandVault;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgrade;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeSettings;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.val;
 
 import java.util.concurrent.CompletableFuture;
@@ -49,7 +50,7 @@ public abstract class EconomyIslandUpgradeCondition extends AbstractIslandUpgrad
         return getSettings().thenCompose(settings -> {
             return currentLevelFuture.thenCombine(currentMoneyFuture, (level, money)->{
                 final int nextLevel = level+1;
-                return level < settings.getMaxLevel() && money >= settings.getRequiredCost(nextLevel);
+                return money >= settings.getRequiredCost(nextLevel);
             });
         });
     }
@@ -80,7 +81,8 @@ public abstract class EconomyIslandUpgradeCondition extends AbstractIslandUpgrad
         return reachedMaxLevelFuture.thenCombine(hasCostFuture, (reachedMaxLevel, hasCost)->{
             if(!reachedMaxLevel){
                 if(hasCost){
-                    return executeUpgrade(island, currentLevelFuture).thenApply(ignored->Result.SUCCESSFUL);
+                    val future = executeUpgrade(island, currentLevelFuture).thenApply(ignored->Result.SUCCESSFUL);
+                    return future;
                 }else{
                     return CompletableFuture.completedFuture(Result.NOT_ENOUGH_MONEY);
                 }

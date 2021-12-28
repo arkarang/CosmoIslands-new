@@ -118,12 +118,14 @@ public class CosmoIslands implements IslandService {
     public CompletableFuture<Island> loadIsland(int id, boolean isLocal) {
         DebugLogger.log("cosmoislands: run load island");
         return OperationPrecondition.canUpdate(id, true).thenCompose(canExecute->{
-            DebugLogger.log("cosmoislands: load island condition: canExecute: "+canExecute+", isLocal: "+isLocal+", final: "+(canExecute || !isLocal));
-            if(canExecute || !isLocal){
-                return factory.fireLoad(id, isLocal)
+           if(canExecute || !isLocal){
+               DebugLogger.log("cosmoislands: load island condition: canExecute: "+canExecute+", isLocal: "+isLocal+", final: "+(canExecute || !isLocal));
+               return factory.fireLoad(id, isLocal)
                         .thenApply(context-> new CosmoIsland(context, cloud))
                         .thenApply(island->{
-                            this.cloud.getHostServer().registerIsland(island, System.currentTimeMillis());
+                            if(isLocal) {
+                                this.cloud.getHostServer().registerIsland(island, System.currentTimeMillis());
+                            }
                             return island;
                         });
             }

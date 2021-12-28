@@ -32,16 +32,16 @@ public class UpgradeMainGUI extends ArkarangGUI {
         glass[1] = new ItemStack(Material.GREEN_STAINED_GLASS_PANE, 1);
         glass[2] = new ItemStack(Material.BROWN_STAINED_GLASS_PANE, 1);
 
-        size = new ItemStackBuilder(new ItemStack(Material.GRASS)).setName("§f§l[§2§l섬 크기 §f§l]").getHandle();
-        member = new ItemStackBuilder(new ItemStack(Material.IRON_HELMET)).setName("§f§l[§3§l섬 인원 §f§l]").getHandle();
-        chest = new ItemStackBuilder(new ItemStack(Material.CHEST)).setName("§f§l[§6§l섬 창고 §f§l]").getHandle();
-        intern = new ItemStackBuilder(new ItemStack(Material.TOTEM_OF_UNDYING)).setName("§f§l[§e§l섬 알바 인원 §f§l]").getHandle();
+        size = new ItemStackBuilder(new ItemStack(Material.GRASS)).setName("§f§l[§2§l 섬 크기 §f§l]").getHandle();
+        member = new ItemStackBuilder(new ItemStack(Material.IRON_HELMET)).setName("§f§l[§3§l 섬 인원 §f§l]").getHandle();
+        chest = new ItemStackBuilder(new ItemStack(Material.CHEST)).setName("§f§l[§6§l 섬 창고 §f§l]").getHandle();
+        intern = new ItemStackBuilder(new ItemStack(Material.TOTEM_OF_UNDYING)).setName("§f§l[§e§l 섬 알바 인원 §f§l]").getHandle();
 
         orderings.put(0, "영");
-        orderings.put(1, "하나");
-        orderings.put(2, "둘");
-        orderings.put(3, "셋");
-        orderings.put(4, "넷");
+        orderings.put(1, "한");
+        orderings.put(2, "두");
+        orderings.put(3, "세");
+        orderings.put(4, "네");
         orderings.put(5, "다섯");
         orderings.put(6, "여섯");
 
@@ -137,7 +137,7 @@ public class UpgradeMainGUI extends ArkarangGUI {
         funcs.put(16, event->{
             Player player = (Player)event.getWhoClicked();
             player.closeInventory();
-            builder(IslandUpgradeType.INVENTORY_SIZE, island, "섬 강화: 최대 알바원")
+            builder(IslandUpgradeType.MAX_INTERNS, island, "섬 강화: 최대 알바원")
                     .thenAccept(gui-> executor.sync(()->gui.openGUI(player)));
         });
     }

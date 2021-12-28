@@ -41,6 +41,7 @@ import kr.cosmoislands.cosmoislands.core.HelloBungeeInitializer;
 import kr.cosmoislands.cosmoislands.core.config.AbstractMySQLIslandConfiguration;
 import kr.cosmoislands.cosmoislands.core.config.MySQLPropertyDataModel;
 import kr.cosmoislands.cosmoislands.warp.IslandWarpModule;
+import kr.cosmoislands.cosmoislands.world.minecraft.MinecraftWorldHandlerBuilder;
 import kr.cosmoislands.cosmoredis.CosmoDataSource;
 import kr.cosmoislands.cosmoteleport.CosmoTeleport;
 import kr.cosmoislands.cosmoteleport.bukkit.CosmoTeleportBukkit;
@@ -49,6 +50,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -105,6 +107,7 @@ public class CosmoIslandsBukkit extends JavaPlugin {
             launcher.registerExternalDependency(ManyWorlds.class, manyWorlds);
             launcher.registerExternalDependency(BukkitExecutor.class, executor);
             launcher.registerExternalDependency(Economy.class, economy);
+            launcher.registerExternalDependency(MinecraftWorldHandlerBuilder.class, new MinecraftWorldHandlerBuilder(Bukkit.getServer(), executor));
 
             launcher.initializeModules(islandConfig);
             launcher.launch();

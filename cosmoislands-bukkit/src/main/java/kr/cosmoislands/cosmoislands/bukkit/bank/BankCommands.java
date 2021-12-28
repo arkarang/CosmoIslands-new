@@ -7,7 +7,7 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Subcommand;
 import kr.cosmoislands.cosmoislands.api.IslandService;
-import kr.cosmoislands.cosmoislands.api.bank.IslandBank;
+import kr.cosmoislands.cosmoislands.api.bank.IslandInventory;
 import kr.cosmoislands.cosmoislands.api.bank.IslandVault;
 import kr.cosmoislands.cosmoislands.bukkit.PlayerPreconditions;
 import kr.cosmoislands.cosmoislands.core.DebugLogger;
@@ -43,7 +43,7 @@ public class BankCommands {
                             player.sendMessage("섬이 존재하지 않습니다.");
                             return;
                         }
-                        IslandBank bank = island.getComponent(IslandBank.class);
+                        IslandInventory bank = island.getComponent(IslandInventory.class);
                         bank.openInventory(player.getUniqueId());
                     });
         }

@@ -54,8 +54,8 @@ public class BankChestGUI extends ArkarangGUI {
 
     public List<ItemStack> getContents(){
         final int lv = getLevel();
-        List<ItemStack> items = new ArrayList<>(lv*9);
-        for(int i = 0; i < lv*9; i++){
+        List<ItemStack> items = new ArrayList<>(Math.min(lv*9,54));
+        for(int i = 0; i < lv*9 && i < 54; i++){
             ItemStack item = inv.getItem(i);
             if(!invalid(item)){
                 items.add(item);
@@ -78,14 +78,23 @@ public class BankChestGUI extends ArkarangGUI {
     public void updateInventory(){
         for(int i = 0; i < 54; i++){
             ItemStack item = inv.getItem(i);
-            if(isUnlocked(i) && invalid(item)) {
-                item.setAmount(0);
+            if(item != null && item.getType() != Material.AIR) {
+                if (isUnlocked(i) && invalid(item)) {
+                    item.setAmount(0);
+                }
+            }
+        }
+
+        for(int i = (getLevel())*9; i < 54; i++){
+            ItemStack item = inv.getItem(i);
+            if(item == null || item.getType() == Material.AIR){
+                inv.setItem(i, barrier);
             }
         }
     }
 
     public boolean isUnlocked(int slot){
-        return slot < (getLevel()+1)*9;
+        return slot < (getLevel())*9;
     }
 
     @Override
@@ -93,8 +102,7 @@ public class BankChestGUI extends ArkarangGUI {
         if(inv.getViewers().isEmpty()){
             executor.async(()->{
                 lock.lock();
-                //save
-                lock.unlock();
+                bank.saveInventory().thenRun(lock::unlock);
             });
         }
     }

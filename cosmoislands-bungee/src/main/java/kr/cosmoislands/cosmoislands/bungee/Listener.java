@@ -6,7 +6,6 @@ import kr.cosmoislands.cosmoislands.api.Island;
 import kr.cosmoislands.cosmoislands.api.IslandStatus;
 import kr.cosmoislands.cosmoislands.api.chat.IslandChat;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayer;
-import kr.cosmoislands.cosmoislands.chat.CosmoIslandChat;
 import kr.cosmoislands.cosmoislands.chat.IslandChatModule;
 import kr.cosmoislands.cosmoislands.core.CosmoIslands;
 import kr.cosmoislands.cosmoislands.core.DebugLogger;
@@ -62,7 +61,7 @@ public class Listener implements net.md_5.bungee.api.plugin.Listener {
         if(markProxyJoin.contains(uuid)) {
             DebugLogger.log("onConnect: 1");
             IslandPlayer ip = cosmoIslands.getPlayerRegistry().get(uuid);
-            val updateFuture = cosmoIslands.getPlayerRegistry().update(uuid);
+            val updateFuture = updatePlayerCache(uuid);
             ip.getIslandId().thenCombine(updateFuture, (id, ignored)->{
                 DebugLogger.log("onConnect: 2: "+id);
                 if (id != Island.NIL_ID) {
@@ -73,6 +72,10 @@ public class Listener implements net.md_5.bungee.api.plugin.Listener {
                     return CompletableFuture.completedFuture(null);
             });
         }
+    }
+
+    private CompletableFuture<Void> updatePlayerCache(UUID uuid){
+        return cosmoIslands.getPlayerRegistry().update(uuid);
     }
 
     private CompletableFuture<Void> sendLoadRequest(int islandId){

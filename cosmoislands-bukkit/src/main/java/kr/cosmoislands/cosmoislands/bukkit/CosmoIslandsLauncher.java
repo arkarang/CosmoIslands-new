@@ -6,7 +6,6 @@ import com.minepalm.helloplayer.core.HelloPlayers;
 import com.minepalm.manyworlds.bukkit.ManyWorlds;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.async.RedisAsyncCommands;
-import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import kr.cosmoislands.cosmoislands.settings.IslandSettingsModule;
 import kr.cosmoislands.cosmochat.core.CosmoChat;
 import kr.cosmoislands.cosmochat.privatechat.CosmoChatPrivateChat;
@@ -14,7 +13,7 @@ import kr.cosmoislands.cosmoislands.api.ExternalRepository;
 import kr.cosmoislands.cosmoislands.api.IslandCloud;
 import kr.cosmoislands.cosmoislands.api.IslandConfiguration;
 import kr.cosmoislands.cosmoislands.api.IslandRegistry;
-import kr.cosmoislands.cosmoislands.api.bank.IslandBank;
+import kr.cosmoislands.cosmoislands.api.bank.IslandInventory;
 import kr.cosmoislands.cosmoislands.api.bank.IslandVault;
 import kr.cosmoislands.cosmoislands.api.chat.IslandChat;
 import kr.cosmoislands.cosmoislands.api.level.IslandAchievements;
@@ -27,7 +26,6 @@ import kr.cosmoislands.cosmoislands.api.protection.IslandPermissionsMap;
 import kr.cosmoislands.cosmoislands.api.protection.IslandProtection;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSettingsMap;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgrade;
-import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeSettings;
 import kr.cosmoislands.cosmoislands.api.warp.IslandWarpsMap;
 import kr.cosmoislands.cosmoislands.api.world.IslandWorld;
 import kr.cosmoislands.cosmoislands.bank.IslandInventoryModule;
@@ -44,14 +42,11 @@ import kr.cosmoislands.cosmoislands.protection.IslandProtectionModule;
 import kr.cosmoislands.cosmoislands.upgrade.IslandUpgradeModule;
 import kr.cosmoislands.cosmoislands.warp.IslandWarpModule;
 import kr.cosmoislands.cosmoislands.world.IslandWorldModule;
+import kr.cosmoislands.cosmoislands.world.minecraft.MinecraftWorldHandlerBuilder;
 import kr.cosmoislands.cosmoteleport.CosmoTeleport;
 import kr.msleague.mslibrary.database.impl.internal.MySQLDatabase;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
@@ -82,18 +77,56 @@ public class CosmoIslandsLauncher {
         CosmoTeleport cosmoTeleport = repo.getRegisteredService(CosmoTeleport.class);
         ManyWorlds manyWorlds = repo.getRegisteredService(ManyWorlds.class);
         BukkitExecutor executor = repo.getRegisteredService(BukkitExecutor.class);
+        MinecraftWorldHandlerBuilder builder = repo.getRegisteredService(MinecraftWorldHandlerBuilder.class);
 
-        IslandChatModule chatModule = new IslandChatModule(cosmoChat, privateChat, playerRegistry, msLibMySQLDatabase, async, logger);
+        IslandChatModule chatModule = new IslandChatModule(
+                cosmoChat,
+                privateChat,
+                playerRegistry,
+                msLibMySQLDatabase,
+                async,
+                logger);
         IslandLevelModule levelModule = new IslandLevelModule(database, logger);
         IslandAchievementsModule achievementsModule = new IslandAchievementsModule(database, logger);
-        IslandSettingsModule settingsModule = new IslandSettingsModule(database, cloud, async, configuration.getDefaultSettings(), logger);
-        IslandPlayersMapModule playersMapModule = new PlayersMapModule(islandRegistry, playerRegistry, settingsModule, database, async, logger);
+        IslandSettingsModule settingsModule = new IslandSettingsModule(
+                database,
+                cloud,
+                async,
+                configuration.getDefaultSettings(),
+                logger);
+        IslandPlayersMapModule playersMapModule = new PlayersMapModule(
+                islandRegistry,
+                playerRegistry,
+                settingsModule,
+                database,
+                async,
+                logger);
 
         IslandPointsModule pointsModule = new IslandPointsModule(database, logger);
-        IslandPermissionsMapModule permissionsModule = new IslandPermissionsMapModule(configuration.getDefaultPermissions(), logger);
-        IslandProtectionModule protectionModule = new IslandProtectionModule(permissionsModule, playersMapModule, settingsModule, playerRegistry, cloud, logger);
-        IslandUpgradeModule upgradeModule = new IslandUpgradeModule(islandRegistry, database, logger);
-        IslandWorldModule worldModule = new IslandWorldModule(manyWorlds, database, configuration.getManyWorldsProperties(), configuration.getDefaultWorldBorder(), service.getThreadFactory(), logger);
+        IslandPermissionsMapModule permissionsModule = new IslandPermissionsMapModule(
+                configuration.getDefaultPermissions(),
+                logger);
+        IslandProtectionModule protectionModule = new IslandProtectionModule(
+                permissionsModule,
+                playersMapModule,
+                settingsModule,
+                playerRegistry,
+                cloud,
+                logger);
+        IslandUpgradeModule upgradeModule = new IslandUpgradeModule(
+                islandRegistry,
+                database,
+                logger);
+        IslandWorldModule worldModule = new IslandWorldModule(
+                manyWorlds,
+                database,
+                configuration.getManyWorldsProperties(),
+                configuration.getDefaultWorldBorder(),
+                service.getThreadFactory(),
+                builder,
+                settingsModule,
+                executor,
+                logger);
 
         IslandInventoryModule bankModule = new IslandInventoryModule(database, executor, logger);
         IslandVaultModule vaultModule = new IslandVaultModule(database, logger);
@@ -103,7 +136,7 @@ public class CosmoIslandsLauncher {
         service.registerModule(IslandSettingsMap.class, settingsModule);
         service.registerModule(IslandWarpsMap.class, warpModule);
         service.registerModule(IslandPlayersMap.class, playersMapModule);
-        service.registerModule(IslandBank.class, bankModule);
+        service.registerModule(IslandInventory.class, bankModule);
 
         service.registerModule(IslandVault.class, vaultModule);
         service.registerModule(IslandChat.class, chatModule);
@@ -118,7 +151,7 @@ public class CosmoIslandsLauncher {
         service.getRegistry().registerComponentId(IslandWorld.class, IslandWorld.COMPONENT_ID);
         service.getRegistry().registerComponentId(IslandSettingsMap.class, IslandSettingsMap.COMPONENT_ID);
         service.getRegistry().registerComponentId(IslandPlayersMap.class, IslandPlayersMap.COMPONENT_ID);
-        service.getRegistry().registerComponentId(IslandBank.class, IslandBank.COMPONENT_ID);
+        service.getRegistry().registerComponentId(IslandInventory.class, IslandInventory.COMPONENT_ID);
         service.getRegistry().registerComponentId(IslandVault.class, IslandVault.COMPONENT_ID);
 
         service.getRegistry().registerComponentId(IslandChat.class, IslandChat.COMPONENT_ID);

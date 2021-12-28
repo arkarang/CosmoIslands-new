@@ -50,9 +50,7 @@ public class MySQLPlayersMap implements IslandPlayersMap {
 
     @Override
     public CompletableFuture<Void> setOwner(IslandPlayer player) {
-        return getOwner().thenCompose(owner->{
-            return model.setRank(islandId, owner.getUniqueId(), MemberRank.MEMBER);
-        }).thenCompose(ignored->{
+        return getOwner().thenCompose(ignored->{
             return model.setOwner(islandId, player.getUniqueId());
         });
     }

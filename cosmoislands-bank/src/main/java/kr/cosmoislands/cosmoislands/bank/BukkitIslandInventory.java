@@ -3,16 +3,16 @@ package kr.cosmoislands.cosmoislands.bank;
 import com.google.common.cache.LoadingCache;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import kr.cosmoislands.cosmoislands.api.IslandComponent;
-import kr.cosmoislands.cosmoislands.api.bank.IslandBank;
+import kr.cosmoislands.cosmoislands.api.bank.IslandInventory;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import kr.cosmoislands.cosmoislands.core.utils.Cached;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
-public class BukkitIslandInventory implements IslandBank  {
+public class BukkitIslandInventory implements IslandInventory {
 
     private final int islandId;
     private final BukkitExecutor executor;
@@ -29,11 +29,7 @@ public class BukkitIslandInventory implements IslandBank  {
         this.executor = executor;
         this.model = model;
         this.cachedLevel = new Cached<>(initialView.level, ()-> {
-            try {
-                return cache.get(islandId);
-            } catch (ExecutionException e) {
-                return CompletableFuture.completedFuture(initialView.level);
-            }
+            return model.getLevel(islandId);
         });
         this.gui = new BankChestGUI(this, initialView, executor);
     }
@@ -61,6 +57,8 @@ public class BukkitIslandInventory implements IslandBank  {
 
     @Override
     public CompletableFuture<Void> setLevel(int level) {
+        DebugLogger.log("set level: level");
+        cachedLevel.set(level);
         return model.setLevel(islandId, level);
     }
 
@@ -72,6 +70,7 @@ public class BukkitIslandInventory implements IslandBank  {
     @Override
     public CompletableFuture<Void> openInventory(UUID uuid) {
         return executor.sync(()->{
+            DebugLogger.log("open inventory: level: "+getCachedLevel());
             Player player = Bukkit.getPlayer(uuid);
             if(player != null)
                 gui.openGUI(player);

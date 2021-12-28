@@ -43,7 +43,6 @@ public class CosmoIslandGarbageCollector implements IslandGarbageCollector {
         return false;
     }
 
-
     @Override
     public void invalidate(Island island) {
         service.unloadIsland(island.getId());

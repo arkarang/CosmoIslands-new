@@ -3,6 +3,7 @@ package kr.cosmoislands.cosmoislands.bank;
 import com.minepalm.arkarangutils.bukkit1_16.v1_16InventorySerializer;
 import kr.cosmoislands.cosmoislands.api.IslandDataModel;
 import kr.cosmoislands.cosmoislands.core.Database;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.inventory.ItemStack;
 
@@ -107,19 +108,26 @@ public class IslandInventoryDataModel implements IslandDataModel {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return new IslandInventoryView(rs.getInt(1), deserialize(rs.getString(1)));
-            }else
-                return new IslandInventoryView(0, new ArrayList<>());
+                String serializedData = rs.getString(2);
+                List<ItemStack> list;
+                if(serializedData == null || serializedData.equals("")){
+                    list = new ArrayList<>();
+                }else{
+                    list = deserialize(serializedData);
+                }
+                return new IslandInventoryView(rs.getInt(1), list);
+            }else {
+                return new IslandInventoryView(1, new ArrayList<>());
+            }
         });
     }
 
     public static List<ItemStack> deserialize(String base64){
         try {
             return Arrays.asList(v1_16InventorySerializer.itemStackArrayFromBase64(base64));
-        }catch (IOException ignored){
-
+        }catch (IOException ex){
+            return new ArrayList<>();
         }
-        return new ArrayList<>();
     }
 
     public static String serialize(List<ItemStack> list){

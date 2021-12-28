@@ -70,12 +70,12 @@ public class MySQLIslandWorldDataModel implements IslandDataModel {
         return setValue(islandId, "minZ", value);
     }
 
-    CompletableFuture<Integer> getLength(int islandId){
-        return sub(islandId, "maxX", "minX");
+    CompletableFuture<Integer> getLength(int islandId, int defaultValue){
+        return sub(islandId, "maxX", "minX", defaultValue);
     }
 
-    CompletableFuture<Integer> getWeight(int islandId){
-        return sub(islandId, "maxZ", "minZ");
+    CompletableFuture<Integer> getWeight(int islandId, int defaultValue){
+        return sub(islandId, "maxZ", "minZ", defaultValue);
     }
 
     CompletableFuture<Integer> getValue(int islandId, String key){
@@ -102,47 +102,63 @@ public class MySQLIslandWorldDataModel implements IslandDataModel {
 			FROM test t WHERE `key`='key1'
 		) q
      */
-    CompletableFuture<Integer> add(int islandId, String key1, String key2){
+    CompletableFuture<Integer> add(int islandId, String key1, String key2, int defaultValue){
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement(
-                    "SELECT "+
-                        "a + b AS total "+
-                    "FROM "+
-                        "(SELECT " +
-                                "(SELECT `value` FROM `test` WHERE `key`=?) as a, "+
-                                "(SELECT `value` FROM `test` WHERE `key`=?) as b "+
-                            "FROM "+table+" WHERE `key`=? AND `island_id`=?) q");
-            ps.setString(1, key1);
-            ps.setString(2, key2);
-            ps.setString(3, key1);
-            ps.setInt(4, islandId);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                return rs.getInt(1);
-            }else
-                return 0;
+            PreparedStatement hasKey1 = connection.prepareStatement("SELECT `key` FROM "+table+" WHERE `key`=?");
+            PreparedStatement hasKey2 = connection.prepareStatement("SELECT `key` FROM "+table+" WHERE `key`=?");
+            hasKey1.setString(1, key1);
+            hasKey2.setString(1, key2);
+            ResultSet hasKey1ResultSet = hasKey1.executeQuery();
+            ResultSet hasKey2ResultSet = hasKey2.executeQuery();
+            if(hasKey1ResultSet.next() && hasKey2ResultSet.next()){
+                PreparedStatement ps = connection.prepareStatement(
+                        "SELECT "+
+                                "a + b AS total "+
+                                "FROM "+
+                                "(SELECT " +
+                                "(SELECT `value` FROM "+table+" WHERE `key`=?) as a, "+
+                                "(SELECT `value` FROM "+table+" WHERE `key`=?) as b "+
+                                "FROM "+table+" WHERE `key`=? AND `island_id`=?) q");
+                ps.setString(1, key1);
+                ps.setString(2, key2);
+                ps.setString(3, key1);
+                ps.setInt(4, islandId);
+                ResultSet rs = ps.executeQuery();
+                if(rs.next()){
+                    return rs.getInt(1);
+                }
+            }
+            return defaultValue;
         });
     }
 
-    CompletableFuture<Integer> sub(int islandId, String key1, String key2){
+    CompletableFuture<Integer> sub(int islandId, String key1, String key2, int defaultValue){
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement(
-                    "SELECT "+
-                        "a - b AS total "+
-                    "FROM "+
-                        "(SELECT " +
-                            "(SELECT `value` FROM `test` WHERE `key`=?) as a, "+
-                            "(SELECT `value` FROM `test` WHERE `key`=?) as b "+
-                        "FROM "+table+" WHERE `key`=? AND `island_id`=?) q");
-            ps.setString(1, key1);
-            ps.setString(2, key2);
-            ps.setString(3, key1);
-            ps.setInt(4, islandId);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                return rs.getInt(1);
-            }else
-                return 0;
+            PreparedStatement hasKey1 = connection.prepareStatement("SELECT `key` FROM "+table+" WHERE `key`=?");
+            PreparedStatement hasKey2 = connection.prepareStatement("SELECT `key` FROM "+table+" WHERE `key`=?");
+            hasKey1.setString(1, key1);
+            hasKey2.setString(1, key2);
+            ResultSet hasKey1ResultSet = hasKey1.executeQuery();
+            ResultSet hasKey2ResultSet = hasKey2.executeQuery();
+            if(hasKey1ResultSet.next() && hasKey2ResultSet.next()){
+                PreparedStatement ps = connection.prepareStatement(
+                        "SELECT "+
+                                "a - b AS total "+
+                                "FROM "+
+                                "(SELECT " +
+                                "(SELECT `value` FROM "+table+" WHERE `key`=?) as a, "+
+                                "(SELECT `value` FROM "+table+" WHERE `key`=?) as b "+
+                                "FROM "+table+" WHERE `key`=? AND `island_id`=?) q");
+                ps.setString(1, key1);
+                ps.setString(2, key2);
+                ps.setString(3, key1);
+                ps.setInt(4, islandId);
+                ResultSet rs = ps.executeQuery();
+                if(rs.next()){
+                    return rs.getInt(1);
+                }
+            }
+            return defaultValue;
         });
     }
 
@@ -153,6 +169,8 @@ public class MySQLIslandWorldDataModel implements IslandDataModel {
             ps.setString(2, key);
             ps.setInt(3, value);
             ps.setString(4, key);
+            ps.setInt(5, value);
+            ps.execute();
             return null;
         });
     }
