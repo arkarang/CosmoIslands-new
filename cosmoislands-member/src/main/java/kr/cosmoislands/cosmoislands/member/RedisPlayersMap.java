@@ -144,17 +144,20 @@ public class RedisPlayersMap implements IslandPlayersMap {
     }
 
     @Override
-    public CompletableFuture<Void> removeIntern(UUID uuid) {
+    public CompletableFuture<Void> removeIntern(IslandPlayer player) {
+        UUID uuid = player.getUniqueId();
         return async.srem(internsKey, uuid.toString())
                 .thenRun(()->{})
                 .toCompletableFuture();
     }
 
     @Override
-    public CompletableFuture<Void> addIntern(UUID intern) {
-        return async.sadd(internsKey, intern.toString())
-                .thenRun(()->{})
-                .toCompletableFuture();
+    public CompletableFuture<Void> addIntern(IslandPlayer player) {
+        UUID uuid = player.getUniqueId();
+        return async.sadd(internsKey, uuid.toString())
+                .thenCompose(ignored -> {
+                    return player.getInternship().update();
+                }).toCompletableFuture();
     }
 
     @Override

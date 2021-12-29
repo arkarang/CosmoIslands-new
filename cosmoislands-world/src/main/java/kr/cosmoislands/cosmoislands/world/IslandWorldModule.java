@@ -15,15 +15,11 @@ import com.minepalm.manyworlds.core.database.MySQLDatabase;
 import kr.cosmoislands.cosmoislands.api.IslandModule;
 import kr.cosmoislands.cosmoislands.api.IslandService;
 import kr.cosmoislands.cosmoislands.api.world.IslandWorld;
+import kr.cosmoislands.cosmoislands.api.world.IslandWorldHandler;
+import kr.cosmoislands.cosmoislands.api.world.WorldHandlerFactory;
 import kr.cosmoislands.cosmoislands.api.world.WorldOperationRegistry;
 import kr.cosmoislands.cosmoislands.core.Database;
-import kr.cosmoislands.cosmoislands.core.thread.IslandThreadFactory;
-import kr.cosmoislands.cosmoislands.settings.IslandSettingsModule;
-import kr.cosmoislands.cosmoislands.world.minecraft.MinecraftWorldHandler;
-import kr.cosmoislands.cosmoislands.world.minecraft.MinecraftWorldHandlerBuilder;
-import kr.cosmoislands.cosmoislands.world.minecraft.MinecraftWorldHandlerInitializer;
 import lombok.Getter;
-import org.bukkit.Server;
 
 import java.util.Map;
 import java.util.Properties;
@@ -37,9 +33,9 @@ public class IslandWorldModule implements IslandModule<IslandWorld> {
     @Getter
     private final Logger logger;
     private final WorldService worldService;
+    @Getter
     private final WorldOperationRegistry operationRegistry;
-    private final MinecraftWorldHandlerBuilder builder;
-    private final IslandSettingsModule settingsModule;
+    private final WorldHandlerFactory handlerFactory;
     //Unsupported features.
     private final WorldHandlerController controller = null;
     private final MySQLIslandWorldDataModel model;
@@ -60,26 +56,22 @@ public class IslandWorldModule implements IslandModule<IslandWorld> {
                              Properties properties,
                              Map<String, Integer> defaultValues,
                              ThreadFactory threadFactory,
-                             MinecraftWorldHandlerBuilder builder,
-                             IslandSettingsModule settingsModule,
-                             BukkitExecutor executor,
+                             WorldHandlerFactory handlerFactory,
                              Logger logger){
         this.worldService = worldService;
         this.logger = logger;
-        this.builder = builder;
+        this.handlerFactory = handlerFactory;
         this.defaultValues = ImmutableMap.copyOf(defaultValues);
-        this.settingsModule = settingsModule;
         this.model = new MySQLIslandWorldDataModel("cosmoislands_world_data", "cosmoislands_islands", islandDatabase, this.defaultValues);
         MySQLDatabase manyWorldDatabase = new MySQLDatabase(properties, Executors.newFixedThreadPool(4, threadFactory));
         this.worldService.getLoadService().registerWorldFactory(WorldToken.get("ISLAND"), new SWMWorldFactory(this.worldService.getWorldRegistry()));
         this.worldService.getWorldRegistry().registerDatabase(new MySQLWorldDatabase(WorldToken.get("ISLAND"), "cosmoislands_worlds", manyWorldDatabase, logger));
         this.operationRegistry = new CosmoWorldOperationRegistry();
 
-        MinecraftWorldHandlerInitializer.init(operationRegistry, executor);
     }
 
     protected IslandManyWorld create(int islandId, ManyWorld world){
-        MinecraftWorldHandler worldHandler = builder.build(islandId, operationRegistry, settingsModule);
+        IslandWorldHandler worldHandler = handlerFactory.build(islandId, operationRegistry);
         return new IslandManyWorld(islandId, world, worldHandler, model, defaultValues);
     }
 

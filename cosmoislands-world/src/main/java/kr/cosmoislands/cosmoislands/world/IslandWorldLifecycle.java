@@ -10,8 +10,8 @@ import kr.cosmoislands.cosmoislands.api.ComponentLifecycle;
 import kr.cosmoislands.cosmoislands.api.IslandContext;
 import kr.cosmoislands.cosmoislands.api.ModulePriority;
 import kr.cosmoislands.cosmoislands.api.world.IslandWorld;
-import kr.cosmoislands.cosmoislands.world.minecraft.MinecraftWorldHandler;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -73,8 +73,11 @@ public class IslandWorldLifecycle implements ComponentLifecycle {
     @Override
     public CompletableFuture<Void> onDelete(IslandContext island) {
         if(island.isLocal()) {
+            val future = island.getComponent(IslandWorld.class).getWorldHandler().runOperation("kick-all");
             module.invalidate(island.getIslandId());
-            return service.unload(toInform(island)).thenRun(() -> {});
+            return future.thenCompose(ignored -> {
+                return service.unload(toInform(island)).thenRun(() -> {});
+            });
         }else{
             return CompletableFuture.completedFuture(null);
         }

@@ -6,6 +6,7 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
+import io.lettuce.core.api.async.RedisAsyncCommands;
 import kr.cosmoislands.cosmoislands.api.IslandService;
 import kr.cosmoislands.cosmoislands.api.member.MemberRank;
 import kr.cosmoislands.cosmoislands.core.DebugLogger;
@@ -17,8 +18,9 @@ import java.util.concurrent.CompletableFuture;
 
 public class GenericCommands {
 
-    public static void init(PaperCommandManager manager, IslandService service, BukkitExecutor executor){
-        manager.registerCommand(new User(service, executor));
+    public static void init(PaperCommandManager manager, IslandService service, RedisAsyncCommands<String, String> async, BukkitExecutor executor){
+        UserOperationCooldown cooldown = new UserOperationCooldown(async);
+        manager.registerCommand(new User(service, cooldown, executor));
     }
 
     @CommandAlias("섬")
@@ -26,6 +28,7 @@ public class GenericCommands {
     protected static class User extends BaseCommand {
 
         private final IslandService service;
+        private final UserOperationCooldown cooldown;
         private final BukkitExecutor executor;
 
         @Subcommand("도움말")
@@ -77,29 +80,37 @@ public class GenericCommands {
 
         @Subcommand("생성")
         public void create(Player player){
-            val execution = PlayerPreconditions
+            val canExecuteFuture = cooldown.canExecute(player, "create");
+            val hasIslandFuture = PlayerPreconditions
                     .of(player.getUniqueId())
-                    .hasIsland()
-                    .thenAccept(hasIsland->{
-                        if (hasIsland){
-                            player.sendMessage("당신은 이미 섬에 소속되어 있습니다.");
-                        }else {
-                            val innerExecution
-                                    = service.getCloud().getLeastLoadedServer(100).thenCompose(islandServer->{
-                                DebugLogger.log("create 1");
-                                return islandServer.create(player.getUniqueId()).thenAccept(island->{
-                                    if(island != null){
-                                        player.sendMessage("섬을 성공적으로 생성했습니다 !");
-                                    }else{
-                                        player.sendMessage("섬을 생성하는데 실패했습니다... 관리자에게 문의해주세요.");
-                                    }
-                                    DebugLogger.log("command create completed: "+System.currentTimeMillis());
-                                });
-                            });
-                            DebugLogger.handle("inner creation: ", innerExecution);
-                            DebugLogger.timeout("inner creation: ", innerExecution, 30000L);
-                        }
+                    .hasIsland();
+            val execution = hasIslandFuture.thenCombine(canExecuteFuture, (hasIsland, canExecute)->{
+                if (hasIsland){
+                    player.sendMessage("당신은 이미 섬에 소속되어 있습니다.");
+                    return null;
+                }
+
+                if(canExecute){
+                    cooldown.submit(player.getUniqueId(), "create");
+                    val innerExecution
+                            = service.getCloud().getLeastLoadedServer(100).thenCompose(islandServer->{
+                        DebugLogger.log("create 1");
+                        return islandServer.create(player.getUniqueId()).thenAccept(island->{
+                            if(island != null){
+                                player.sendMessage("섬을 성공적으로 생성했습니다 !");
+                            }else{
+                                player.sendMessage("섬을 생성하는데 실패했습니다... 관리자에게 문의해주세요.");
+                            }
+                            DebugLogger.log("command create completed: "+System.currentTimeMillis());
+                        });
                     });
+                    DebugLogger.handle("inner creation: ", innerExecution);
+                    DebugLogger.timeout("inner creation: ", innerExecution, 30000L);
+                } else{
+                    player.sendMessage("아직은 섬을 다시 생성할수 없어요. (쿨타임 10분)");
+                }
+                return null;
+            });
             DebugLogger.handle("create command", execution);
             DebugLogger.timeout("create command timeout", execution, 30000L);
         }
@@ -107,21 +118,26 @@ public class GenericCommands {
         @Subcommand("삭제")
         public void delete(Player player){
             PlayerPreconditions preconditions = PlayerPreconditions.of(player.getUniqueId());
+            val canExecuteFuture = cooldown.canExecute(player, "delete");
             preconditions.hasIsland()
-                    .thenCompose(hasIsland->{
+                    .thenCombine(canExecuteFuture, (hasIsland, canExecute)->{
                         if (!hasIsland){
                             player.sendMessage("당신은 섬에 소속되어 있지 않습니다..");
-                            return CompletableFuture.completedFuture(null);
-                        }else {
+                            return CompletableFuture.completedFuture((Boolean)null);
+                        }else if(!canExecute) {
+                            player.sendMessage("아직은 섬을 삭제할수 없어요. (쿨타임 10분)");
+                            return CompletableFuture.completedFuture((Boolean)null);
+                        } else{
                             return preconditions
                                     .hasRank(player.getUniqueId(), MemberRank.OWNER);
                         }
                     })
+                    .thenCompose(future -> future)
                     .thenApply(hasRank -> {
                         if(hasRank != null){
                             if(hasRank){
+                                cooldown.submit(player.getUniqueId(), "delete");
                                 return preconditions.getIsland().thenApply(island -> {
-                                    //todo: 섬 삭제시, 섬 내 유저 전체 fallback 서버로 이동
                                     val future = service.deleteIsland(island.getId());
                                     future.thenAccept(completed->{
                                         if(completed){

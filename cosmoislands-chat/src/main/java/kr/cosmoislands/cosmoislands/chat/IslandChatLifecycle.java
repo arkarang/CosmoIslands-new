@@ -50,10 +50,10 @@ public class IslandChatLifecycle implements ComponentLifecycle {
 
     @Override
     public CompletableFuture<Void> onDelete(IslandContext island) {
-        module.invalidate(island.getIslandId());
         IslandChat islandChat = island.getComponent(IslandChat.class);
         val future1 = islandChat.invalidate();
         val future2 = islandChat.disband();
+        module.invalidate(island.getIslandId());
         return CompletableFuture.allOf(future1, future2);
     }
 }

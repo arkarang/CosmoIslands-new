@@ -6,6 +6,7 @@ import kr.cosmoislands.cosmoislands.api.protection.IslandPermissions;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeSettings;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -46,8 +47,8 @@ public abstract class AbstractMySQLIslandConfiguration implements IslandConfigur
         val future3 = this.setDefaultWorldBorder(configuration.getDefaultWorldBorder());
         val future4 = this.setLevelLoreKey(configuration.getLevelLore());
         val future5 = this.setLevelLorePattern(configuration.getLevelLorePattern().pattern());
-        val future6 = this.setDefaultSettings(configuration.getDefaultSettings());
-        val future7 = this.setManyWorldsProperties(configuration.getManyWorldsProperties());
+        val future6 = this.setManyWorldsProperties(configuration.getManyWorldsProperties());
+        val future7 = this.setDefaultPermissions(configuration.getDefaultPermissions());
         return CompletableFuture.allOf(future1, future2, future3, future4, future4, future5, future6, future7);
     }
     
@@ -94,7 +95,7 @@ public abstract class AbstractMySQLIslandConfiguration implements IslandConfigur
         Map<String, String> map = model.getValuesLike(permissionsPrefix);
         Map<IslandPermissions, MemberRank> result = new HashMap<>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            String key = entry.getKey().replace(settingsPrefix, "");
+            String key = entry.getKey().replace(permissionsPrefix, "");
             String value = entry.getValue();
             try {
                 IslandPermissions setting = IslandPermissions.valueOf(key);
@@ -104,6 +105,7 @@ public abstract class AbstractMySQLIslandConfiguration implements IslandConfigur
 
             }
         }
+        DebugLogger.log("getDefaultPermissions: "+map.size());
         return result;
     }
 
@@ -113,7 +115,7 @@ public abstract class AbstractMySQLIslandConfiguration implements IslandConfigur
             List<CompletableFuture<?>> futures = new ArrayList<>();
             for (Map.Entry<IslandPermissions, MemberRank> entry : map.entrySet()) {
                 val future = CompletableFuture.runAsync(() -> {
-                    model.setValue(worldBorderPrefix+entry.getKey().name(), entry.getValue().name()+"");
+                    model.setValue(permissionsPrefix+entry.getKey().name(), entry.getValue().name()+"");
                 }, service);
                 futures.add(future);
             }

@@ -5,6 +5,7 @@ import kr.cosmoislands.cosmochat.core.api.ChatPlayer;
 import kr.cosmoislands.cosmochat.privatechat.PrivateChat;
 import kr.cosmoislands.cosmoislands.api.IslandComponent;
 import kr.cosmoislands.cosmoislands.api.chat.IslandChat;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

@@ -26,7 +26,7 @@ public class IslandThreadFactory implements ThreadFactory {
     public Thread newThread(Runnable r){
         count.addAndGet(1);
         DebugLogger.log("ThreadFactory: count: "+count.get());
-        return new Thread( group, r );
+        return new Thread(group, r, group.getName() + " Pool Thread #%1$d");
     }
 
     public static ThreadFactoryBuilder newFactory(String name){

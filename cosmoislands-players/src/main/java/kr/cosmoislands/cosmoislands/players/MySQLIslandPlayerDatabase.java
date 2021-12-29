@@ -1,6 +1,7 @@
 package kr.cosmoislands.cosmoislands.players;
 
 import kr.cosmoislands.cosmoislands.api.Island;
+import kr.cosmoislands.cosmoislands.api.member.MemberRank;
 import kr.msleague.mslibrary.database.impl.internal.MySQLDatabase;
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +35,7 @@ public class MySQLIslandPlayerDatabase {
 
     public CompletableFuture<Integer> get(UUID uuid){
         return database.executeAsync(connection -> {
-            PreparedStatement ps = connection.prepareStatement("SELECT `island_id` FROM "+table+" WHERE `uuid`=?");
+            PreparedStatement ps = connection.prepareStatement("SELECT `island_id` FROM "+table+" WHERE `uuid`=? AND `member_rank` > "+ MemberRank.INTERN.getPriority());
             ps.setString(1, uuid.toString());
             ResultSet rs = ps.executeQuery();
             int id = Island.NIL_ID;

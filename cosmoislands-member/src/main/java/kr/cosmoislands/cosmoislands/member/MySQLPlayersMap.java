@@ -50,9 +50,7 @@ public class MySQLPlayersMap implements IslandPlayersMap {
 
     @Override
     public CompletableFuture<Void> setOwner(IslandPlayer player) {
-        return getOwner().thenCompose(ignored->{
-            return model.setOwner(islandId, player.getUniqueId());
-        });
+        return model.setOwner(islandId, player.getUniqueId());
     }
 
     @Override
@@ -85,7 +83,7 @@ public class MySQLPlayersMap implements IslandPlayersMap {
         return model.getMembers(islandId).thenApply(map->{
             HashMap<UUID, MemberRank> filtered = new HashMap<>();
             map.forEach((key, value)->{
-                if(value.getPriority() >= MemberRank.INTERN.getPriority()){
+                if(value.getPriority() > MemberRank.INTERN.getPriority()){
                     filtered.put(key, value);
                 }
             });
@@ -94,13 +92,13 @@ public class MySQLPlayersMap implements IslandPlayersMap {
     }
 
     @Override
-    public CompletableFuture<Void> removeIntern(UUID uuid) {
-        return model.removeIntern(islandId, uuid);
+    public CompletableFuture<Void> removeIntern(IslandPlayer player) {
+        return model.removeIntern(islandId, player.getUniqueId());
     }
 
     @Override
-    public CompletableFuture<Void> addIntern(UUID uuid) {
-        return model.addIntern(islandId, uuid);
+    public CompletableFuture<Void> addIntern(IslandPlayer player) {
+        return model.addIntern(islandId, player.getUniqueId());
     }
 
     @Override

@@ -1,20 +1,22 @@
-package kr.cosmoislands.cosmoislands.world.minecraft;
+package kr.cosmoislands.cosmoislands.bukkit.world;
 
-import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSettingsMap;
+import kr.cosmoislands.cosmoislands.api.world.WorldHandlerFactory;
 import kr.cosmoislands.cosmoislands.api.world.WorldOperationRegistry;
 import kr.cosmoislands.cosmoislands.settings.IslandSettingsModule;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Server;
 
 @RequiredArgsConstructor
-public class MinecraftWorldHandlerBuilder {
+public class MinecraftWorldHandlerFactory implements WorldHandlerFactory {
 
     private final Server minecraftServer;
-    private final BukkitExecutor executor;
+    private final IslandSettingsModule module;
 
-    public MinecraftWorldHandler build(int islandId, WorldOperationRegistry operationRegistry, IslandSettingsModule module){
+    @Override
+    public MinecraftWorldHandler build(int islandId, WorldOperationRegistry operationRegistry){
         IslandSettingsMap settingsMap = module.get(islandId);
         return new MinecraftWorldHandler(islandId, settingsMap, minecraftServer, operationRegistry);
     }
+
 }

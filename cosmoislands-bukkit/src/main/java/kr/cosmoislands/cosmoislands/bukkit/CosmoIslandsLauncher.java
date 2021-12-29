@@ -6,6 +6,8 @@ import com.minepalm.helloplayer.core.HelloPlayers;
 import com.minepalm.manyworlds.bukkit.ManyWorlds;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.async.RedisAsyncCommands;
+import kr.cosmoislands.cosmoislands.bukkit.world.MinecraftWorldHandlerFactory;
+import kr.cosmoislands.cosmoislands.bukkit.world.MinecraftWorldHandlerInitializer;
 import kr.cosmoislands.cosmoislands.settings.IslandSettingsModule;
 import kr.cosmoislands.cosmochat.core.CosmoChat;
 import kr.cosmoislands.cosmochat.privatechat.CosmoChatPrivateChat;
@@ -42,10 +44,10 @@ import kr.cosmoislands.cosmoislands.protection.IslandProtectionModule;
 import kr.cosmoislands.cosmoislands.upgrade.IslandUpgradeModule;
 import kr.cosmoislands.cosmoislands.warp.IslandWarpModule;
 import kr.cosmoislands.cosmoislands.world.IslandWorldModule;
-import kr.cosmoislands.cosmoislands.world.minecraft.MinecraftWorldHandlerBuilder;
 import kr.cosmoislands.cosmoteleport.CosmoTeleport;
 import kr.msleague.mslibrary.database.impl.internal.MySQLDatabase;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Server;
 
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
@@ -70,6 +72,7 @@ public class CosmoIslandsLauncher {
         IslandPlayerRegistry playerRegistry = service.getPlayerRegistry();
         IslandCloud cloud = service.getCloud();
 
+        Server minecraftServer = repo.getRegisteredService(Server.class);
         HelloEveryone networkModule = repo.getRegisteredService(HelloEveryone.class);
         HelloPlayers playersModule = repo.getRegisteredService(HelloPlayers.class);
         CosmoChat cosmoChat = repo.getRegisteredService(CosmoChat.class);
@@ -77,7 +80,6 @@ public class CosmoIslandsLauncher {
         CosmoTeleport cosmoTeleport = repo.getRegisteredService(CosmoTeleport.class);
         ManyWorlds manyWorlds = repo.getRegisteredService(ManyWorlds.class);
         BukkitExecutor executor = repo.getRegisteredService(BukkitExecutor.class);
-        MinecraftWorldHandlerBuilder builder = repo.getRegisteredService(MinecraftWorldHandlerBuilder.class);
 
         IslandChatModule chatModule = new IslandChatModule(
                 cosmoChat,
@@ -87,13 +89,16 @@ public class CosmoIslandsLauncher {
                 async,
                 logger);
         IslandLevelModule levelModule = new IslandLevelModule(database, logger);
+
         IslandAchievementsModule achievementsModule = new IslandAchievementsModule(database, logger);
+
         IslandSettingsModule settingsModule = new IslandSettingsModule(
                 database,
                 cloud,
                 async,
                 configuration.getDefaultSettings(),
                 logger);
+
         IslandPlayersMapModule playersMapModule = new PlayersMapModule(
                 islandRegistry,
                 playerRegistry,
@@ -103,20 +108,26 @@ public class CosmoIslandsLauncher {
                 logger);
 
         IslandPointsModule pointsModule = new IslandPointsModule(database, logger);
+
         IslandPermissionsMapModule permissionsModule = new IslandPermissionsMapModule(
                 configuration.getDefaultPermissions(),
                 logger);
+
         IslandProtectionModule protectionModule = new IslandProtectionModule(
                 permissionsModule,
                 playersMapModule,
                 settingsModule,
+                islandRegistry,
                 playerRegistry,
                 cloud,
                 logger);
+
         IslandUpgradeModule upgradeModule = new IslandUpgradeModule(
                 islandRegistry,
                 database,
                 logger);
+
+        MinecraftWorldHandlerFactory builder = new MinecraftWorldHandlerFactory(minecraftServer, settingsModule);
         IslandWorldModule worldModule = new IslandWorldModule(
                 manyWorlds,
                 database,
@@ -124,12 +135,14 @@ public class CosmoIslandsLauncher {
                 configuration.getDefaultWorldBorder(),
                 service.getThreadFactory(),
                 builder,
-                settingsModule,
-                executor,
                 logger);
 
+        MinecraftWorldHandlerInitializer.init(playerRegistry, worldModule.getOperationRegistry(), cosmoTeleport, executor);
+
         IslandInventoryModule bankModule = new IslandInventoryModule(database, executor, logger);
+
         IslandVaultModule vaultModule = new IslandVaultModule(database, logger);
+
         IslandWarpModule warpModule = new IslandWarpModule(database, islandRegistry, playerRegistry, cosmoTeleport, settingsModule, logger);
 
         service.registerModule(IslandWorld.class, worldModule);

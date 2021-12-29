@@ -3,7 +3,6 @@ package kr.cosmoislands.cosmoislands.world;
 import kr.cosmoislands.cosmoislands.api.world.IslandWorldHandler;
 import kr.cosmoislands.cosmoislands.api.world.WorldOperation;
 import kr.cosmoislands.cosmoislands.api.world.WorldOperationRegistry;
-import kr.cosmoislands.cosmoislands.world.minecraft.MinecraftWorldHandler;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +33,11 @@ public class CosmoWorldOperationRegistry implements WorldOperationRegistry {
 
     CosmoWorldOperationRegistry(){
         this.map = new ConcurrentHashMap<>();
-        this.map.put(MinecraftWorldHandler.class, new OperationsMap<>());
+    }
+
+    @Override
+    public <T extends IslandWorldHandler> void registerType(Class<T> clazz) {
+        this.map.put(clazz, new OperationsMap<>());
     }
 
     @Override

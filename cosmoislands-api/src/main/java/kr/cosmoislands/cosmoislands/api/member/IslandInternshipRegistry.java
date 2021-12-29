@@ -11,4 +11,8 @@ public interface IslandInternshipRegistry {
     CompletableFuture<List<Integer>> getHiredIslandIds(UUID uuid);
 
     CompletableFuture<Integer> getMaxInternships(UUID uuid);
+
+    CompletableFuture<Void> update(UUID uuid);
+
+    CompletableFuture<Void> unload(UUID uuid);
 }

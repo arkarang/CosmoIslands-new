@@ -1,4 +1,4 @@
-package kr.cosmoislands.cosmoislands.world.minecraft;
+package kr.cosmoislands.cosmoislands.bukkit.world;
 
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSetting;
@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
-public class MinecraftChangeWeatherOperation implements WorldOperation<MinecraftWorldHandler> {
+public class MinecraftSetTimeOperation implements WorldOperation<MinecraftWorldHandler> {
 
     @Getter
     private final BukkitExecutor executor;
@@ -20,12 +20,12 @@ public class MinecraftChangeWeatherOperation implements WorldOperation<Minecraft
     @Override
     public CompletableFuture<Boolean> execute(MinecraftWorldHandler handler, IslandSettingsMap settingsMap) {
         Optional<World> optional = handler.world();
-        return settingsMap.getSettingAsync(IslandSetting.SUNNY).thenApply(value->{
+        return settingsMap.getSettingAsync(IslandSetting.TIME).thenApply(value->{
             try{
-                boolean sunny = Boolean.parseBoolean(value);
+                int time = Integer.parseInt(value);
                 if(optional.isPresent()){
                     World world = optional.get();
-                    executor.sync(()->world.setStorm(!sunny));
+                    executor.sync(()->world.setTime(time));
                 }
                 return optional.isPresent();
             }catch (IllegalArgumentException e){

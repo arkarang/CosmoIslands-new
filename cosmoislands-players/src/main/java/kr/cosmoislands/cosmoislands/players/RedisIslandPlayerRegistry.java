@@ -10,7 +10,7 @@ import kr.cosmoislands.cosmoislands.api.member.IslandInternship;
 import kr.cosmoislands.cosmoislands.api.member.IslandInternshipRegistry;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayer;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
-import kr.cosmoislands.cosmoislands.players.internship.RedisIslandInternshipRegistry;
+import kr.cosmoislands.cosmoislands.players.internship.CosmoIslandInternshipRegistry;
 import kr.msleague.mslibrary.database.impl.internal.MySQLDatabase;
 import lombok.RequiredArgsConstructor;
 
@@ -33,8 +33,8 @@ public class RedisIslandPlayerRegistry implements IslandPlayerRegistry {
                                                   MySQLDatabase database,
                                                   RedisAsyncCommands<String, String> async,
                                                   IslandRegistry islandRegistry){
-        RedisIslandInternshipRegistry internshipRegistry
-                = RedisIslandInternshipRegistry.build(playersTable, islandsTable, database, async, islandRegistry);
+        CosmoIslandInternshipRegistry internshipRegistry
+                = CosmoIslandInternshipRegistry.build(playersTable, islandsTable, database, async, islandRegistry);
         MySQLIslandPlayerDatabase playerDatabase = new MySQLIslandPlayerDatabase(database, playersTable, islandsTable);
         playerDatabase.init();
         return new RedisIslandPlayerRegistry(islandRegistry, internshipRegistry, playerDatabase, async);

@@ -47,6 +47,8 @@ public class CosmoIslands implements IslandService {
                          RedisClient client,
                          MySQLDatabase msMySQLDatabase,
                          Logger logger) throws ExecutionException, InterruptedException {
+
+        //todo: redis connection 정리하기
         StatefulRedisConnection<String, String> connection = client.connect();
         RedisAsyncCommands<String, String> async = connection.async();
         this.externalRepository = new CosmoExternalRepository();

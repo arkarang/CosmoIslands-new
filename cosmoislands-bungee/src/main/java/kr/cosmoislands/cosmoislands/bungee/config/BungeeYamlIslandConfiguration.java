@@ -8,6 +8,7 @@ import kr.cosmoislands.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeSettings;
 import kr.cosmoislands.cosmoislands.api.upgrade.IslandUpgradeType;
 import kr.cosmoislands.cosmoislands.bungee.CosmoIslandsBungee;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import kr.cosmoislands.cosmoislands.upgrade.UpgradeSettingImpl;
 import net.md_5.bungee.config.Configuration;
 
@@ -85,6 +86,7 @@ public class BungeeYamlIslandConfiguration extends BungeeConfig implements Islan
                 map.put(permission, rank);
             }
         }
+        DebugLogger.log("settings size : "+map.size());
         validateDefaultPermissions(map);
         return map;
     }

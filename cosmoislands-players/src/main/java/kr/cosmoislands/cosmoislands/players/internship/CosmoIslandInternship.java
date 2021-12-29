@@ -33,6 +33,12 @@ public class CosmoIslandInternship implements IslandInternship {
                 .thenCompose(this::reMap);
     }
 
+    @Override
+    public CompletableFuture<Void> update() {
+        return internshipRegistry.update(uniqueId);
+    }
+
+
     private CompletableFuture<List<Island>> reMap(List<Integer> list){
         List<Island> result = new ArrayList<>();
         List<CompletableFuture<?>> islandFutures = new ArrayList<>();

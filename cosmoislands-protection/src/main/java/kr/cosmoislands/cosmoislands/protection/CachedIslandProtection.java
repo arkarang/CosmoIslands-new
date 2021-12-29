@@ -2,6 +2,7 @@ package kr.cosmoislands.cosmoislands.protection;
 
 import com.google.common.collect.ImmutableMap;
 import kr.cosmoislands.cosmoislands.api.IslandComponent;
+import kr.cosmoislands.cosmoislands.api.IslandRegistry;
 import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMap;
 import kr.cosmoislands.cosmoislands.api.member.MemberRank;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
@@ -10,6 +11,7 @@ import kr.cosmoislands.cosmoislands.api.protection.IslandPermissionsMap;
 import kr.cosmoislands.cosmoislands.api.protection.IslandProtection;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSetting;
 import kr.cosmoislands.cosmoislands.api.settings.IslandSettingsMap;
+import kr.cosmoislands.cosmoislands.api.world.IslandWorld;
 import kr.cosmoislands.cosmoislands.core.utils.Cached;
 import lombok.val;
 
@@ -27,6 +29,7 @@ public class CachedIslandProtection implements IslandProtection {
     protected final IslandPermissionsMap permissionsMap;
     protected final IslandPlayersMap playersMap;
     protected final IslandSettingsMap settingsMap;
+    protected final IslandRegistry islandRegistry;
     protected final IslandPlayerRegistry playerRegistry;
     protected final ConcurrentHashMap<IslandPermissions, MemberRank> permissionsCache = new ConcurrentHashMap<>();
     protected final ConcurrentHashMap<UUID, Cached<MemberRank>> cachedMap = new ConcurrentHashMap<>();
@@ -35,9 +38,11 @@ public class CachedIslandProtection implements IslandProtection {
                                   IslandPermissionsMap permissionsMap,
                                   IslandPlayersMap playersMap,
                                   IslandSettingsMap settingsMap,
+                                  IslandRegistry islandRegistry,
                                   IslandPlayerRegistry playerRegistry,
                                   ImmutableMap<IslandPermissions, MemberRank> defaultValues){
         this.islandId = islandId;
+        this.islandRegistry = islandRegistry;
         this.permissionsMap = permissionsMap;
         this.settingsMap = settingsMap;
         this.defaultValues = defaultValues;
@@ -52,7 +57,22 @@ public class CachedIslandProtection implements IslandProtection {
 
     @Override
     public CompletableFuture<Void> setPrivate(boolean b) {
-        return this.settingsMap.setSetting(IslandSetting.PRIVATE, Boolean.toString(b));
+        CompletableFuture<Void> kickGuest;
+        if(b) {
+            kickGuest = islandRegistry.getIsland(islandId).thenCompose(island -> {
+                if (island != null) {
+                    IslandWorld world = island.getComponent(IslandWorld.class);
+                    if (world != null) {
+                        return world.getWorldHandler().runOperation("kick-guest").thenRun(()->{});
+                    }
+                }
+                return CompletableFuture.completedFuture(null);
+            });
+        }else{
+            kickGuest = CompletableFuture.completedFuture(null);
+        }
+        val setValue = this.settingsMap.setSetting(IslandSetting.PRIVATE, Boolean.toString(b));
+        return CompletableFuture.allOf(kickGuest, setValue);
     }
 
     @Override

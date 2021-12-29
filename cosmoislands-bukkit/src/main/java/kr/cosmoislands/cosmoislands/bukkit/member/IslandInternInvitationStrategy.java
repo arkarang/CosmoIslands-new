@@ -10,6 +10,8 @@ import kr.cosmoislands.cosmoislands.api.chat.IslandChat;
 import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMap;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayer;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
+import lombok.val;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -45,24 +47,36 @@ public class IslandInternInvitationStrategy extends InvitationExecuteStrategy {
 
     @Override
     public void onAccept(Invitation invitation) throws InvitationTimeoutException {
+        DebugLogger.log("intern invitation accept 1");
+
         CompletableFuture<String> usernameFuture = players.getUsername(invitation.getReceived());
         IslandPlayer islandPlayer = playerRegistry.get(invitation.getIssuer());
 
-        islandPlayer.getIsland().thenAccept(island->{
+        val future2 = islandPlayer.getIsland().thenAccept(island->{
+            DebugLogger.log("intern invitation accept 2");
             IslandPlayersMap playersMap = island.getComponent(IslandPlayersMap.class);
             IslandChat chat = island.getComponent(IslandChat.class);
 
-            playersMap.getOwner().thenAccept(owner->{
+            val future1 = playersMap.getOwner().thenAccept(owner->{
+                DebugLogger.log("intern invitation accept 3");
                 if(owner.getUniqueId().equals(invitation.getIssuer())){
+                    IslandPlayer receivedIslandPlayer = playerRegistry.get(invitation.getReceived());
                     //todo: 알바 최대 가입 횟수 체크하기
-                    playersMap.addIntern(invitation.getReceived()).thenRun(()->{
+                    DebugLogger.log("intern invitation accept 4");
+                    val future = playersMap.addIntern(receivedIslandPlayer).thenRun(()->{
+                        helper.system(invitation.getReceived()).send("알바 초대를 수락했습니다.");
+                        DebugLogger.log("intern invitation accept 6");
                         usernameFuture.thenAccept(username->{
+                            DebugLogger.log("intern invitation accept 5");
                             chat.sendSystem(username + "님이 새로운 섬 알바원이 되었습니다.");
                         });
                     });
+                    DebugLogger.handle("future", future);
                 }
             });
+            DebugLogger.handle("future1", future1);
         });
+        DebugLogger.handle("future2", future2);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.minepalm.hellobungee.api.HelloEveryone;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import kr.cosmoislands.cosmoislands.api.*;
 import lombok.Getter;
+import lombok.val;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -107,9 +108,7 @@ public class CosmoIslandCloud implements IslandCloud {
 
     @Override
     public CompletableFuture<Boolean> isOnline(String serverName) {
-        return async.hexists(onlineKey, serverName)
-                .thenApply(Objects::nonNull)
-                .toCompletableFuture();
+        return async.hexists(onlineKey, serverName).toCompletableFuture();
     }
 
     private CompletableFuture<Void> offlineServer(String serverName){
@@ -144,12 +143,17 @@ public class CosmoIslandCloud implements IslandCloud {
         return serverRegistration.getRegisteredServers(IslandServer.Type.ISLAND).thenCompose(list->{
             List<CompletableFuture<?>> futures = new ArrayList<>();
             for (String serverName : list) {
-                DebugLogger.log("islandcloud: found online island server: "+list.size());
-                IslandServer server = servers.get(serverName);
+                IslandServer server = this.servers.get(serverName);
                 if(server != null){
-                    CompletableFuture<?> future = server.getLoadedCount().thenAccept(count -> {
-                        DebugLogger.log("islandcloud: serverName: "+serverName+", count: "+count);
-                        counts.put(serverName, count);
+                    val future = server.isOnline().thenCompose(isOnline -> {
+                        if(isOnline){
+                            return server.getLoadedCount().thenAccept(count -> {
+                                DebugLogger.log("islandcloud: serverName: "+serverName+", count: "+count);
+                                counts.put(serverName, count);
+                            });
+                        }else{
+                            return CompletableFuture.completedFuture(null);
+                        }
                     });
                     futures.add(future);
                 }
@@ -159,6 +163,7 @@ public class CosmoIslandCloud implements IslandCloud {
                 String serverName = null;
                 int min = maximumLoaded;
                 for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+                    DebugLogger.log("islandcloud: found online island server: "+counts.size());
                     if(entry.getValue() < min){
                         min = entry.getValue();
                         serverName = entry.getKey();

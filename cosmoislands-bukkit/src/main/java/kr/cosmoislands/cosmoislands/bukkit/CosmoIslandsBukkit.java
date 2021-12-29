@@ -35,13 +35,13 @@ import kr.cosmoislands.cosmoislands.bukkit.settings.SettingsCommands;
 import kr.cosmoislands.cosmoislands.bukkit.upgrade.UpgradeCommands;
 import kr.cosmoislands.cosmoislands.bukkit.utils.IslandIcon;
 import kr.cosmoislands.cosmoislands.bukkit.warp.IslandWarpCommands;
+import kr.cosmoislands.cosmoislands.bukkit.world.MinecraftWorldHandlerFactory;
 import kr.cosmoislands.cosmoislands.core.CosmoIslands;
 import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import kr.cosmoislands.cosmoislands.core.HelloBungeeInitializer;
 import kr.cosmoislands.cosmoislands.core.config.AbstractMySQLIslandConfiguration;
 import kr.cosmoislands.cosmoislands.core.config.MySQLPropertyDataModel;
 import kr.cosmoislands.cosmoislands.warp.IslandWarpModule;
-import kr.cosmoislands.cosmoislands.world.minecraft.MinecraftWorldHandlerBuilder;
 import kr.cosmoislands.cosmoredis.CosmoDataSource;
 import kr.cosmoislands.cosmoteleport.CosmoTeleport;
 import kr.cosmoislands.cosmoteleport.bukkit.CosmoTeleportBukkit;
@@ -99,6 +99,7 @@ public class CosmoIslandsBukkit extends JavaPlugin {
             HelloBungeeInitializer.init(networkModule, cosmoIslands);
             CosmoIslandsLauncher launcher = new CosmoIslandsLauncher(cosmoIslands, redis, msLibMySQLDatabase, this.getLogger());
 
+            launcher.registerExternalDependency(Server.class, Bukkit.getServer());
             launcher.registerExternalDependency(HelloEveryone.class, networkModule);
             launcher.registerExternalDependency(HelloPlayers.class, playersModule);
             launcher.registerExternalDependency(CosmoChat.class, cosmoChat);
@@ -107,7 +108,6 @@ public class CosmoIslandsBukkit extends JavaPlugin {
             launcher.registerExternalDependency(ManyWorlds.class, manyWorlds);
             launcher.registerExternalDependency(BukkitExecutor.class, executor);
             launcher.registerExternalDependency(Economy.class, economy);
-            launcher.registerExternalDependency(MinecraftWorldHandlerBuilder.class, new MinecraftWorldHandlerBuilder(Bukkit.getServer(), executor));
 
             launcher.initializeModules(islandConfig);
             launcher.launch();
@@ -137,9 +137,14 @@ public class CosmoIslandsBukkit extends JavaPlugin {
         PaperCommandManager manager = new PaperCommandManager(this);
         ExternalRepository repo = islands.getExternalRepository();
 
+        //todo: redis connection 정리하기
         StatefulRedisConnection<String, String> connection = client.connect();
-        connection.setTimeout(Duration.ofMillis(30000L));
+
         RedisAsyncCommands<String, String> timeoutAsync = connection.async();
+        timeoutAsync.setTimeout(Duration.ofMillis(30000L));
+
+        RedisAsyncCommands<String, String> async2 = connection.async();
+        async2.setTimeout(Duration.ofMillis(1000L*60L*10L));
 
         HelloEveryone networkModule = repo.getRegisteredService(HelloEveryone.class);
         HelloPlayers playersModule = repo.getRegisteredService(HelloPlayers.class);
@@ -163,11 +168,11 @@ public class CosmoIslandsBukkit extends JavaPlugin {
         MemberCommands.init(manager, islands, playersModule, memberInvitation, internInvitation, helper, executor);
 
         PointsCommands.init(manager, islands, playersModule, executor);
-        ProtectionCommands.init(manager, cosmoTeleport);
+        ProtectionCommands.init(manager);
         SettingsCommands.init(manager, executor);
         UpgradeCommands.init(manager, executor);
         IslandWarpCommands.init(manager, islands, (IslandWarpModule) islands.getModule(IslandWarpsMap.class), executor);
-        GenericCommands.init(manager, islands, executor);
+        GenericCommands.init(manager, islands, async2, executor);
 
         manager.registerCommand(new TestCommands(islands, helper, executor));
     }

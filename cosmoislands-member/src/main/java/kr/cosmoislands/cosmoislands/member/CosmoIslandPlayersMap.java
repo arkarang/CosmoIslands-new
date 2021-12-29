@@ -152,10 +152,12 @@ public class CosmoIslandPlayersMap implements IslandPlayersMap {
     }
 
     @Override
-    public CompletableFuture<Void> removeIntern(UUID uuid) {
-        CompletableFuture<Void> redisFuture = redis.removeIntern(uuid);
-        CompletableFuture<Void> mysqlFuture = mysql.removeIntern(uuid);
+    public CompletableFuture<Void> removeIntern(IslandPlayer player) {
+        UUID uuid = player.getUniqueId();
+        CompletableFuture<Void> redisFuture = redis.removeIntern(player);
+        CompletableFuture<Void> mysqlFuture = mysql.removeIntern(player);
         return CompletableFuture.allOf(redisFuture, mysqlFuture)
+                .thenCompose(ignored -> player.getInternship().update())
                 .thenCompose(ignored->islandRegistry.getIsland(islandId))
                 .thenAccept(island->{
                     strategies.values().forEach(strategy -> strategy.onInternRemove(island, uuid));
@@ -163,13 +165,15 @@ public class CosmoIslandPlayersMap implements IslandPlayersMap {
     }
 
     @Override
-    public CompletableFuture<Void> addIntern(UUID intern) {
-        CompletableFuture<Void> redisFuture = redis.addIntern(intern);
-        CompletableFuture<Void> mysqlFuture = mysql.addIntern(intern);
+    public CompletableFuture<Void> addIntern(IslandPlayer player) {
+        UUID uuid = player.getUniqueId();
+        CompletableFuture<Void> redisFuture = redis.addIntern(player);
+        CompletableFuture<Void> mysqlFuture = mysql.addIntern(player);
         return CompletableFuture.allOf(redisFuture, mysqlFuture)
+                .thenCompose(ignored -> player.getInternship().update())
                 .thenCompose(ignored->islandRegistry.getIsland(islandId))
                 .thenAccept(island->{
-                    strategies.values().forEach(strategy -> strategy.onInternAdd(island, intern));
+                    strategies.values().forEach(strategy -> strategy.onInternAdd(island, uuid));
                 });
     }
 

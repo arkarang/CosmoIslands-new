@@ -1,6 +1,7 @@
 package kr.cosmoislands.cosmoislands.protection;
 
 import com.google.common.collect.ImmutableMap;
+import kr.cosmoislands.cosmoislands.api.IslandRegistry;
 import kr.cosmoislands.cosmoislands.settings.IslandSettingsModule;
 import kr.cosmoislands.cosmoislands.api.IslandCloud;
 import kr.cosmoislands.cosmoislands.api.IslandModule;
@@ -30,6 +31,7 @@ public class IslandProtectionModule implements IslandModule<IslandProtection> {
     final IslandPermissionsMapModule permissionsMapModule;
     final IslandPlayersMapModule playersMapModule;
     final IslandSettingsModule settingsModule;
+    final IslandRegistry islandRegistry;
     final IslandPlayerRegistry playerRegistry;
     final IslandCloud cloud;
     @Getter(AccessLevel.PUBLIC)
@@ -43,7 +45,7 @@ public class IslandProtectionModule implements IslandModule<IslandProtection> {
         IslandPermissionsMap permissionsMap = permissionsMapModule.get(islandId);
         ImmutableMap<IslandPermissions, MemberRank> defaultValues = permissionsMapModule.getDefaultValues();
         IslandSettingsMap settingsMap = settingsModule.get(islandId);
-        protection = new CachedIslandProtection(islandId, permissionsMap, playersMap, settingsMap, playerRegistry, defaultValues);
+        protection = new CachedIslandProtection(islandId, permissionsMap, playersMap, settingsMap, islandRegistry, playerRegistry, defaultValues);
         protection.sync();
         return protection;
     }
@@ -54,7 +56,7 @@ public class IslandProtectionModule implements IslandModule<IslandProtection> {
         IslandPermissionsMap permissionsMap = permissionsMapModule.get(islandId);
         ImmutableMap<IslandPermissions, MemberRank> defaultValues = permissionsMapModule.getDefaultValues();
         IslandSettingsMap settingsMap = settingsModule.get(islandId);
-        protection = new IslandProtectionRemote(islandId, permissionsMap, playersMap, settingsMap, playerRegistry, defaultValues, cloud);
+        protection = new IslandProtectionRemote(islandId, islandRegistry, permissionsMap, playersMap, settingsMap,  playerRegistry, defaultValues, cloud);
         protection.sync();
         return protection;
     }

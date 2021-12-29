@@ -6,8 +6,11 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
 import kr.cosmoislands.cosmoislands.api.protection.IslandPermissions;
 import kr.cosmoislands.cosmoislands.api.protection.IslandProtection;
+import kr.cosmoislands.cosmoislands.api.world.IslandWorld;
+import kr.cosmoislands.cosmoislands.api.world.IslandWorldHandler;
 import kr.cosmoislands.cosmoislands.bukkit.IslandPreconditions;
 import kr.cosmoislands.cosmoislands.bukkit.PlayerPreconditions;
+import kr.cosmoislands.cosmoislands.core.DebugLogger;
 import kr.cosmoislands.cosmoteleport.CosmoTeleport;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.World;
@@ -19,15 +22,13 @@ import java.util.UUID;
 
 public class ProtectionCommands {
 
-    public static void init(PaperCommandManager manager, CosmoTeleport teleport){
-        manager.registerCommand(new User(teleport));
+    public static void init(PaperCommandManager manager){
+        manager.registerCommand(new User());
     }
 
     @CommandAlias("섬")
     @RequiredArgsConstructor
     protected static class User extends BaseCommand {
-
-        private final CosmoTeleport teleportService;
 
         @Subcommand("잠금")
         public void lock(Player player){
@@ -48,26 +49,22 @@ public class ProtectionCommands {
             }).thenAccept(islandPreconditions -> {
                 if (islandPreconditions != null) {
                     islandPreconditions.isOwnerOf(player.getUniqueId()).thenAccept(isOwner->{
-
                         if (isOwner) {
                             IslandProtection protection = islandPreconditions.getIsland().getComponent(IslandProtection.class);
-                            protection.isPrivate().thenAccept(isPrivate->{
+                            IslandWorld islandWorld = islandPreconditions.getIsland().getComponent(IslandWorld.class);
+                            IslandWorldHandler worldHandler = islandWorld.getWorldHandler();
 
-                                if(isPrivate){
-                                    player.sendMessage("섬 잠금을 해제했습니다.");
-                                }else{
-                                    List<UUID> list = new ArrayList<>();
-                                    world.getPlayers().forEach(p->list.add(p.getUniqueId()));
-                                    for (UUID uuid : list) {
-                                        if (!protection.hasPermission(uuid, IslandPermissions.IGNORE_LOCK)) {
-                                            teleportService.getWarpService().getSpawnLocation().thenAccept(spawn->{
-                                                teleportService.warpPlayer(uuid, spawn);
-                                            });
-                                            player.sendMessage("섬을 잠구었습니다.");
-                                        }
+                            protection.isPrivate().thenAccept(isPrivate->{
+                                final boolean lockIsland = !isPrivate;
+
+                                protection.setPrivate(lockIsland).thenRun(()->{
+                                    DebugLogger.log("command lock:4" + isPrivate);
+                                    if(lockIsland){
+                                        player.sendMessage("섬 잠금을 해제했습니다.");
+                                    }else{
+                                        player.sendMessage("섬을 잠구었습니다.");
                                     }
-                                }
-                                protection.setPrivate(!isPrivate);
+                                });
                             });
                         } else {
                             player.sendMessage("섬장만 명령어를 실행할수 있습니다.");

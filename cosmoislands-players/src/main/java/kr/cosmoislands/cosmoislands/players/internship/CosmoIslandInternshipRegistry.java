@@ -15,9 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class RedisIslandInternshipRegistry implements IslandInternshipRegistry {
+public class CosmoIslandInternshipRegistry implements IslandInternshipRegistry {
 
     private static final String key = "cosmoislands:player:";
 
@@ -25,7 +26,7 @@ public class RedisIslandInternshipRegistry implements IslandInternshipRegistry {
     private final MySQLIslandInternshipDataModel model;
     private final RedisAsyncCommands<String, String> async;
 
-    public static RedisIslandInternshipRegistry build(String playersTable,
+    public static CosmoIslandInternshipRegistry build(String playersTable,
                                                       String islandTable,
                                                       MySQLDatabase database,
                                                       RedisAsyncCommands<String, String> async,
@@ -35,7 +36,7 @@ public class RedisIslandInternshipRegistry implements IslandInternshipRegistry {
                 "cosmoislands_players_max_interns",
                 islandTable);
         model.init();
-        return new RedisIslandInternshipRegistry(islandRegistry, model, async);
+        return new CosmoIslandInternshipRegistry(islandRegistry, model, async);
     }
 
     LoadingCache<UUID, IslandInternship> cache = CacheBuilder
@@ -43,7 +44,7 @@ public class RedisIslandInternshipRegistry implements IslandInternshipRegistry {
             .build(new CacheLoader<UUID, IslandInternship>() {
                 @Override
                 public IslandInternship load(UUID uuid) throws Exception {
-                    return new CosmoIslandInternship(uuid, registry, RedisIslandInternshipRegistry.this);
+                    return new CosmoIslandInternship(uuid, registry, CosmoIslandInternshipRegistry.this);
                 }
             });
 
@@ -55,7 +56,7 @@ public class RedisIslandInternshipRegistry implements IslandInternshipRegistry {
 
     @Override
     public CompletableFuture<List<Integer>> getHiredIslandIds(UUID uuid) {
-        async.smembers(islandsKey(uuid)).thenCompose(values->{
+        return async.smembers(islandsKey(uuid)).thenCompose(values->{
             if(values == null){
                 return model.getInternships(uuid).thenApply(list->{
                     async.sadd(islandsKey(uuid), list.stream().map(number -> Integer.toString(number)).toArray(String[]::new));
@@ -74,12 +75,25 @@ public class RedisIslandInternshipRegistry implements IslandInternshipRegistry {
                 return CompletableFuture.completedFuture(list);
             }
         }).toCompletableFuture();
-        return null;
     }
 
     @Override
     public CompletableFuture<Integer> getMaxInternships(UUID uuid) {
         return model.getMaxInternships(uuid);
+    }
+
+    @Override
+    public CompletableFuture<Void> update(UUID uuid) {
+        return async.del(islandsKey(uuid)).thenCompose(ignored -> {
+            return model.getInternships(uuid).thenAccept(list -> {
+                async.sadd(islandsKey(uuid), list.stream().map(Object::toString).toArray(String[]::new));
+            });
+        }).toCompletableFuture();
+    }
+
+    @Override
+    public CompletableFuture<Void> unload(UUID uuid) {
+        return null;
     }
 
     private static String islandsKey(UUID uuid){

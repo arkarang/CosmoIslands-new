@@ -3,6 +3,7 @@ package kr.cosmoislands.cosmoislands.protection;
 import com.google.common.collect.ImmutableMap;
 import kr.cosmoislands.cosmoislands.api.IslandCloud;
 import kr.cosmoislands.cosmoislands.api.IslandComponent;
+import kr.cosmoislands.cosmoislands.api.IslandRegistry;
 import kr.cosmoislands.cosmoislands.api.member.IslandPlayersMap;
 import kr.cosmoislands.cosmoislands.api.member.MemberRank;
 import kr.cosmoislands.cosmoislands.api.player.IslandPlayerRegistry;
@@ -19,13 +20,14 @@ public class IslandProtectionRemote extends CachedIslandProtection {
     private final IslandCloud cloud;
 
     IslandProtectionRemote(int islandId,
+                           IslandRegistry registry,
                            IslandPermissionsMap permissionsMap,
                            IslandPlayersMap playersMap,
                            IslandSettingsMap settingsMap,
                            IslandPlayerRegistry playerRegistry,
                            ImmutableMap<IslandPermissions, MemberRank> defaultValues,
                            IslandCloud cloud) {
-        super(islandId, permissionsMap, playersMap, settingsMap, playerRegistry, defaultValues);
+        super(islandId, permissionsMap, playersMap, settingsMap, registry, playerRegistry, defaultValues);
         this.cloud = cloud;
     }
 

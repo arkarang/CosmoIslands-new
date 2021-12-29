@@ -458,19 +458,11 @@ public class MemberCommands {
             }).thenAccept(island -> {
                 if (island != null) {
                     IslandPlayersMap playersMap = island.getComponent(IslandPlayersMap.class);
-                    playersMap.getMembers().thenAccept(map -> {
-                        List<UUID> list = new ArrayList<>();
-                        UUID owner = null;
-                        for (UUID uuid : map.keySet()) {
-                            if (map.get(uuid).getPriority() == MemberRank.INTERN.getPriority()) {
-                                list.add(uuid);
-                            }
-                            if (map.get(uuid) == MemberRank.OWNER) {
-                                owner = uuid;
-                            }
-                        }
-                        InternListGUI gui = new InternListGUI(owner, list, executor);
+                    val ownerFuture = playersMap.getOwner();
+                    playersMap.getInterns().thenCombine(ownerFuture, (list, owner) -> {
+                        InternListGUI gui = new InternListGUI(owner.getUniqueId(), list, executor);
                         executor.sync(() -> gui.openGUI(player));
+                        return null;
                     });
                 }
             });
@@ -512,7 +504,7 @@ public class MemberCommands {
                 return CompletableFuture.completedFuture(null);
             });
 
-            preconditions.getIsland().thenCombine(receiverUuidFuture, (island, receiverUuid) -> {
+            val execution = preconditions.getIsland().thenCombine(receiverUuidFuture, (island, receiverUuid) -> {
                 if (island == null) {
                     player.sendMessage("당신은 섬에 소속되어 있지 않습니다.");
                 } else {
@@ -566,7 +558,7 @@ public class MemberCommands {
                 CompletableFuture<Boolean> exceededPersonalMaxInterns = internship.getMaxInternships()
                         .thenCombine(internship.getHiredIslands(), (max, list) -> max <= list.size());
 
-                isMemberFuture.thenCombine(isInternFuture, (isMember, isIntern) -> {
+                val future = isMemberFuture.thenCombine(isInternFuture, (isMember, isIntern) -> {
                     if (isMember) {
                         player.sendMessage("해당 플레이어는 이미 섬의 섬원입니다.");
                         return false;
@@ -588,9 +580,9 @@ public class MemberCommands {
                                 receiverNameFuture.thenAccept(username -> {
                                     if (canInvite) {
                                         internInvitation.sender(player.getUniqueId()).invite(receiverUuid);
-                                        player.sendMessage("플레이어 " + username + "님에게 섬 초대 메세지를 보냈습니다.");
+                                        player.sendMessage("플레이어 " + username + "님에게 섬 알바 초대 메세지를 보냈습니다.");
                                     } else {
-                                        player.sendMessage("이미 " + username + "님에게 초대를 보냈습니다.");
+                                        player.sendMessage("이미 " + username + "님에게 알바 초대를 보냈습니다.");
                                     }
                                 });
                             });
@@ -652,7 +644,8 @@ public class MemberCommands {
                         if (isIntern) {
                             targetUniqueIdFuture.thenCombine(targetNameFuture, (uuid, username) -> {
                                 if (uuid != null) {
-                                    playersMap.removeIntern(uuid);
+                                    IslandPlayer islandPlayer = playerRegistry.get(uuid);
+                                    playersMap.removeIntern(islandPlayer);
                                     if (username != null) {
                                         chat.sendSystem(player.getName() + "님이 " + username + "님을 섬 알바에서 추방했습니다.");
                                         player.sendMessage(username + "님을 추방했습니다.");
@@ -697,15 +690,7 @@ public class MemberCommands {
                     if (island != null) {
                         IslandPlayersMap playersMap = island.getComponent(IslandPlayersMap.class);
                         CompletableFuture<Integer> maxInternsFuture = playersMap.getMaxInterns();
-                        CompletableFuture<Map<UUID, MemberRank>> internsFuture = playersMap.getMembers().thenApply(map -> {
-                            HashMap<UUID, MemberRank> newMap = new HashMap<>();
-                            for (UUID uuid : map.keySet()) {
-                                if (map.get(uuid).getPriority() == MemberRank.INTERN.getPriority()) {
-                                    newMap.put(uuid, map.get(uuid));
-                                }
-                            }
-                            return newMap;
-                        });
+                        CompletableFuture<List<UUID>> internsFuture = playersMap.getInterns();
                         return maxInternsFuture.thenCombine(internsFuture, (maxInterns, map) -> maxInterns > map.size());
                     }
                     return CompletableFuture.completedFuture(null);
@@ -716,7 +701,7 @@ public class MemberCommands {
                 CompletableFuture<Boolean> exceededPersonalMaxInterns = internship.getMaxInternships()
                         .thenCombine(internship.getHiredIslands(), (max, list) -> max <= list.size());
 
-                playerPreconditions.hasIsland().thenCombine(senderHasIslandFuture, (hasIsland, senderHasIsland) -> {
+                val execution = playerPreconditions.hasIsland().thenCombine(senderHasIslandFuture, (hasIsland, senderHasIsland) -> {
                     if (hasIsland) {
                         player.sendMessage("당신은 이미 소속된 섬이 존재합니다.");
                         return false;
@@ -739,16 +724,16 @@ public class MemberCommands {
                         player.sendMessage("해당 플레이어는 이미 소속 가능한 최대 섬 알바 수에 도달했습니다.");
                         return false;
                     }
-                    return hasSlot;
+                    return true;
                 }).thenCombine(memberRankFuture, (canExecute, hasRank) -> {
                     if (canExecute) {
                         if (hasRank) {
                             player.sendMessage("당신은 이미 해당 섬에 소속되어 있습니다.");
                         } else {
                             if (accepted) {
-                                memberInvitation.receiver(player.getUniqueId()).accept(sender);
+                                val future1 = internInvitation.receiver(player.getUniqueId()).accept(sender);
                             } else {
-                                memberInvitation.receiver(player.getUniqueId()).deny(sender);
+                                internInvitation.receiver(player.getUniqueId()).deny(sender);
                                 player.sendMessage("섬 알바 초대를 거절했습니다.");
                             }
                         }
@@ -790,10 +775,13 @@ public class MemberCommands {
                     if(isIntern != null){
                         if(isIntern){
                             IslandPlayersMap playersMap = island.getComponent(IslandPlayersMap.class);
-                            val usernameFuture = playersMap.getOwner().thenCompose(islandPlayer->{
-                                return playersModule.getUsername(islandPlayer.getUniqueId());
+                            IslandPlayer islandPlayer = playerRegistry.get(player.getUniqueId());
+
+                            val usernameFuture = playersMap.getOwner().thenCompose(islandOwner->{
+                                return playersModule.getUsername(islandOwner.getUniqueId());
                             });
-                            playersMap.removeIntern(player.getUniqueId())
+
+                            playersMap.removeIntern(islandPlayer)
                                     .thenCombine(usernameFuture, (ignored, username)->{
                                         player.sendMessage(username+"님의 섬 알바를 탈퇴했습니다.");
                                         return null;

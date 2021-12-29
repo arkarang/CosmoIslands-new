@@ -14,4 +14,6 @@ public interface IslandInternship {
 
     CompletableFuture<List<Island>> getHiredIslands();
 
+    CompletableFuture<Void> update();
+
 }

@@ -28,9 +28,9 @@ public interface IslandPlayersMap extends IslandComponent {
 
     CompletableFuture<Map<UUID, MemberRank>> getMembers();
 
-    CompletableFuture<Void> removeIntern(UUID uuid);
+    CompletableFuture<Void> removeIntern(IslandPlayer player);
 
-    CompletableFuture<Void> addIntern(UUID intern);
+    CompletableFuture<Void> addIntern(IslandPlayer player);
 
     CompletableFuture<List<UUID>> getInterns();
 
