@@ -181,6 +181,7 @@ nbdist/
 
 ### Maven ###
 target/
+pom.xml
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
